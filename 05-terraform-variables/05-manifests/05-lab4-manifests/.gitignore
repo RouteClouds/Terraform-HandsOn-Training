@@ -1,0 +1,6 @@
+# Ignore sensitive files
+secrets.tfvars
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl 
