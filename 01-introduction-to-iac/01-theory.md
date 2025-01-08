@@ -222,3 +222,4 @@ Infrastructure as Code is the practice of managing infrastructure through code a
 - [Official Terraform Documentation](https://www.terraform.io/docs)
 - [HashiCorp Learn](https://learn.hashicorp.com/terraform)
 - [Terraform Best Practices](https://www.terraform-best-practices.com/)
+- mazhar
