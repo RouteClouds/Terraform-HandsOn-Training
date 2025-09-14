@@ -4,30 +4,60 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0"
+      version = "~> 6.12.0"
     }
   }
 }
 
 # Default provider configuration
 provider "aws" {
-  region = var.aws_region
+  region = "us-east-1"
+  default_tags {
+    tags = {
+      Environment      = var.environment
+      Project          = var.project_name
+      ManagedBy        = "terraform"
+      TerraformVersion = "1.13.x"
+      ProviderVersion  = "6.12.x"
+      TrainingModule   = "04-terraform-providers-resources"
+    }
+  }
 }
 
 # Provider with static credentials (demo only)
 provider "aws" {
   alias  = "static"
-  region = var.aws_region
+  region = "us-east-1"
   access_key = var.aws_access_key
   secret_key = var.aws_secret_key
+  default_tags {
+    tags = {
+      Environment      = var.environment
+      Project          = var.project_name
+      ManagedBy        = "terraform"
+      TerraformVersion = "1.13.x"
+      ProviderVersion  = "6.12.x"
+      TrainingModule   = "04-terraform-providers-resources"
+    }
+  }
 }
 
 # Provider with assume role
 provider "aws" {
   alias  = "assumed_role"
-  region = var.aws_region
+  region = "us-east-1"
   assume_role {
     role_arn = var.assume_role_arn
+  }
+  default_tags {
+    tags = {
+      Environment      = var.environment
+      Project          = var.project_name
+      ManagedBy        = "terraform"
+      TerraformVersion = "1.13.x"
+      ProviderVersion  = "6.12.x"
+      TrainingModule   = "04-terraform-providers-resources"
+    }
   }
 }
 

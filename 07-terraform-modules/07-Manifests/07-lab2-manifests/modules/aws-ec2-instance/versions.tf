@@ -1,7 +1,7 @@
 # Custom EC2 Instance Module - Version Constraints
 
 terraform {
-  required_version = ">= 1.0.0"
+  required_version = "~> 1.13.0"
 
   required_providers {
     aws = {

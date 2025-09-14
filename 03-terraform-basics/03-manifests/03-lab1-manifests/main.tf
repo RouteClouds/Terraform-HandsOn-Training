@@ -11,22 +11,32 @@
 
 # Provider and Version Configuration
 terraform {
-  required_version = ">= 1.0.0"
+  required_version = "~> 1.13.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"      # Official AWS provider
-      version = "~> 4.0"             # Using version 4.x
+      version = "~> 6.12.0"             # Using version 4.x
     }
     random = {
       source  = "hashicorp/random"   # For generating unique names
-      version = "~> 3.0"
+      version = "~> 3.6.0"
     }
   }
 }
 
 # AWS Provider Configuration
 provider "aws" {
-  region = var.aws_region            # Region from variables
+  region = "us-east-1"            # Region from variables
+  default_tags {
+    tags = {
+      Environment      = var.environment
+      Project          = var.project_name
+      ManagedBy        = "terraform"
+      TerraformVersion = "1.13.x"
+      ProviderVersion  = "6.12.x"
+      TrainingModule   = "03-terraform-basics"
+    }
+  }
 }
 
 # Random String Generator

@@ -2,6 +2,11 @@ variable "aws_region" {
   description = "AWS region to deploy resources"
   type        = string
   default     = "us-east-1"
+
+  validation {
+    condition     = var.aws_region == "us-east-1"
+    error_message = "All training resources must be created in us-east-1 region for consistency."
+  }
 }
 
 variable "vpc_cidr" {
