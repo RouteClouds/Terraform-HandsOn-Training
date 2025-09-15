@@ -1,0 +1,313 @@
+# AWS Terraform Training - Core Terraform Operations
+# Lab 3.1: Core Workflow and Resource Lifecycle Management
+# File: terraform.tfvars.example - Example Variable Configurations
+
+# ============================================================================
+# COPY THIS FILE TO terraform.tfvars AND CUSTOMIZE FOR YOUR DEPLOYMENT
+# ============================================================================
+# cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your specific values
+
+# ============================================================================
+# PROJECT IDENTIFICATION (REQUIRED)
+# ============================================================================
+
+# Project and student identification
+project_name = "core-terraform-operations"
+environment  = "lab"
+student_name = "john-doe"  # REQUIRED: Replace with your name (alphanumeric and hyphens only)
+owner_email  = "john.doe@example.com"  # REQUIRED: Replace with your email
+cost_center  = "training"
+
+# ============================================================================
+# AWS CONFIGURATION
+# ============================================================================
+
+# AWS region for deployment
+aws_region = "us-east-1"
+
+# Availability zones (auto-detected if not specified)
+availability_zones = ["us-east-1a", "us-east-1b"]
+
+# ============================================================================
+# NETWORKING CONFIGURATION
+# ============================================================================
+
+# VPC and subnet configuration
+vpc_cidr             = "10.0.0.0/16"
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
+
+# Security configuration
+allowed_ssh_cidrs  = ["0.0.0.0/0"]  # Restrict this in production
+allowed_http_cidrs = ["0.0.0.0/0"]
+
+# ============================================================================
+# COMPUTE CONFIGURATION
+# ============================================================================
+
+# EC2 instance configuration
+instance_type  = "t3.micro"  # Cost-optimized for lab
+instance_count = 2
+key_pair_name  = ""  # Optional: specify your AWS key pair name for SSH access
+
+# Monitoring
+enable_detailed_monitoring = false  # Keep costs low for lab
+
+# ============================================================================
+# LOAD BALANCER CONFIGURATION
+# ============================================================================
+
+# Application Load Balancer
+enable_load_balancer = true
+load_balancer_type   = "application"
+
+# ============================================================================
+# STORAGE CONFIGURATION
+# ============================================================================
+
+# S3 bucket configuration
+create_s3_bucket      = true
+s3_bucket_versioning  = true
+s3_lifecycle_enabled  = true
+
+# ============================================================================
+# MONITORING AND LOGGING
+# ============================================================================
+
+# CloudWatch configuration
+monitoring_enabled    = true
+log_retention_days    = 7  # Short retention for cost optimization
+enable_vpc_flow_logs  = false  # Disabled for cost optimization
+
+# ============================================================================
+# SECURITY CONFIGURATION
+# ============================================================================
+
+# Security settings
+data_classification = "internal"
+backup_required     = false  # Disabled for lab environment
+encryption_enabled  = true
+
+# ============================================================================
+# COST OPTIMIZATION
+# ============================================================================
+
+# Auto-shutdown configuration
+auto_shutdown_enabled   = true
+auto_shutdown_hours     = 4  # Automatically shutdown after 4 hours
+cost_optimization_level = "aggressive"
+
+# ============================================================================
+# FEATURE TOGGLES
+# ============================================================================
+
+# Optional features (disabled for cost optimization)
+enable_nat_gateway    = false  # Saves ~$45/month
+enable_bastion_host   = false
+enable_auto_scaling   = false
+enable_rds           = false
+
+# Testing features
+enable_dependency_testing  = true
+enable_lifecycle_testing   = true
+enable_performance_testing = true
+
+# ============================================================================
+# ADVANCED CONFIGURATION
+# ============================================================================
+
+# Resource naming
+resource_prefix = "lab"
+
+# Custom tags (optional)
+custom_tags = {
+  # Department = "Engineering"
+  # Team       = "Infrastructure"
+  # Purpose    = "Training"
+}
+
+# ============================================================================
+# EXAMPLE CONFIGURATIONS FOR DIFFERENT SCENARIOS
+# ============================================================================
+
+# -----------------------------------------------------------------------------
+# SCENARIO 1: BASIC LAB SETUP (DEFAULT)
+# -----------------------------------------------------------------------------
+# Use the values above for a basic lab setup with minimal costs
+
+# -----------------------------------------------------------------------------
+# SCENARIO 2: ENHANCED MONITORING SETUP
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for enhanced monitoring:
+
+# monitoring_enabled = true
+# enable_vpc_flow_logs = true
+# log_retention_days = 14
+# enable_detailed_monitoring = true
+
+# -----------------------------------------------------------------------------
+# SCENARIO 3: PRODUCTION-LIKE ENVIRONMENT
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for production-like testing:
+
+# environment = "production"
+# instance_type = "t3.small"
+# instance_count = 3
+# enable_nat_gateway = true
+# backup_required = true
+# data_classification = "confidential"
+# cost_optimization_level = "moderate"
+# auto_shutdown_enabled = false
+
+# -----------------------------------------------------------------------------
+# SCENARIO 4: MINIMAL COST CONFIGURATION
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for absolute minimal cost:
+
+# instance_count = 1
+# enable_load_balancer = false
+# create_s3_bucket = false
+# monitoring_enabled = false
+# auto_shutdown_hours = 1
+# cost_optimization_level = "aggressive"
+
+# -----------------------------------------------------------------------------
+# SCENARIO 5: DEPENDENCY TESTING FOCUS
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for dependency testing:
+
+# enable_dependency_testing = true
+# enable_lifecycle_testing = true
+# instance_count = 3
+# enable_load_balancer = true
+# create_s3_bucket = true
+# monitoring_enabled = true
+
+# -----------------------------------------------------------------------------
+# SCENARIO 6: PERFORMANCE TESTING SETUP
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for performance testing:
+
+# enable_performance_testing = true
+# instance_type = "t3.small"
+# instance_count = 5
+# enable_load_balancer = true
+# enable_detailed_monitoring = true
+
+# ============================================================================
+# COST ESTIMATION GUIDE
+# ============================================================================
+
+# Based on the configuration above, estimated AWS costs:
+#
+# BASIC CONFIGURATION (default values):
+# - EC2 instances (2 × t3.micro): ~$0.0232/hour = ~$0.56/day
+# - Application Load Balancer: ~$0.0225/hour = ~$0.54/day
+# - S3 bucket: ~$0.023/GB/month (minimal usage)
+# - CloudWatch logs: ~$0.50/GB ingested (minimal for lab)
+# - Total estimated: ~$1.10/day (with auto-shutdown after 4 hours: ~$0.46/day)
+#
+# ENHANCED MONITORING CONFIGURATION:
+# - Additional CloudWatch costs: ~$0.10/day
+# - VPC Flow Logs: ~$0.05/day
+# - Total estimated: ~$1.25/day
+#
+# PRODUCTION-LIKE CONFIGURATION:
+# - EC2 instances (3 × t3.small): ~$0.0464/hour × 3 = ~$3.34/day
+# - NAT Gateway: ~$1.08/day
+# - Enhanced monitoring: ~$0.20/day
+# - Total estimated: ~$4.62/day
+#
+# MINIMAL COST CONFIGURATION:
+# - EC2 instance (1 × t3.micro): ~$0.0116/hour = ~$0.28/day
+# - No load balancer: $0
+# - No S3 bucket: $0
+# - Total estimated: ~$0.28/day (with auto-shutdown after 1 hour: ~$0.012/day)
+
+# ============================================================================
+# TERRAFORM OPERATIONS TESTING GUIDE
+# ============================================================================
+
+# After applying this configuration, test core Terraform operations:
+
+# 1. INITIALIZATION AND PLANNING:
+# terraform init
+# terraform validate
+# terraform plan
+# terraform plan -out=lab.tfplan
+
+# 2. APPLY OPERATIONS:
+# terraform apply
+# terraform apply lab.tfplan
+# terraform apply -target=aws_instance.web[0]
+
+# 3. STATE MANAGEMENT:
+# terraform state list
+# terraform state show aws_instance.web[0]
+# terraform refresh
+
+# 4. MODIFICATION TESTING:
+# # Change instance_count from 2 to 3
+# terraform plan
+# terraform apply
+
+# 5. DEPENDENCY TESTING:
+# terraform graph | dot -Tpng > dependencies.png
+# terraform apply -target=aws_vpc.main
+# terraform apply -target=aws_instance.web
+
+# 6. PERFORMANCE TESTING:
+# time terraform plan
+# terraform apply -parallelism=20
+
+# 7. ERROR RECOVERY:
+# # Simulate error by manually terminating an instance
+# terraform plan  # Shows drift
+# terraform apply  # Recreates instance
+
+# 8. CLEANUP:
+# terraform destroy -target=aws_instance.web
+# terraform destroy
+
+# ============================================================================
+# TROUBLESHOOTING COMMON ISSUES
+# ============================================================================
+
+# Issue: "Instance failed to launch"
+# Solution: Check if the specified key pair exists in the region
+
+# Issue: "Security group rules conflict"
+# Solution: Ensure CIDR blocks are valid and don't overlap
+
+# Issue: "Load balancer health checks failing"
+# Solution: Verify security groups allow ALB to reach instances on port 80
+
+# Issue: "S3 bucket name already exists"
+# Solution: Use a different student_name or add more randomness
+
+# Issue: "Insufficient capacity"
+# Solution: Try a different availability zone or instance type
+
+# Issue: "State lock timeout"
+# Solution: Check if another terraform operation is running
+
+# ============================================================================
+# VALIDATION CHECKLIST
+# ============================================================================
+
+# After successful deployment, verify:
+# ✅ VPC and subnets created in correct AZs
+# ✅ Internet gateway attached and routes configured
+# ✅ Security groups allow appropriate access
+# ✅ EC2 instances running and accessible
+# ✅ Load balancer healthy and distributing traffic
+# ✅ S3 bucket created with proper configuration
+# ✅ CloudWatch logs receiving data
+# ✅ All resources properly tagged
+# ✅ Auto-shutdown configured (if enabled)
+
+# Test commands:
+# curl http://$(terraform output -raw compute_resources | jq -r '.instances[0].public_ip')/
+# aws ec2 describe-instances --filters "Name=tag:Project,Values=core-terraform-operations"
+# aws elbv2 describe-target-health --target-group-arn $(terraform output -raw load_balancer_configuration | jq -r '.target_group.arn')
