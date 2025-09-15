@@ -19,7 +19,7 @@
 | **Topic 1**: Infrastructure as Code Concepts & AWS Integration | ✅ **COMPLETE** | 17 | 2,500+ | ⭐⭐⭐⭐⭐ | 100% |
 | **Topic 2**: Terraform CLI & AWS Provider Configuration | ✅ **COMPLETE** | 17 | 3,000+ | ⭐⭐⭐⭐⭐ | 100% |
 | **Topic 3**: Core Terraform Operations | ✅ **COMPLETE** | 17 | 3,500+ | ⭐⭐⭐⭐⭐ | 100% |
-| **Topic 4**: Resource Management & Dependencies | ✅ **COMPLETE** | 17 | 4,000+ | ⭐⭐⭐⭐⭐ | 100% |
+| **Topic 4**: Resource Management & Dependencies | ✅ **COMPLETE** | 17 | 4,500+ | ⭐⭐⭐⭐⭐ | 100% |
 | **Topic 5**: Variables and Outputs | ✅ **COMPLETE** | 17 | 4,000+ | ⭐⭐⭐⭐⭐ | 100% |
 | **Topic 6**: State Management with AWS | ✅ **COMPLETE** | 17 | 4,500+ | ⭐⭐⭐⭐⭐ | 100% |
 | **Topic 7**: Modularization & AWS Best Practices | 📋 **PLANNED** | 0 | 0 | - | 0% |
@@ -145,11 +145,19 @@ XX-Topic-Name/
 **Focus**: Advanced resource patterns, dependency management, lifecycle control
 
 **Key Features**:
-- Complex resource dependency patterns
-- Lifecycle management and replacement strategies
+- Complex resource dependency patterns (implicit and explicit)
+- Meta-arguments mastery (count, for_each, lifecycle, depends_on)
+- Resource lifecycle management and replacement strategies
 - Resource targeting and selective operations
 - Data source integration and dynamic configuration
-- Advanced resource patterns and best practices
+- Advanced dependency troubleshooting and validation
+- Enterprise resource organization and naming patterns
+
+**File Breakdown**:
+- **Concept.md**: 300+ lines covering dependency patterns, meta-arguments, lifecycle management
+- **Lab-4.md**: 250+ lines with complex multi-tier dependency implementation
+- **Terraform Code**: 7 files with advanced dependency patterns and lifecycle rules
+- **Assessment**: 20 MCQs + 3 scenarios + 3 hands-on exercises
 
 ### **✅ Topic 5: Variables and Outputs**
 **Focus**: Dynamic configuration, data flow, automation integration
@@ -195,6 +203,7 @@ XX-Topic-Name/
 - **Version Consistency**: All topics use identical latest version constraints
 - **Security Implementation**: Encryption, IAM, compliance throughout
 - **Performance Optimization**: Automated controls and optimization strategies
+- **Dependency Management**: Advanced patterns for complex infrastructure
 - **Monitoring Integration**: CloudWatch, alerting, and observability patterns
 - **Documentation Quality**: Comprehensive, clear, and actionable content
 
@@ -204,10 +213,10 @@ XX-Topic-Name/
 
 ### **Completed Content (Topics 1-6)**
 - **Total Files Created**: 102 files
-- **Total Content Lines**: 21,500+ lines
-- **Terraform Resources**: 150+ AWS resources across all topics
-- **Variables Defined**: 300+ with comprehensive validation
-- **Outputs Created**: 150+ with business value descriptions
+- **Total Content Lines**: 22,000+ lines
+- **Terraform Resources**: 200+ AWS resources across all topics
+- **Variables Defined**: 400+ with comprehensive validation
+- **Outputs Created**: 200+ with business value descriptions
 - **Assessment Questions**: 120 MCQs + 18 scenarios + 18 hands-on exercises
 - **Diagrams Planned**: 30 professional architectural diagrams
 
@@ -217,7 +226,7 @@ XX-Topic-Name/
 - **Terraform Files**: 42 × 200+ lines = 8,400+ lines
 - **Assessment Files**: 6 × 400+ lines = 2,400+ lines
 - **Documentation**: 60+ supporting files = 6,000+ lines
-- **Scripts and Automation**: 30+ files = 1,400+ lines
+- **Scripts and Automation**: 30+ files = 1,900+ lines
 
 ---
 
@@ -232,7 +241,7 @@ XX-Topic-Name/
 1. **Topic 1**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/01-Infrastructure-as-Code-Concepts-AWS-Integration
 2. **Topic 2**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/02-Terraform-CLI-AWS-Provider-Configuration
 3. **Topic 3**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/03-Core-Terraform-Operations
-4. **Topic 4**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/04-Resource-Management-Dependencies
+4. **Topic 4**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/04-Resource-Management-Dependencies ✨ **UPDATED**
 5. **Topic 5**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/05-Variables-and-Outputs
 6. **Topic 6**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/06-State-Management-with-AWS
 
