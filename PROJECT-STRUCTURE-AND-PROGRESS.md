@@ -20,7 +20,7 @@
 | **Topic 2**: Terraform CLI & AWS Provider Configuration | ✅ **COMPLETE** | 17 | 3,000+ | ⭐⭐⭐⭐⭐ | Tools & Setup |
 | **Topic 3**: Core Terraform Operations | ✅ **COMPLETE** | 17 | 3,500+ | ⭐⭐⭐⭐⭐ | Workflow Mastery |
 | **Topic 4**: Resource Management & Dependencies | ✅ **COMPLETE** | 17 | 4,500+ | ⭐⭐⭐⭐⭐ | Advanced Patterns |
-| **Topic 5**: Variables and Outputs | ✅ **COMPLETE** | 17 | 4,000+ | ⭐⭐⭐⭐⭐ | Dynamic Configuration |
+| **Topic 5**: Variables and Outputs | ✅ **COMPLETE** | 17 | 5,000+ | ⭐⭐⭐⭐⭐ | Dynamic Configuration |
 | **Topic 6**: State Management with AWS | ✅ **COMPLETE** | 17 | 4,500+ | ⭐⭐⭐⭐⭐ | Enterprise State |
 | **Topic 7**: Modularization & AWS Best Practices | 📋 **PLANNED** | 0 | 0 | - | Code Organization |
 | **Topic 8**: Advanced State Management | 📋 **PLANNED** | 0 | 0 | - | State Mastery |
@@ -136,11 +136,11 @@
 ## 📊 **Comprehensive Statistics**
 
 ### **Content Volume (Topics 1-6)**
-- **Total Files**: 102 files across 6 complete topics
-- **Total Lines**: 22,000+ lines of enterprise-grade content
-- **Terraform Resources**: 200+ AWS resources with complex dependencies
-- **Variables**: 400+ with comprehensive validation and business context
-- **Outputs**: 200+ with business value and automation integration
+- **Total Files**: 119 files across 6 complete topics
+- **Total Lines**: 27,000+ lines of enterprise-grade content
+- **Terraform Resources**: 250+ AWS resources with complex dependencies and variable patterns
+- **Variables**: 500+ with comprehensive validation and business context
+- **Outputs**: 300+ with business value and automation integration
 - **Assessments**: 120 MCQs + 18 scenarios + 18 hands-on exercises
 
 ### **Quality Metrics**
@@ -169,8 +169,8 @@
 1. **Topic 1**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/01-Infrastructure-as-Code-Concepts-AWS-Integration
 2. **Topic 2**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/02-Terraform-CLI-AWS-Provider-Configuration
 3. **Topic 3**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/03-Core-Terraform-Operations
-4. **Topic 4**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/04-Resource-Management-Dependencies ✨ **UPDATED**
-5. **Topic 5**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/05-Variables-and-Outputs
+4. **Topic 4**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/04-Resource-Management-Dependencies
+5. **Topic 5**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/05-Variables-and-Outputs ✨ **NEWLY COMPLETED**
 6. **Topic 6**: https://github.com/RouteClouds/Terraform-HandsOn-Training/tree/feature/complete-content-overhaul-v2/06-State-Management-with-AWS
 
 ---

@@ -1,0 +1,335 @@
+# AWS Terraform Training - Variables and Outputs
+# Lab 5.1: Advanced Variable Management and Output Patterns
+# File: terraform.tfvars.example - Example Variable Configurations for Different Scenarios
+
+# ============================================================================
+# BASIC PROJECT CONFIGURATION
+# ============================================================================
+
+# Project identification
+project_name = "terraform-training"
+environment  = "development"  # Options: development, staging, production, disaster-recovery
+owner_email  = "devops@company.com"
+cost_center  = "ENGINEERING-001"
+
+# AWS configuration
+aws_region           = "us-east-1"
+secondary_aws_region = "us-west-2"
+enable_multi_region  = false
+
+# ============================================================================
+# COMPREHENSIVE INFRASTRUCTURE CONFIGURATION
+# ============================================================================
+
+infrastructure_config = {
+  # Environment settings
+  environment = {
+    name           = "development"
+    tier           = "basic"  # Options: basic, standard, premium, enterprise
+    region         = "us-east-1"
+    multi_az       = true
+    backup_enabled = true
+  }
+  
+  # Compute configuration
+  compute = {
+    web_tier = {
+      instance_type    = "t3.micro"
+      min_capacity     = 1
+      max_capacity     = 3
+      desired_capacity = 1
+      ami_id          = null  # Will use latest Amazon Linux 2023
+      key_pair_name   = null  # Optional: specify if you have a key pair
+    }
+    
+    app_tier = {
+      instance_type    = "t3.small"
+      min_capacity     = 1
+      max_capacity     = 2
+      desired_capacity = 1
+      ami_id          = null  # Will use latest Amazon Linux 2023
+      key_pair_name   = null  # Optional: specify if you have a key pair
+    }
+  }
+  
+  # Network configuration
+  networking = {
+    vpc_cidr             = "10.0.0.0/16"
+    availability_zones   = ["us-east-1a", "us-east-1b"]
+    public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+    private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
+    enable_nat_gateway   = true
+    enable_vpn_gateway   = false
+    enable_flow_logs     = true
+  }
+  
+  # Database configuration
+  database = {
+    engine                = "mysql"
+    engine_version        = "8.0"
+    instance_class        = "db.t3.micro"
+    allocated_storage     = 20
+    max_allocated_storage = 100
+    backup_retention      = 7
+    backup_window         = "03:00-04:00"
+    maintenance_window    = "sun:04:00-sun:05:00"
+    multi_az             = false  # Set to true for production
+    encryption_enabled    = true
+    deletion_protection   = false  # Set to true for production
+  }
+  
+  # Storage configuration
+  storage = {
+    s3_buckets = {
+      assets = {
+        versioning_enabled  = true
+        encryption_enabled  = true
+        lifecycle_enabled   = true
+        public_access_block = true
+      }
+      
+      logs = {
+        versioning_enabled  = false
+        encryption_enabled  = true
+        lifecycle_enabled   = true
+        public_access_block = true
+      }
+    }
+    
+    efs_file_systems = {
+      shared_storage = {
+        performance_mode = "generalPurpose"
+        throughput_mode  = "bursting"
+        encrypted       = true
+      }
+    }
+  }
+  
+  # Monitoring configuration
+  monitoring = {
+    enable_detailed_monitoring = false  # Set to true for production
+    log_retention_days         = 7      # Increase for production
+    enable_cloudtrail         = true
+    enable_config             = false   # Set to true for compliance
+    enable_guardduty          = false   # Set to true for production
+    alert_email               = "alerts@company.com"
+    dashboard_enabled         = true
+  }
+  
+  # Security configuration
+  security = {
+    enable_waf              = false  # Set to true for production
+    enable_shield           = false  # Set to true for production
+    ssl_policy             = "ELBSecurityPolicy-TLS-1-2-2017-01"
+    enable_secrets_manager  = true
+    enable_parameter_store  = true
+    kms_key_rotation       = true
+  }
+}
+
+# ============================================================================
+# SENSITIVE VARIABLES (EXAMPLE VALUES - REPLACE WITH ACTUAL)
+# ============================================================================
+
+# Database credentials
+database_credentials = {
+  username = "admin"
+  password = ""  # Leave empty to auto-generate, or provide a secure password
+}
+
+# API credentials (example - replace with actual values)
+api_credentials = {
+  # external_service = {
+  #   api_key    = "your-api-key-here"
+  #   secret_key = "your-secret-key-here"
+  #   endpoint   = "https://api.external-service.com"
+  #   region     = "us-east-1"
+  #   timeout    = 30
+  # }
+}
+
+# SSL certificates (example - replace with actual domains)
+ssl_certificates = {
+  # main_cert = {
+  #   domain_name                = "example.com"
+  #   subject_alternative_names  = ["www.example.com", "api.example.com"]
+  #   validation_method         = "DNS"
+  #   key_algorithm            = "RSA_2048"
+  # }
+}
+
+# ============================================================================
+# FEATURE FLAGS AND OPTIONAL CONFIGURATIONS
+# ============================================================================
+
+# Feature toggles
+enable_backup                   = true
+enable_monitoring              = true
+enable_auto_shutdown           = true   # Good for development
+enable_vpc_endpoints           = false  # Enable for enhanced security
+enable_cross_region_backup     = false  # Enable for disaster recovery
+enable_compliance_monitoring   = false  # Enable for compliance requirements
+
+# ============================================================================
+# TAGGING CONFIGURATION
+# ============================================================================
+
+# Default tags applied to all resources
+default_tags = {
+  Department = "Engineering"
+  Team       = "DevOps"
+  Purpose    = "Training"
+}
+
+# Additional tags for specific use cases
+additional_tags = {
+  TrainingModule = "Variables-and-Outputs"
+  Instructor     = "DevOps-Team"
+  StudentGroup   = "Batch-2025-Q1"
+}
+
+# Compliance and governance
+data_classification  = "internal"  # Options: public, internal, confidential, restricted
+compliance_framework = ""          # Options: "", soc2, pci-dss, hipaa, gdpr, iso27001, fedramp
+data_retention_period = "2555"     # Days (7 years default)
+
+# ============================================================================
+# PROVIDER CONFIGURATION
+# ============================================================================
+
+# AWS provider settings
+aws_max_retries      = 3
+skip_aws_validations = false  # Set to true for faster development
+
+# Custom endpoints (for VPC endpoints or testing)
+custom_aws_endpoints = null
+# custom_aws_endpoints = {
+#   s3  = "https://s3.us-east-1.amazonaws.com"
+#   ec2 = "https://ec2.us-east-1.amazonaws.com"
+# }
+
+# IAM role assumption (for cross-account access)
+assume_role_arn         = null
+assume_role_external_id = null
+assume_role_duration    = "3600"
+assume_role_policy      = null
+
+# Multi-region role assumption
+secondary_assume_role_arn       = null
+global_services_assume_role_arn = null
+
+# Tag management
+ignore_tag_keys         = ["LastModified", "DeploymentTime"]
+ignore_tag_key_prefixes = ["aws:", "kubernetes.io/"]
+
+# ============================================================================
+# SCENARIO-SPECIFIC CONFIGURATIONS
+# ============================================================================
+
+# DEVELOPMENT SCENARIO
+# Uncomment and modify for development environment
+# environment = "development"
+# infrastructure_config = {
+#   environment = {
+#     name = "development"
+#     tier = "basic"
+#     region = "us-east-1"
+#     multi_az = false
+#     backup_enabled = true
+#   }
+#   compute = {
+#     web_tier = {
+#       instance_type = "t3.micro"
+#       min_capacity = 1
+#       max_capacity = 2
+#       desired_capacity = 1
+#     }
+#     app_tier = {
+#       instance_type = "t3.micro"
+#       min_capacity = 1
+#       max_capacity = 1
+#       desired_capacity = 1
+#     }
+#   }
+#   # ... rest of configuration
+# }
+
+# STAGING SCENARIO
+# Uncomment and modify for staging environment
+# environment = "staging"
+# infrastructure_config = {
+#   environment = {
+#     name = "staging"
+#     tier = "standard"
+#     region = "us-east-1"
+#     multi_az = true
+#     backup_enabled = true
+#   }
+#   compute = {
+#     web_tier = {
+#       instance_type = "t3.small"
+#       min_capacity = 2
+#       max_capacity = 4
+#       desired_capacity = 2
+#     }
+#     app_tier = {
+#       instance_type = "t3.medium"
+#       min_capacity = 2
+#       max_capacity = 3
+#       desired_capacity = 2
+#     }
+#   }
+#   # ... rest of configuration
+# }
+
+# PRODUCTION SCENARIO
+# Uncomment and modify for production environment
+# environment = "production"
+# enable_multi_region = true
+# infrastructure_config = {
+#   environment = {
+#     name = "production"
+#     tier = "enterprise"
+#     region = "us-east-1"
+#     multi_az = true
+#     backup_enabled = true
+#   }
+#   compute = {
+#     web_tier = {
+#       instance_type = "t3.large"
+#       min_capacity = 3
+#       max_capacity = 10
+#       desired_capacity = 3
+#     }
+#     app_tier = {
+#       instance_type = "t3.xlarge"
+#       min_capacity = 3
+#       max_capacity = 8
+#       desired_capacity = 3
+#     }
+#   }
+#   database = {
+#     engine = "mysql"
+#     engine_version = "8.0"
+#     instance_class = "db.r5.large"
+#     allocated_storage = 100
+#     backup_retention = 30
+#     multi_az = true
+#     encryption_enabled = true
+#     deletion_protection = true
+#   }
+#   security = {
+#     enable_waf = true
+#     enable_shield = true
+#     ssl_policy = "ELBSecurityPolicy-FS-1-2-Res-2019-08"
+#   }
+#   monitoring = {
+#     enable_detailed_monitoring = true
+#     log_retention_days = 90
+#     enable_cloudtrail = true
+#     enable_config = true
+#     enable_guardduty = true
+#   }
+# }
+# compliance_framework = "soc2"
+# data_classification = "confidential"
