@@ -1,0 +1,340 @@
+# =============================================================================
+# AWS Terraform Training - Topic 7: Modules and Module Development
+# Example Terraform Variables Configuration
+# =============================================================================
+# 
+# Instructions:
+# 1. Copy this file to terraform.tfvars
+# 2. Uncomment and modify values as needed for your environment
+# 3. Never commit terraform.tfvars to version control
+# 4. Use different variable files for different environments
+# 
+# =============================================================================
+
+# =============================================================================
+# Project and Environment Configuration
+# =============================================================================
+
+# Project name for resource naming and tagging
+project_name = "terraform-modules-training"
+
+# Environment name (development, staging, production)
+environment = "development"
+
+# Owner of the resources for accountability
+owner = "terraform-training-team"
+
+# Cost center for billing and resource allocation
+cost_center = "training-infrastructure"
+
+# =============================================================================
+# AWS Configuration
+# =============================================================================
+
+# Primary AWS region for resource deployment
+aws_region = "us-east-1"
+
+# Secondary AWS region for multi-region module testing
+secondary_region = "us-west-2"
+
+# =============================================================================
+# Cross-Account Access Configuration (Optional)
+# =============================================================================
+
+# ARN of the IAM role to assume for cross-account access
+# Uncomment and set if using cross-account deployment
+# assume_role_arn = "arn:aws:iam::123456789012:role/TerraformModulesRole"
+
+# External ID for assume role operations (security best practice)
+# Uncomment and set if using cross-account deployment with external ID
+# external_id = "unique-external-id-for-modules"
+
+# =============================================================================
+# Module Development Configuration
+# =============================================================================
+
+# Enable module development mode with additional features
+module_development_mode = true
+
+# Enable module testing infrastructure
+enable_module_testing = true
+
+# URL of the private module registry (optional)
+# Leave null to use local registry simulation
+# module_registry_url = "https://registry.example.com"
+
+# Module version being developed
+module_version = "1.0.0"
+
+# =============================================================================
+# Network Configuration for Module Testing
+# =============================================================================
+
+# CIDR block for the VPC
+vpc_cidr = "10.0.0.0/16"
+
+# List of availability zones to use
+availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+# =============================================================================
+# Module Configuration Examples
+# =============================================================================
+
+# Configuration for different module examples
+module_examples = {
+  vpc_module = {
+    enabled           = true
+    instance_type     = "t3.micro"
+    min_size         = 1
+    max_size         = 3
+    desired_capacity = 2
+    enable_monitoring = false
+    tags = {
+      ModuleType = "networking"
+      Purpose    = "vpc-example"
+    }
+  }
+  compute_module = {
+    enabled           = true
+    instance_type     = "t3.small"
+    min_size         = 1
+    max_size         = 5
+    desired_capacity = 2
+    enable_monitoring = true
+    tags = {
+      ModuleType = "compute"
+      Purpose    = "ec2-example"
+    }
+  }
+  storage_module = {
+    enabled           = true
+    instance_type     = "t3.medium"
+    min_size         = 1
+    max_size         = 2
+    desired_capacity = 1
+    enable_monitoring = true
+    tags = {
+      ModuleType = "storage"
+      Purpose    = "s3-rds-example"
+    }
+  }
+}
+
+# =============================================================================
+# Module Testing Configuration
+# =============================================================================
+
+# Configuration for module testing environments
+testing_environments = {
+  unit_testing = {
+    enabled              = true
+    auto_destroy        = true
+    test_duration_hours = 1
+    test_scenarios      = ["basic_functionality", "error_handling"]
+    notification_email  = "dev-team@example.com"
+  }
+  integration_testing = {
+    enabled              = true
+    auto_destroy        = true
+    test_duration_hours = 2
+    test_scenarios      = ["module_composition", "cross_module_dependencies"]
+    notification_email  = "qa-team@example.com"
+  }
+  performance_testing = {
+    enabled              = false
+    auto_destroy        = true
+    test_duration_hours = 4
+    test_scenarios      = ["load_testing", "stress_testing", "scalability"]
+    notification_email  = "performance-team@example.com"
+  }
+}
+
+# =============================================================================
+# Security Configuration
+# =============================================================================
+
+# Enable security scanning for modules
+enable_security_scanning = true
+
+# Enable compliance checking for modules
+enable_compliance_checking = true
+
+# Cron schedule for security scanning (daily at 2 AM)
+security_scan_schedule = "0 2 * * *"
+
+# =============================================================================
+# Monitoring and Alerting
+# =============================================================================
+
+# Enable detailed CloudWatch monitoring
+enable_detailed_monitoring = false
+
+# Email address for notifications and alerts
+notification_email = "admin@example.com"
+
+# =============================================================================
+# Cost Management
+# =============================================================================
+
+# Enable cost allocation tags for billing analysis
+enable_cost_allocation_tags = true
+
+# Monthly budget limit in USD for cost monitoring
+budget_limit = 200
+
+# =============================================================================
+# Feature Flags
+# =============================================================================
+
+# Enable multi-region module testing
+enable_multi_region_testing = false
+
+# Enable module versioning and tagging
+enable_module_versioning = true
+
+# Enable automated module testing
+enable_automated_testing = true
+
+# =============================================================================
+# Environment-Specific Examples
+# =============================================================================
+
+# Development Environment Example
+# Uncomment and modify for development environment
+# project_name = "terraform-modules-dev"
+# environment = "development"
+# aws_region = "us-east-1"
+# enable_detailed_monitoring = false
+# budget_limit = 100
+# enable_multi_region_testing = false
+
+# Staging Environment Example
+# Uncomment and modify for staging environment
+# project_name = "terraform-modules-staging"
+# environment = "staging"
+# aws_region = "us-east-1"
+# secondary_region = "us-west-2"
+# enable_detailed_monitoring = true
+# budget_limit = 300
+# enable_multi_region_testing = true
+# enable_security_scanning = true
+
+# Production Environment Example
+# Uncomment and modify for production environment
+# project_name = "terraform-modules-prod"
+# environment = "production"
+# aws_region = "us-east-1"
+# secondary_region = "us-west-2"
+# enable_detailed_monitoring = true
+# budget_limit = 1000
+# enable_multi_region_testing = true
+# enable_security_scanning = true
+# enable_compliance_checking = true
+# security_scan_schedule = "0 1 * * *"  # Daily at 1 AM
+
+# =============================================================================
+# Module Development Workflow Examples
+# =============================================================================
+
+# Basic Module Development Workflow
+# module_development_mode = true
+# enable_module_testing = true
+# enable_automated_testing = true
+# module_version = "0.1.0"
+
+# Advanced Module Development Workflow
+# module_development_mode = true
+# enable_module_testing = true
+# enable_automated_testing = true
+# enable_security_scanning = true
+# enable_compliance_checking = true
+# enable_multi_region_testing = true
+# module_version = "1.0.0"
+
+# Module Publishing Workflow
+# module_development_mode = false
+# enable_module_testing = true
+# enable_automated_testing = true
+# enable_security_scanning = true
+# enable_compliance_checking = true
+# module_registry_url = "https://registry.terraform.io"
+# module_version = "1.0.0"
+
+# =============================================================================
+# Testing Scenarios Examples
+# =============================================================================
+
+# Minimal Testing Configuration
+# testing_environments = {
+#   unit_testing = {
+#     enabled              = true
+#     auto_destroy        = true
+#     test_duration_hours = 1
+#     test_scenarios      = ["basic_functionality"]
+#     notification_email  = "dev@example.com"
+#   }
+# }
+
+# Comprehensive Testing Configuration
+# testing_environments = {
+#   unit_testing = {
+#     enabled              = true
+#     auto_destroy        = true
+#     test_duration_hours = 1
+#     test_scenarios      = ["basic_functionality", "error_handling", "edge_cases"]
+#     notification_email  = "dev@example.com"
+#   }
+#   integration_testing = {
+#     enabled              = true
+#     auto_destroy        = true
+#     test_duration_hours = 2
+#     test_scenarios      = ["module_composition", "cross_module_dependencies", "data_flow"]
+#     notification_email  = "qa@example.com"
+#   }
+#   performance_testing = {
+#     enabled              = true
+#     auto_destroy        = true
+#     test_duration_hours = 4
+#     test_scenarios      = ["load_testing", "stress_testing", "scalability", "resource_limits"]
+#     notification_email  = "performance@example.com"
+#   }
+#   security_testing = {
+#     enabled              = true
+#     auto_destroy        = true
+#     test_duration_hours = 2
+#     test_scenarios      = ["vulnerability_scanning", "compliance_checking", "access_control"]
+#     notification_email  = "security@example.com"
+#   }
+# }
+
+# =============================================================================
+# Module Registry Configuration Examples
+# =============================================================================
+
+# Private Registry Configuration
+# module_registry_url = null  # Use local simulation
+# enable_module_testing = true
+
+# Terraform Cloud Registry
+# module_registry_url = "https://app.terraform.io"
+
+# Custom Private Registry
+# module_registry_url = "https://modules.company.com"
+
+# GitHub Registry
+# module_registry_url = "https://github.com/company/terraform-modules"
+
+# =============================================================================
+# Security Notes:
+# 
+# 1. Never commit terraform.tfvars to version control
+# 2. Use environment variables for sensitive values:
+#    export TF_VAR_external_id="your-secret-external-id"
+# 3. Consider using AWS Secrets Manager for sensitive configuration
+# 4. Use IAM roles instead of access keys when possible
+# 5. Enable MFA for production environments
+# 6. Regularly rotate external IDs and access credentials
+# 7. Use separate AWS accounts for different environments
+# 8. Implement least privilege access for module development
+# 
+# =============================================================================
