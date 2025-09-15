@@ -401,14 +401,138 @@ Upon successful completion of this assessment, you demonstrate:
 - [Lifecycle Management](https://developer.hashicorp.com/terraform/language/meta-arguments/lifecycle)
 - [Dependency Management Best Practices](https://developer.hashicorp.com/terraform/language/resources/behavior#resource-dependencies)
 
+## 🆕 **2025 Advanced Resource Management Scenarios**
+
+### **Scenario 9: Advanced for_each with Complex Filtering**
+**Difficulty**: Expert
+**Time**: 25 minutes
+
+Your organization needs to deploy a complex multi-tier application with dynamic server configurations based on environment and business rules.
+
+**Requirements**:
+- Implement advanced for_each with complex expressions and filtering
+- Use conditional logic to enable/disable resources based on environment
+- Implement preconditions and postconditions for resource validation
+- Create dynamic resource keys with meaningful naming conventions
+
+**Deliverables**:
+- Advanced for_each configuration with filtering
+- Conditional resource creation logic
+- Validation rules with preconditions/postconditions
+- Dynamic output generation for deployed resources
+
+**Evaluation Criteria**:
+- for_each complexity and filtering (4 points)
+- Conditional logic implementation (3 points)
+- Validation rules (2 points)
+- Output organization (1 point)
+
+### **Scenario 10: Cross-Module Dependencies with Remote State**
+**Difficulty**: Expert
+**Time**: 30 minutes
+
+Design a multi-module architecture where application modules depend on network and security modules through remote state.
+
+**Requirements**:
+- Configure remote state data sources for cross-module dependencies
+- Implement proper dependency management between modules
+- Create conditional resources based on remote state outputs
+- Establish error handling for missing remote state data
+
+**Deliverables**:
+- Remote state data source configurations
+- Cross-module dependency implementation
+- Conditional resource creation based on remote state
+- Error handling and validation mechanisms
+
+**Evaluation Criteria**:
+- Remote state configuration (3 points)
+- Dependency management (3 points)
+- Conditional logic (2 points)
+- Error handling (2 points)
+
+### **Scenario 11: Performance Optimization for Large-Scale Deployments**
+**Difficulty**: Advanced
+**Time**: 20 minutes
+
+Optimize a Terraform configuration that manages 100+ resources for maximum performance and reliability.
+
+**Requirements**:
+- Implement resource batching strategies
+- Optimize dependency graph for parallel execution
+- Configure advanced resource targeting
+- Create performance monitoring and analysis tools
+
+**Deliverables**:
+- Resource batching implementation
+- Optimized dependency graph
+- Resource targeting strategies
+- Performance monitoring scripts
+
+**Evaluation Criteria**:
+- Batching strategy (3 points)
+- Graph optimization (3 points)
+- Targeting implementation (2 points)
+- Monitoring tools (2 points)
+
+### **Scenario 12: Advanced Lifecycle Management with Business Rules**
+**Difficulty**: Expert
+**Time**: 25 minutes
+
+Implement sophisticated lifecycle management that adapts to business requirements and environment-specific rules.
+
+**Requirements**:
+- Configure environment-specific lifecycle rules
+- Implement replace_triggered_by for coordinated updates
+- Create business rule validation with preconditions
+- Establish disaster recovery patterns with lifecycle management
+
+**Deliverables**:
+- Environment-specific lifecycle configurations
+- Coordinated update mechanisms
+- Business rule validation
+- Disaster recovery lifecycle patterns
+
+**Evaluation Criteria**:
+- Lifecycle complexity (4 points)
+- Business rule integration (3 points)
+- Coordinated updates (2 points)
+- Disaster recovery (1 point)
+
+## 📊 **Enhanced Assessment Summary**
+
+### **Total Points**: 120 points
+- **Core Resource Management (1-8)**: 80 points
+- **Advanced 2025 Patterns (9-12)**: 40 points
+
+### **Grading Scale**:
+- **Expert (108-120 points)**: Mastery of all patterns including cutting-edge features
+- **Advanced (96-107 points)**: Strong understanding with minor gaps in advanced features
+- **Intermediate (84-95 points)**: Good grasp of core concepts, needs practice with modern features
+- **Beginner (72-83 points)**: Basic understanding, requires additional study
+- **Needs Review (<72 points)**: Fundamental concepts need reinforcement
+
+### **2025 Skills Validation**:
+- ✅ **Core Dependencies**: Implicit and explicit dependency mastery
+- ✅ **Meta-Arguments**: count, for_each, lifecycle, depends_on expertise
+- ✅ **Resource Lifecycle**: Creation, updates, deletion patterns
+- ✅ **Performance Optimization**: Parallelism and targeting strategies
+- ✅ **Advanced Patterns**: Complex for_each with filtering and conditions
+- ✅ **Cross-Module Integration**: Remote state and module dependencies
+- ✅ **Enterprise Governance**: Business rules and validation patterns
+- ✅ **Modern Features**: Terraform 1.13 advanced capabilities
+
 ### **Practice Labs**
 - Complete Lab 4.2: Advanced Resource Patterns
 - Explore Lab 5.1: Variables and Outputs with Dependencies
 - Practice Lab 6.1: State Management with Complex Dependencies
+- **🆕 New**: Lab 4.3: Advanced for_each and Conditional Resources
+- **🆕 New**: Lab 4.4: Cross-Module Dependencies and Performance Optimization
 
 ---
 
-**Assessment Version**: 4.0  
-**Last Updated**: January 2025  
-**Aligned with**: Terraform ~> 1.13.0, AWS Provider ~> 6.12.0  
+**Assessment Version**: 5.0
+**Last Updated**: September 2025
+**Aligned with**: Terraform ~> 1.13.0, AWS Provider ~> 6.12.0
 **Review Date**: Quarterly updates recommended
+**2025 Features**: Advanced for_each, Cross-Module Dependencies, Performance Optimization

@@ -1097,11 +1097,366 @@ Upon successful completion, you should have:
 - **Enterprise lifecycle management** with create_before_destroy and prevent_destroy
 - **Dependency resolution** for complex real-world scenarios
 
+## 🆕 **Bonus Section: Advanced Resource Management Patterns (2025)**
+
+### **Part 6: Dynamic Resource Scaling with Advanced Meta-Arguments (20 minutes)**
+
+**Step 1: Advanced for_each with Complex Expressions**
+```bash
+# Create advanced server configuration
+cat > advanced-servers.tf << 'EOF'
+# Advanced for_each with complex expressions and filtering
+variable "server_configurations" {
+  description = "Complex server configurations"
+  type = list(object({
+    environment   = string
+    tier         = string
+    instance_type = string
+    os_type      = string
+    enabled      = bool
+    az_index     = number
+  }))
+  default = [
+    {
+      environment   = "production"
+      tier         = "web"
+      instance_type = "t3.medium"
+      os_type      = "amazon-linux"
+      enabled      = true
+      az_index     = 0
+    },
+    {
+      environment   = "production"
+      tier         = "app"
+      instance_type = "t3.large"
+      os_type      = "amazon-linux"
+      enabled      = true
+      az_index     = 1
+    },
+    {
+      environment   = "staging"
+      tier         = "web"
+      instance_type = "t3.small"
+      os_type      = "ubuntu"
+      enabled      = false
+      az_index     = 0
+    }
+  ]
+}
+
+variable "allowed_environments" {
+  description = "Allowed environments for deployment"
+  type        = list(string)
+  default     = ["production", "staging"]
+}
+
+# Advanced for_each with filtering and complex keys
+resource "aws_instance" "advanced_servers" {
+  for_each = {
+    for idx, config in var.server_configurations :
+    "${config.environment}-${config.tier}-${idx}" => config
+    if config.enabled && contains(var.allowed_environments, config.environment)
+  }
+
+  ami           = data.aws_ami.amazon_linux.id
+  instance_type = each.value.instance_type
+  subnet_id     = aws_subnet.private[each.value.az_index].id
+
+  vpc_security_group_ids = [
+    each.value.tier == "web" ? aws_security_group.web.id : aws_security_group.app.id
+  ]
+
+  # Advanced lifecycle management with conditions
+  lifecycle {
+    create_before_destroy = true
+    precondition {
+      condition     = can(regex("^(t3|m5|c5)", each.value.instance_type))
+      error_message = "Only modern instance types (t3, m5, c5) are allowed."
+    }
+    postcondition {
+      condition     = self.instance_state == "running"
+      error_message = "Instance must be in running state after creation."
+    }
+  }
+
+  tags = merge(local.common_tags, {
+    Name        = each.key
+    Environment = each.value.environment
+    Tier        = each.value.tier
+    OS          = each.value.os_type
+  })
+}
+
+# Output the filtered configurations
+output "deployed_servers" {
+  description = "Successfully deployed server configurations"
+  value = {
+    for k, v in aws_instance.advanced_servers : k => {
+      instance_id = v.id
+      private_ip  = v.private_ip
+      state       = v.instance_state
+    }
+  }
+}
+EOF
+
+# Plan and apply the advanced configuration
+terraform plan -target=aws_instance.advanced_servers
+terraform apply -target=aws_instance.advanced_servers -auto-approve
+```
+
+**Step 2: Conditional Dependencies with Dynamic Expressions**
+```bash
+# Create conditional database setup
+cat > conditional-database.tf << 'EOF'
+variable "enable_database" {
+  description = "Enable database creation"
+  type        = bool
+  default     = true
+}
+
+variable "enable_read_replica" {
+  description = "Enable read replica creation"
+  type        = bool
+  default     = false
+}
+
+# Conditional primary database
+resource "aws_db_instance" "primary" {
+  count = var.enable_database ? 1 : 0
+
+  identifier = "${local.name_prefix}-primary"
+  engine     = "mysql"
+  engine_version = "8.0"
+  instance_class = "db.t3.micro"
+
+  allocated_storage     = 20
+  max_allocated_storage = 100
+  storage_encrypted     = true
+
+  db_name  = "appdb"
+  username = "admin"
+  password = random_password.db_password.result
+
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [aws_security_group.database.id]
+
+  backup_retention_period = var.environment == "production" ? 7 : 1
+  backup_window          = "03:00-04:00"
+  maintenance_window     = "sun:04:00-sun:05:00"
+
+  skip_final_snapshot = var.environment != "production"
+
+  depends_on = [
+    aws_db_subnet_group.main,
+    aws_security_group.database
+  ]
+
+  lifecycle {
+    prevent_destroy = var.environment == "production"
+  }
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-primary-db"
+    Type = "primary"
+  })
+}
+
+# Conditional read replica
+resource "aws_db_instance" "replica" {
+  count = var.enable_database && var.enable_read_replica ? 1 : 0
+
+  identifier             = "${local.name_prefix}-replica"
+  replicate_source_db    = aws_db_instance.primary[0].identifier
+  instance_class         = "db.t3.micro"
+
+  auto_minor_version_upgrade = false
+  backup_retention_period    = 0
+
+  # Implicit dependency on primary database
+  depends_on = [aws_db_instance.primary]
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-replica-db"
+    Type = "replica"
+  })
+}
+
+# Database connection outputs
+output "database_endpoints" {
+  description = "Database connection endpoints"
+  value = {
+    primary = var.enable_database ? aws_db_instance.primary[0].endpoint : null
+    replica = var.enable_database && var.enable_read_replica ? aws_db_instance.replica[0].endpoint : null
+  }
+  sensitive = false
+}
+EOF
+
+# Test conditional database creation
+terraform plan -var="enable_database=true" -var="enable_read_replica=true"
+terraform apply -var="enable_database=true" -var="enable_read_replica=false" -auto-approve
+```
+
+### **Part 7: Advanced Resource Targeting and Performance Optimization (15 minutes)**
+
+**Step 1: Advanced Resource Targeting**
+```bash
+# Test advanced targeting patterns
+echo "🎯 Testing Advanced Resource Targeting Patterns"
+
+# Target specific resource instances
+terraform plan -target="aws_instance.advanced_servers[\"production-web-0\"]"
+
+# Target entire resource collections
+terraform plan -target="aws_instance.advanced_servers"
+
+# Target multiple resources
+terraform plan -target="aws_instance.advanced_servers" -target="aws_db_instance.primary"
+
+# Refresh specific resources only
+terraform refresh -target="aws_instance.advanced_servers"
+
+echo "✅ Resource targeting patterns tested"
+```
+
+**Step 2: Performance Monitoring and Optimization**
+```bash
+# Create performance monitoring script
+cat > monitor-resource-performance.sh << 'EOF'
+#!/bin/bash
+# Resource Management Performance Monitoring
+
+echo "📊 Terraform Resource Performance Analysis"
+echo "=========================================="
+
+# Enable detailed logging
+export TF_LOG=INFO
+export TF_LOG_PATH="./resource-performance.log"
+
+echo "⏱️  Timing Resource Operations:"
+
+echo "1. Resource Graph Analysis:"
+terraform graph | wc -l
+echo "   Total nodes in dependency graph"
+
+echo "2. Resource Count Analysis:"
+terraform state list | wc -l
+echo "   Total resources in state"
+
+echo "3. Plan Performance:"
+time terraform plan -out=perf-test.tfplan
+
+echo "4. Resource Dependencies:"
+terraform graph -type=plan | grep -c "\->"
+echo "   Total dependency relationships"
+
+echo "5. State Size Analysis:"
+ls -lh terraform.tfstate | awk '{print $5}'
+echo "   Current state file size"
+
+echo "📈 Performance Recommendations:"
+echo "- Optimize resource dependencies"
+echo "- Use resource targeting for large deployments"
+echo "- Consider module organization for better performance"
+
+# Cleanup
+rm -f perf-test.tfplan
+EOF
+
+chmod +x monitor-resource-performance.sh
+./monitor-resource-performance.sh
+```
+
+### **Part 8: Cross-Module Dependencies and Remote State (15 minutes)**
+
+**Step 1: Simulate Cross-Module Dependencies**
+```bash
+# Create remote state simulation
+cat > remote-state-example.tf << 'EOF'
+# Simulate remote state data source
+data "terraform_remote_state" "network" {
+  backend = "local"
+  config = {
+    path = "./network-state.tfstate"
+  }
+}
+
+# Create mock network state file
+resource "local_file" "network_state" {
+  filename = "./network-state.tfstate"
+  content = jsonencode({
+    version = 4
+    terraform_version = "1.13.0"
+    outputs = {
+      vpc_id = {
+        value = aws_vpc.main.id
+      }
+      private_subnet_ids = {
+        value = aws_subnet.private[*].id
+      }
+      app_security_group_id = {
+        value = aws_security_group.app.id
+      }
+    }
+  })
+}
+
+# Resource with cross-module dependencies
+resource "aws_instance" "cross_module_app" {
+  count = 2
+
+  ami           = data.aws_ami.amazon_linux.id
+  instance_type = "t3.micro"
+  subnet_id     = aws_subnet.private[count.index].id
+
+  vpc_security_group_ids = [aws_security_group.app.id]
+
+  # Simulate dependency on network module
+  depends_on = [local_file.network_state]
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-cross-module-${count.index}"
+    Type = "cross-module-dependency"
+  })
+}
+EOF
+
+# Apply cross-module example
+terraform plan -target=aws_instance.cross_module_app
+terraform apply -target=aws_instance.cross_module_app -auto-approve
+```
+
+### **Validation and Testing**
+
+**Test All Advanced Features**:
+```bash
+# Test 1: Advanced for_each patterns
+terraform state list | grep "advanced_servers"
+
+# Test 2: Conditional resource creation
+terraform state list | grep "db_instance"
+
+# Test 3: Resource targeting
+terraform plan -target="aws_instance.advanced_servers" | grep "Plan:"
+
+# Test 4: Performance monitoring
+./monitor-resource-performance.sh | grep "Total"
+
+# Test 5: Cross-module dependencies
+terraform state list | grep "cross_module"
+
+echo "🎉 All advanced resource management patterns tested successfully!"
+```
+
 ### **Next Steps:**
 1. **Explore Terraform modules** for code organization and reusability
 2. **Implement remote state management** for team collaboration
 3. **Add automated testing** with dependency validation frameworks
 4. **Practice advanced patterns** with conditional resources and dynamic blocks
+5. **🆕 Implement advanced for_each patterns** with complex filtering
+6. **🆕 Master conditional dependencies** for dynamic infrastructure
+7. **🆕 Optimize resource performance** for large-scale deployments
 
 ---
 
