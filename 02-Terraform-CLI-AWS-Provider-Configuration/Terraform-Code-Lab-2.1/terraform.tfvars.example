@@ -1,0 +1,311 @@
+# AWS Terraform Training - Terraform CLI & AWS Provider Configuration
+# Lab 2.1: Advanced Provider Configuration and Authentication
+# File: terraform.tfvars.example - Example Variable Configurations
+
+# ============================================================================
+# COPY THIS FILE TO terraform.tfvars AND CUSTOMIZE FOR YOUR DEPLOYMENT
+# ============================================================================
+# cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your specific values
+
+# ============================================================================
+# PROJECT IDENTIFICATION (REQUIRED)
+# ============================================================================
+
+# Project and student identification
+project_name = "terraform-cli-aws-provider"
+environment  = "development"
+student_name = "john-doe"  # REQUIRED: Replace with your name (alphanumeric and hyphens only)
+owner_email  = "john.doe@example.com"  # REQUIRED: Replace with your email
+cost_center  = "training"
+
+# ============================================================================
+# AWS REGION CONFIGURATION
+# ============================================================================
+
+# Primary region for main resources
+aws_region = "us-east-1"
+
+# Secondary region for multi-region testing
+secondary_region = "us-west-2"
+
+# Disaster recovery region
+disaster_recovery_region = "us-west-1"
+
+# Availability zones (will be auto-detected if not specified)
+availability_zones = ["us-east-1a", "us-east-1b"]
+
+# ============================================================================
+# AWS AUTHENTICATION CONFIGURATION
+# ============================================================================
+
+# Primary authentication method
+aws_profile = "default"  # Change to your AWS CLI profile name
+auth_method = "aws-profile"  # Options: aws-profile, environment-variables, iam-role, aws-sso, instance-profile, assume-role
+
+# AWS CLI configuration files (default locations)
+shared_config_files      = ["~/.aws/config"]
+shared_credentials_files = ["~/.aws/credentials"]
+
+# ============================================================================
+# ASSUME ROLE CONFIGURATION (OPTIONAL)
+# ============================================================================
+
+# Leave empty if not using assume role
+assume_role_arn    = ""  # Example: "arn:aws:iam::123456789012:role/TerraformExecutionRole"
+session_name       = "terraform-cli-lab-session"
+external_id        = ""  # External ID for enhanced security
+session_duration   = 3600  # 1 hour in seconds
+assume_role_policy = ""  # Optional policy to apply during assume role
+
+# ============================================================================
+# ENVIRONMENT-SPECIFIC AUTHENTICATION
+# ============================================================================
+
+# Development environment
+development_profile  = "development"
+development_role_arn = ""  # Example: "arn:aws:iam::111111111111:role/DevelopmentRole"
+
+# Staging environment
+staging_profile  = "staging"
+staging_role_arn = ""  # Example: "arn:aws:iam::222222222222:role/StagingRole"
+
+# Production environment
+production_profile  = "production"
+production_role_arn = ""  # Example: "arn:aws:iam::333333333333:role/ProductionRole"
+
+# ============================================================================
+# PROVIDER PERFORMANCE CONFIGURATION
+# ============================================================================
+
+# AWS API retry configuration
+max_retries = 10
+retry_mode  = "adaptive"  # Options: standard, adaptive
+
+# ============================================================================
+# FEATURE TOGGLES
+# ============================================================================
+
+# Resource creation toggles
+create_test_resources = true
+enable_multi_region   = true
+enable_cross_account  = false
+
+# Testing and validation toggles
+enable_provider_validation  = true
+enable_authentication_test  = true
+enable_multi_region_test    = true
+
+# ============================================================================
+# SECURITY AND COMPLIANCE CONFIGURATION
+# ============================================================================
+
+# Security settings
+encryption_enabled   = true
+monitoring_enabled   = true
+backup_required      = false
+
+# Compliance settings
+data_classification   = "internal"  # Options: public, internal, confidential, restricted
+compliance_framework  = "training"  # Options: training, development, sox, pci, hipaa, gdpr
+
+# ============================================================================
+# COST OPTIMIZATION CONFIGURATION
+# ============================================================================
+
+# Auto-shutdown configuration
+auto_shutdown_enabled = true
+auto_shutdown_hours   = 4  # Automatically shutdown after 4 hours
+cost_optimization_level = "aggressive"  # Options: none, basic, moderate, aggressive
+
+# ============================================================================
+# ADVANCED CONFIGURATION (OPTIONAL)
+# ============================================================================
+
+# Custom AWS service endpoints (for testing or private deployments)
+custom_endpoints = {
+  # s3  = "https://s3.custom-endpoint.com"
+  # ec2 = "https://ec2.custom-endpoint.com"
+  # iam = "https://iam.custom-endpoint.com"
+}
+
+# Additional provider tags
+provider_tags = {
+  # Department = "Engineering"
+  # Team       = "Infrastructure"
+  # Purpose    = "Training"
+}
+
+# Tag ignore patterns
+ignore_tag_keys = [
+  "LastAccessed",
+  "TemporaryTag",
+  "AutoGenerated"
+]
+
+ignore_tag_key_prefixes = [
+  "aws:",
+  "kubernetes.io/",
+  "eks:",
+  "auto-"
+]
+
+# ============================================================================
+# WORKSPACE AND STATE CONFIGURATION
+# ============================================================================
+
+# Workspace configuration
+workspace_name = ""  # Leave empty to use default workspace naming
+
+# State backend configuration (will be auto-generated if empty)
+state_bucket_name     = ""  # Will be auto-generated: terraform-state-{student_name}-{random}
+state_dynamodb_table  = ""  # Will be auto-generated: terraform-locks-{student_name}-{random}
+state_encryption_enabled = true
+
+# ============================================================================
+# TESTING CONFIGURATION
+# ============================================================================
+
+# Test resource prefix to avoid naming conflicts
+test_resource_prefix = "terraform-cli-test"
+
+# ============================================================================
+# EXAMPLE CONFIGURATIONS FOR DIFFERENT SCENARIOS
+# ============================================================================
+
+# -----------------------------------------------------------------------------
+# SCENARIO 1: BASIC SINGLE-REGION SETUP (DEFAULT)
+# -----------------------------------------------------------------------------
+# Use the values above for a basic single-region setup with default authentication
+
+# -----------------------------------------------------------------------------
+# SCENARIO 2: MULTI-REGION DEVELOPMENT ENVIRONMENT
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for multi-region development:
+
+# environment = "development"
+# enable_multi_region = true
+# enable_multi_region_test = true
+# aws_profile = "development"
+# development_profile = "development"
+# cost_optimization_level = "aggressive"
+# auto_shutdown_hours = 2
+
+# -----------------------------------------------------------------------------
+# SCENARIO 3: PRODUCTION-LIKE ENVIRONMENT WITH ASSUME ROLE
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for production-like testing:
+
+# environment = "production"
+# auth_method = "assume-role"
+# assume_role_arn = "arn:aws:iam::123456789012:role/TerraformProductionRole"
+# session_duration = 3600
+# external_id = "your-external-id"
+# encryption_enabled = true
+# monitoring_enabled = true
+# backup_required = true
+# data_classification = "confidential"
+# compliance_framework = "sox"
+# cost_optimization_level = "balanced"
+# auto_shutdown_enabled = false
+
+# -----------------------------------------------------------------------------
+# SCENARIO 4: AWS SSO INTEGRATION
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for AWS SSO:
+
+# auth_method = "aws-sso"
+# aws_profile = "sso-terraform"
+# development_profile = "sso-development"
+# staging_profile = "sso-staging"
+# production_profile = "sso-production"
+
+# -----------------------------------------------------------------------------
+# SCENARIO 5: CROSS-ACCOUNT DEPLOYMENT
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for cross-account deployment:
+
+# enable_cross_account = true
+# development_role_arn = "arn:aws:iam::111111111111:role/TerraformDevelopmentRole"
+# staging_role_arn = "arn:aws:iam::222222222222:role/TerraformStagingRole"
+# production_role_arn = "arn:aws:iam::333333333333:role/TerraformProductionRole"
+# external_id = "cross-account-external-id"
+
+# -----------------------------------------------------------------------------
+# SCENARIO 6: MINIMAL COST CONFIGURATION
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for minimal cost:
+
+# create_test_resources = true
+# enable_multi_region = false
+# enable_cross_account = false
+# auto_shutdown_enabled = true
+# auto_shutdown_hours = 1
+# cost_optimization_level = "aggressive"
+# monitoring_enabled = false
+# backup_required = false
+
+# ============================================================================
+# COST ESTIMATION GUIDE
+# ============================================================================
+
+# Based on the configuration above, estimated AWS costs:
+#
+# BASIC CONFIGURATION (default values):
+# - S3 bucket: ~$0.023/GB/month (minimal usage)
+# - DynamoDB table: ~$0.25/month (pay-per-request)
+# - CloudWatch logs: ~$0.50/GB ingested (minimal for lab)
+# - Lambda function: ~$0.20/1M requests (minimal usage)
+# - Total estimated: ~$1.00-$2.00/month
+#
+# MULTI-REGION CONFIGURATION:
+# - Additional S3 buckets: ~$0.023/GB/month per region
+# - Additional CloudWatch logs: ~$0.50/GB per region
+# - Total estimated: ~$2.00-$4.00/month
+#
+# PRODUCTION-LIKE CONFIGURATION:
+# - Enhanced monitoring: ~$1.00/month
+# - Additional security features: ~$0.50/month
+# - Total estimated: ~$3.00-$6.00/month
+#
+# COST OPTIMIZATION NOTES:
+# 1. Enable auto_shutdown_enabled = true to minimize costs
+# 2. Use pay-per-request DynamoDB billing
+# 3. Set short CloudWatch log retention periods
+# 4. Disable unnecessary features for basic testing
+# 5. Always run 'terraform destroy' after completing labs
+
+# ============================================================================
+# VALIDATION AND TESTING NOTES
+# ============================================================================
+
+# After applying this configuration, validate:
+# 1. Provider authentication: terraform providers
+# 2. AWS identity: aws sts get-caller-identity --profile {your-profile}
+# 3. Multi-region access: Check resources in both regions
+# 4. State backend: Verify S3 bucket and DynamoDB table creation
+# 5. Workspace functionality: terraform workspace list
+# 6. Resource tagging: Check default tags are applied
+# 7. Cost optimization: Verify auto-shutdown configuration
+
+# ============================================================================
+# TROUBLESHOOTING COMMON ISSUES
+# ============================================================================
+
+# Issue: "No valid credential sources found"
+# Solution: Verify AWS CLI configuration: aws configure list --profile {profile-name}
+
+# Issue: "Access Denied" errors
+# Solution: Check IAM permissions for the authenticated user/role
+
+# Issue: "Region not supported"
+# Solution: Ensure all regions in configuration are valid AWS regions
+
+# Issue: "Workspace already exists"
+# Solution: Use terraform workspace select {workspace-name} instead of new
+
+# Issue: "State bucket already exists"
+# Solution: Use a different student_name or manually specify bucket names
+
+# Issue: "DynamoDB table already exists"
+# Solution: Use a different student_name or manually specify table names
