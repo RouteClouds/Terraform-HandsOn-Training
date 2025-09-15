@@ -933,11 +933,225 @@ Upon successful completion, you should have:
 - **Remote state management** with encryption and locking
 - **Development workflow automation** with scripts and validation
 
+## 🆕 **Bonus Section: 2025 Modern Authentication Patterns**
+
+### **Part 7: AWS SSO CLI v2 Setup (15 minutes)**
+
+**Step 1: Configure AWS SSO**
+```bash
+# Configure AWS SSO (if available in your organization)
+aws configure sso
+# Follow prompts:
+# SSO session name: terraform-enterprise
+# SSO start URL: https://your-org.awsapps.com/start
+# SSO region: us-east-1
+
+# Login to SSO
+aws sso login --profile terraform-enterprise
+
+# Test SSO authentication
+aws sts get-caller-identity --profile terraform-enterprise
+```
+
+**Step 2: Update Provider for SSO**
+```bash
+# Create SSO-enabled provider configuration
+cat > providers-sso.tf << 'EOF'
+provider "aws" {
+  alias   = "sso"
+  profile = "terraform-enterprise"
+  region  = var.aws_region
+
+  default_tags {
+    tags = {
+      ManagedBy    = "terraform"
+      SSOSession   = "terraform-enterprise"
+      AuthMethod   = "AWS-SSO"
+      Environment  = var.environment
+    }
+  }
+}
+EOF
+
+# Test SSO provider
+terraform plan -var="use_sso=true"
+```
+
+### **Part 8: OIDC GitHub Actions Setup (20 minutes)**
+
+**Step 1: Create OIDC Provider**
+```bash
+# Create OIDC identity provider for GitHub Actions
+cat > github-oidc.tf << 'EOF'
+resource "aws_iam_openid_connect_provider" "github" {
+  url = "https://token.actions.githubusercontent.com"
+
+  client_id_list = [
+    "sts.amazonaws.com",
+  ]
+
+  thumbprint_list = [
+    "6938fd4d98bab03faadb97b34396831e3780aea1",
+    "1c58a3a8518e8759bf075b76b750d4f2df264fcd"
+  ]
+
+  tags = {
+    Name        = "GitHubActions-OIDC"
+    Purpose     = "Terraform-CI-CD"
+    Environment = var.environment
+  }
+}
+
+resource "aws_iam_role" "github_actions" {
+  name = "GitHubActions-Terraform-Role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.github.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
+          }
+          StringLike = {
+            "token.actions.githubusercontent.com:sub" = "repo:your-org/your-repo:*"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions" {
+  role       = aws_iam_role.github_actions.name
+  policy_arn = "arn:aws:iam::aws:policy/PowerUserAccess"
+}
+EOF
+
+# Apply OIDC configuration
+terraform apply -target=aws_iam_openid_connect_provider.github
+terraform apply -target=aws_iam_role.github_actions
+```
+
+**Step 2: Create GitHub Actions Workflow**
+```bash
+# Create GitHub Actions workflow
+mkdir -p .github/workflows
+cat > .github/workflows/terraform.yml << 'EOF'
+name: Terraform CI/CD with OIDC
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-session-name: terraform-github-actions
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ~1.13.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -no-color
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve
+EOF
+```
+
+### **Part 9: Terraform Cloud Integration (10 minutes)**
+
+**Step 1: Configure Terraform Cloud Backend**
+```bash
+# Create Terraform Cloud configuration
+cat > terraform-cloud.tf << 'EOF'
+terraform {
+  cloud {
+    organization = "your-organization"
+
+    workspaces {
+      name = "aws-cli-lab-${var.environment}"
+    }
+  }
+}
+EOF
+
+# Login to Terraform Cloud
+terraform login
+
+# Initialize with Terraform Cloud
+terraform init
+```
+
+**Step 2: Set Environment Variables in Terraform Cloud**
+```bash
+# Set variables via CLI (or use web interface)
+terraform workspace select aws-cli-lab-development
+
+# Variables to set in Terraform Cloud:
+# AWS_ACCESS_KEY_ID (environment variable, sensitive)
+# AWS_SECRET_ACCESS_KEY (environment variable, sensitive)
+# TF_VAR_aws_region (terraform variable)
+# TF_VAR_environment (terraform variable)
+```
+
+### **Validation and Testing**
+
+**Test All Authentication Methods**:
+```bash
+# Test 1: Profile-based authentication
+AWS_PROFILE=terraform-dev terraform plan
+
+# Test 2: SSO authentication
+aws sso login --profile terraform-enterprise
+AWS_PROFILE=terraform-enterprise terraform plan
+
+# Test 3: Assume role authentication
+terraform plan -var="use_assume_role=true"
+
+# Test 4: Environment variables
+export AWS_ACCESS_KEY_ID="your-key"
+export AWS_SECRET_ACCESS_KEY="your-secret"
+terraform plan
+
+# Test 5: Terraform Cloud
+terraform plan  # Uses Terraform Cloud backend
+```
+
 ### **Next Steps:**
 1. **Explore advanced provider features** like assume role and cross-account access
 2. **Implement CI/CD integration** with the configured authentication methods
 3. **Add monitoring and alerting** for infrastructure changes
 4. **Practice troubleshooting** common configuration issues
+5. **🆕 Set up AWS SSO CLI v2** for enterprise authentication
+6. **🆕 Implement OIDC GitHub Actions** for secure CI/CD
+7. **🆕 Configure Terraform Cloud** for team collaboration
 
 ---
 

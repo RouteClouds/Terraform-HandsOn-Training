@@ -309,6 +309,100 @@ A) Store variables  B) Track resource state  C) Define providers  D) Configure b
 - IAM setup (3 points)
 - Testing and documentation (2 points)
 
+## 🆕 **2025 Modern Authentication Scenarios**
+
+### **Scenario 6: AWS SSO CLI v2 Implementation**
+**Difficulty**: Advanced
+**Time**: 20 minutes
+
+Your organization has implemented AWS SSO and requires all Terraform operations to use SSO authentication. Configure Terraform to work with AWS SSO CLI v2.
+
+**Requirements**:
+- Configure AWS SSO session named "terraform-enterprise"
+- Set up Terraform provider to use SSO profile
+- Implement automatic SSO token refresh
+- Create validation script for SSO authentication
+
+**Deliverables**:
+- AWS SSO configuration
+- Terraform provider with SSO integration
+- Token refresh automation
+- Authentication validation script
+
+**Evaluation Criteria**:
+- SSO configuration (3 points)
+- Provider integration (3 points)
+- Automation implementation (2 points)
+- Validation and testing (2 points)
+
+### **Scenario 7: OIDC GitHub Actions Setup**
+**Difficulty**: Expert
+**Time**: 25 minutes
+
+Implement secure CI/CD authentication using OIDC with GitHub Actions, eliminating the need for long-lived AWS credentials.
+
+**Requirements**:
+- Create OIDC identity provider for GitHub Actions
+- Set up IAM role with web identity federation
+- Configure GitHub Actions workflow with OIDC
+- Implement least-privilege access policies
+
+**Deliverables**:
+- OIDC provider Terraform configuration
+- IAM role with web identity trust policy
+- GitHub Actions workflow with OIDC authentication
+- Security policy documentation
+
+**Evaluation Criteria**:
+- OIDC provider setup (3 points)
+- IAM role configuration (3 points)
+- GitHub Actions workflow (3 points)
+- Security implementation (1 point)
+
+### **Scenario 8: Terraform Cloud Enterprise Integration**
+**Difficulty**: Advanced
+**Time**: 15 minutes
+
+Configure Terraform Cloud for enterprise team collaboration with secure credential management and workspace organization.
+
+**Requirements**:
+- Set up Terraform Cloud organization and workspace
+- Configure remote backend with Terraform Cloud
+- Implement environment-specific variable management
+- Set up team access controls
+
+**Deliverables**:
+- Terraform Cloud backend configuration
+- Environment variable management
+- Team access control setup
+- Workspace organization strategy
+
+**Evaluation Criteria**:
+- Backend configuration (3 points)
+- Variable management (2 points)
+- Access controls (3 points)
+- Organization strategy (2 points)
+
+## 📊 **Assessment Summary**
+
+### **Total Points**: 80 points
+- **Basic Scenarios (1-5)**: 50 points
+- **Modern Authentication (6-8)**: 30 points
+
+### **Grading Scale**:
+- **Expert (72-80 points)**: Mastery of all authentication methods including modern patterns
+- **Advanced (64-71 points)**: Strong understanding with minor gaps in modern authentication
+- **Intermediate (56-63 points)**: Good grasp of basic concepts, needs practice with modern patterns
+- **Beginner (48-55 points)**: Basic understanding, requires additional study
+- **Needs Review (<48 points)**: Fundamental concepts need reinforcement
+
+### **2025 Skills Validation**:
+- ✅ **Traditional Authentication**: AWS profiles, assume roles, environment variables
+- ✅ **Modern Enterprise**: AWS SSO CLI v2, OIDC federation
+- ✅ **CI/CD Integration**: GitHub Actions, automated workflows
+- ✅ **Platform Integration**: Terraform Cloud, team collaboration
+- ✅ **Security Best Practices**: Zero-trust, temporary credentials, least privilege
+
 ---
 
 ### **Exercise 3: State Backend and Workspace Management (10 points)**
