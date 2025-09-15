@@ -1,0 +1,56 @@
+# AWS Terraform Training - Resource Management & Dependencies
+# Python Dependencies for Diagram as Code (DaC) Generation
+
+# Core diagram generation library
+diagrams==0.23.4
+
+# Image processing and manipulation
+Pillow==10.1.0
+
+# Graph visualization (required by diagrams)
+graphviz==0.20.1
+
+# Optional: Enhanced diagram capabilities
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# Development and testing dependencies
+pytest==7.4.3
+pytest-cov==4.1.0
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Documentation generation
+sphinx==7.2.6
+sphinx-rtd-theme==1.3.0
+
+# Utility libraries
+click==8.1.7
+colorama==0.4.6
+tqdm==4.66.1
+
+# Data handling (for complex diagrams)
+pandas==2.1.4
+numpy==1.26.2
+
+# Network and cloud provider icons (additional icon sets)
+requests==2.31.0
+urllib3==2.1.0
+
+# Version information
+# Python >= 3.9 required
+# Graphviz system package required (install via system package manager)
+
+# Installation notes:
+# 1. Install system dependencies first:
+#    Ubuntu/Debian: sudo apt-get install graphviz
+#    RHEL/CentOS: sudo yum install graphviz
+#    macOS: brew install graphviz
+#    Windows: Download from https://graphviz.org/download/
+#
+# 2. Install Python dependencies:
+#    pip install -r requirements.txt
+#
+# 3. Verify installation:
+#    python -c "import diagrams; print('Diagrams library installed successfully')"

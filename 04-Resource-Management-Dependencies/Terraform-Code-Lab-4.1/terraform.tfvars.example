@@ -1,0 +1,456 @@
+# AWS Terraform Training - Resource Management & Dependencies
+# Lab 4.1: Advanced Resource Dependencies and Meta-Arguments
+# File: terraform.tfvars.example - Example Variable Configurations
+
+# ============================================================================
+# COPY THIS FILE TO terraform.tfvars AND CUSTOMIZE FOR YOUR DEPLOYMENT
+# ============================================================================
+# cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your specific values
+
+# ============================================================================
+# PROJECT IDENTIFICATION (REQUIRED)
+# ============================================================================
+
+# Project and student identification
+project_name = "resource-management-dependencies"
+environment  = "lab"
+student_name = "john-doe"  # REQUIRED: Replace with your name (alphanumeric and hyphens only)
+owner_email  = "john.doe@example.com"  # REQUIRED: Replace with your email
+cost_center  = "training"
+
+# ============================================================================
+# AWS CONFIGURATION
+# ============================================================================
+
+# AWS region for deployment
+aws_region = "us-east-1"
+
+# Availability zones (auto-detected if not specified)
+availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+# ============================================================================
+# DEPENDENCY MANAGEMENT CONFIGURATION
+# ============================================================================
+
+# Dependency complexity level for demonstration
+dependency_complexity_level = "advanced"
+
+# Enable various dependency patterns
+enable_explicit_dependencies = true
+enable_lifecycle_management = true
+enable_circular_dependency_resolution = true
+
+# ============================================================================
+# INFRASTRUCTURE CONFIGURATION
+# ============================================================================
+
+# VPC configuration
+vpc_configuration = {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+  enable_flow_logs     = false  # Disabled for cost optimization
+}
+
+# Subnet configurations for dependency tier separation
+subnet_configurations = {
+  public = {
+    cidr_blocks                = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+    map_public_ip_on_launch   = true
+    availability_zone_mapping = true
+  }
+  private = {
+    cidr_blocks                = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+    map_public_ip_on_launch   = false
+    availability_zone_mapping = true
+  }
+  database = {
+    cidr_blocks                = ["10.0.21.0/24", "10.0.22.0/24", "10.0.23.0/24"]
+    map_public_ip_on_launch   = false
+    availability_zone_mapping = true
+  }
+}
+
+# ============================================================================
+# DATABASE TIER CONFIGURATION
+# ============================================================================
+
+# Database configuration for dependency demonstration
+database_configuration = {
+  engine                = "mysql"
+  engine_version        = "8.0"
+  instance_class        = "db.t3.micro"
+  allocated_storage     = 20
+  max_allocated_storage = 100
+  storage_type          = "gp2"
+  storage_encrypted     = true
+  username              = "admin"
+  password              = "changeme123!"  # Change in production
+  backup_retention_period = 7
+  backup_window         = "03:00-04:00"
+  maintenance_window    = "sun:04:00-sun:05:00"
+  multi_az              = false  # Single AZ for cost optimization
+  deletion_protection   = false  # Disabled for lab cleanup
+}
+
+# ============================================================================
+# APPLICATION TIER CONFIGURATION
+# ============================================================================
+
+# Application tier configurations for for_each demonstration
+application_tiers = {
+  web = {
+    instance_type        = "t3.micro"
+    min_size            = 2
+    max_size            = 6
+    desired_capacity    = 3
+    health_check_type   = "ELB"
+    health_check_grace_period = 300
+    target_group_port   = 80
+    target_group_protocol = "HTTP"
+    enable_monitoring   = true
+  }
+  app = {
+    instance_type        = "t3.small"
+    min_size            = 2
+    max_size            = 4
+    desired_capacity    = 2
+    health_check_type   = "EC2"
+    health_check_grace_period = 300
+    target_group_port   = 8080
+    target_group_protocol = "HTTP"
+    enable_monitoring   = false
+  }
+  api = {
+    instance_type        = "t3.micro"
+    min_size            = 1
+    max_size            = 3
+    desired_capacity    = 2
+    health_check_type   = "EC2"
+    health_check_grace_period = 300
+    target_group_port   = 3000
+    target_group_protocol = "HTTP"
+    enable_monitoring   = false
+  }
+}
+
+# ============================================================================
+# LOAD BALANCER CONFIGURATION
+# ============================================================================
+
+# Load balancer configuration
+load_balancer_configuration = {
+  enable_application_lb = true
+  enable_network_lb     = false
+  internal              = false
+  enable_deletion_protection = false
+  idle_timeout          = 60
+  enable_cross_zone_load_balancing = true
+}
+
+# ============================================================================
+# SECURITY CONFIGURATION
+# ============================================================================
+
+# Security configuration
+security_configuration = {
+  enable_strict_security_groups = true
+  allowed_ssh_cidrs            = ["10.0.0.0/16"]  # Restrict to VPC
+  allowed_http_cidrs           = ["0.0.0.0/0"]
+  allowed_https_cidrs          = ["0.0.0.0/0"]
+  enable_vpc_flow_logs         = false  # Disabled for cost optimization
+  enable_security_group_logging = false
+}
+
+# Data classification and compliance
+data_classification = "internal"
+backup_required     = true
+encryption_enabled  = true
+
+# ============================================================================
+# MONITORING AND LOGGING
+# ============================================================================
+
+# CloudWatch configuration
+monitoring_enabled    = true
+log_retention_days    = 7  # Short retention for cost optimization
+enable_detailed_monitoring = false  # Disabled for cost optimization
+
+# ============================================================================
+# COST OPTIMIZATION
+# ============================================================================
+
+# Auto-shutdown configuration
+auto_shutdown_enabled   = true
+auto_shutdown_hours     = 4  # Automatically shutdown after 4 hours
+cost_optimization_level = "aggressive"
+
+# ============================================================================
+# FEATURE TOGGLES
+# ============================================================================
+
+# Optional features (some disabled for cost optimization)
+enable_nat_gateway    = false  # Saves ~$45/month per AZ
+enable_bastion_host   = false
+enable_auto_scaling   = true
+enable_rds           = true
+enable_elasticache   = false
+
+# Testing features
+enable_dependency_testing     = true
+enable_meta_argument_testing  = true
+enable_lifecycle_testing      = true
+enable_performance_testing    = false
+
+# ============================================================================
+# ADVANCED CONFIGURATION
+# ============================================================================
+
+# Resource naming
+resource_prefix = "lab"
+
+# Custom tags (optional)
+custom_tags = {
+  # Department = "Engineering"
+  # Team       = "Infrastructure"
+  # Purpose    = "Training"
+}
+
+# Cross-account and cross-region (optional)
+cross_account_role_arn = ""
+enable_cross_region_dependencies = false
+
+# ============================================================================
+# EXAMPLE CONFIGURATIONS FOR DIFFERENT SCENARIOS
+# ============================================================================
+
+# -----------------------------------------------------------------------------
+# SCENARIO 1: BASIC DEPENDENCY DEMONSTRATION (DEFAULT)
+# -----------------------------------------------------------------------------
+# Use the values above for basic dependency patterns with minimal costs
+
+# -----------------------------------------------------------------------------
+# SCENARIO 2: ADVANCED DEPENDENCY PATTERNS
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for advanced dependency testing:
+
+# dependency_complexity_level = "enterprise"
+# enable_nat_gateway = true
+# enable_elasticache = true
+# vpc_configuration = {
+#   cidr_block           = "10.0.0.0/16"
+#   enable_dns_hostnames = true
+#   enable_dns_support   = true
+#   enable_flow_logs     = true
+# }
+
+# -----------------------------------------------------------------------------
+# SCENARIO 3: LIFECYCLE MANAGEMENT FOCUS
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for lifecycle management testing:
+
+# enable_lifecycle_testing = true
+# database_configuration = {
+#   engine                = "mysql"
+#   engine_version        = "8.0"
+#   instance_class        = "db.t3.micro"
+#   allocated_storage     = 20
+#   max_allocated_storage = 100
+#   storage_type          = "gp2"
+#   storage_encrypted     = true
+#   username              = "admin"
+#   password              = "changeme123!"
+#   backup_retention_period = 7
+#   backup_window         = "03:00-04:00"
+#   maintenance_window    = "sun:04:00-sun:05:00"
+#   multi_az              = true
+#   deletion_protection   = true  # Enable for lifecycle testing
+# }
+
+# -----------------------------------------------------------------------------
+# SCENARIO 4: META-ARGUMENTS DEMONSTRATION
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for meta-arguments focus:
+
+# enable_meta_argument_testing = true
+# application_tiers = {
+#   web = {
+#     instance_type        = "t3.micro"
+#     min_size            = 3
+#     max_size            = 9
+#     desired_capacity    = 6
+#     health_check_type   = "ELB"
+#     health_check_grace_period = 300
+#     target_group_port   = 80
+#     target_group_protocol = "HTTP"
+#     enable_monitoring   = true
+#   }
+#   app = {
+#     instance_type        = "t3.small"
+#     min_size            = 2
+#     max_size            = 6
+#     desired_capacity    = 4
+#     health_check_type   = "EC2"
+#     health_check_grace_period = 300
+#     target_group_port   = 8080
+#     target_group_protocol = "HTTP"
+#     enable_monitoring   = true
+#   }
+#   api = {
+#     instance_type        = "t3.micro"
+#     min_size            = 2
+#     max_size            = 6
+#     desired_capacity    = 4
+#     health_check_type   = "EC2"
+#     health_check_grace_period = 300
+#     target_group_port   = 3000
+#     target_group_protocol = "HTTP"
+#     enable_monitoring   = false
+#   }
+#   cache = {
+#     instance_type        = "t3.micro"
+#     min_size            = 1
+#     max_size            = 3
+#     desired_capacity    = 2
+#     health_check_type   = "EC2"
+#     health_check_grace_period = 300
+#     target_group_port   = 6379
+#     target_group_protocol = "HTTP"
+#     enable_monitoring   = false
+#   }
+# }
+
+# -----------------------------------------------------------------------------
+# SCENARIO 5: MINIMAL COST CONFIGURATION
+# -----------------------------------------------------------------------------
+# Uncomment and modify the following for absolute minimal cost:
+
+# application_tiers = {
+#   web = {
+#     instance_type        = "t3.micro"
+#     min_size            = 1
+#     max_size            = 2
+#     desired_capacity    = 1
+#     health_check_type   = "EC2"
+#     health_check_grace_period = 300
+#     target_group_port   = 80
+#     target_group_protocol = "HTTP"
+#     enable_monitoring   = false
+#   }
+# }
+# enable_rds = false
+# load_balancer_configuration = {
+#   enable_application_lb = false
+#   enable_network_lb     = false
+#   internal              = false
+#   enable_deletion_protection = false
+#   idle_timeout          = 60
+#   enable_cross_zone_load_balancing = false
+# }
+# monitoring_enabled = false
+# auto_shutdown_hours = 1
+
+# ============================================================================
+# COST ESTIMATION GUIDE
+# ============================================================================
+
+# Based on the configuration above, estimated AWS costs:
+#
+# BASIC CONFIGURATION (default values):
+# - VPC and networking: Free
+# - EC2 instances (7 × t3.micro): ~$0.0812/hour = ~$1.95/day
+# - RDS instance (db.t3.micro): ~$0.017/hour = ~$0.41/day
+# - Application Load Balancer: ~$0.0225/hour = ~$0.54/day
+# - CloudWatch logs: ~$0.50/GB ingested (minimal for lab)
+# - Total estimated: ~$2.90/day (with auto-shutdown after 4 hours: ~$1.21/day)
+#
+# ADVANCED DEPENDENCY CONFIGURATION:
+# - Additional NAT Gateways (3): ~$3.24/day
+# - ElastiCache cluster: ~$0.017/hour = ~$0.41/day
+# - VPC Flow Logs: ~$0.05/day
+# - Total estimated: ~$6.60/day
+#
+# LIFECYCLE MANAGEMENT CONFIGURATION:
+# - Multi-AZ RDS: ~$0.034/hour = ~$0.82/day
+# - Additional monitoring: ~$0.20/day
+# - Total estimated: ~$3.52/day
+#
+# MINIMAL COST CONFIGURATION:
+# - EC2 instance (1 × t3.micro): ~$0.0116/hour = ~$0.28/day
+# - No RDS: $0
+# - No load balancer: $0
+# - Total estimated: ~$0.28/day (with auto-shutdown after 1 hour: ~$0.012/day)
+
+# ============================================================================
+# DEPENDENCY TESTING GUIDE
+# ============================================================================
+
+# After applying this configuration, test dependency management:
+
+# 1. DEPENDENCY GRAPH ANALYSIS:
+# terraform graph | dot -Tpng > dependencies.png
+# terraform graph | grep -E "(vpc|subnet|database|autoscaling|lb)"
+
+# 2. RESOURCE TARGETING BY DEPENDENCY TIER:
+# terraform plan -target=aws_vpc.main
+# terraform plan -target=aws_subnet.public
+# terraform plan -target=aws_db_instance.main
+# terraform plan -target=aws_autoscaling_group.app_tiers
+
+# 3. META-ARGUMENTS TESTING:
+# terraform state show 'aws_subnet.public[0]'
+# terraform state show 'aws_security_group.app_tiers["web"]'
+# terraform state list | grep -E "(count|for_each)"
+
+# 4. LIFECYCLE MANAGEMENT TESTING:
+# terraform apply -replace=aws_launch_template.app_tiers["web"]
+# terraform plan  # Should show create_before_destroy behavior
+
+# 5. DEPENDENCY RESOLUTION TESTING:
+# terraform apply -target=aws_vpc.main
+# terraform apply -target=aws_subnet.database
+# terraform apply -target=aws_db_instance.main
+# terraform apply  # Complete deployment
+
+# 6. CIRCULAR DEPENDENCY RESOLUTION:
+# # Modify security group rules to create circular dependencies
+# # Use data sources to break the cycle
+
+# ============================================================================
+# TROUBLESHOOTING COMMON DEPENDENCY ISSUES
+# ============================================================================
+
+# Issue: "Resource depends on resource that cannot be determined"
+# Solution: Use explicit depends_on or data sources
+
+# Issue: "Cycle: resource.a -> resource.b -> resource.a"
+# Solution: Break cycle with data sources or separate apply operations
+
+# Issue: "Error creating resource: dependency not ready"
+# Solution: Check explicit dependencies and resource ordering
+
+# Issue: "Auto Scaling Group instances not joining target group"
+# Solution: Verify security group rules and health check configuration
+
+# Issue: "Database connection timeout from application tier"
+# Solution: Check security group rules and subnet routing
+
+# ============================================================================
+# VALIDATION CHECKLIST
+# ============================================================================
+
+# After successful deployment, verify:
+# ✅ VPC and subnets created with proper dependency order
+# ✅ Security groups configured with tier-specific rules
+# ✅ Database accessible from application tier only
+# ✅ Auto Scaling Groups using correct launch templates
+# ✅ Load balancer distributing traffic to web tier
+# ✅ All resources properly tagged with dependency information
+# ✅ Lifecycle rules applied to critical resources
+# ✅ Meta-arguments working correctly (count and for_each)
+
+# Test commands:
+# terraform output dependency_analysis
+# terraform output meta_arguments_demonstration
+# curl http://$(terraform output -raw load_balancer_configuration | jq -r '.load_balancer.dns_name')/
