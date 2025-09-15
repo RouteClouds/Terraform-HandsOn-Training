@@ -1,0 +1,32 @@
+# Python Dependencies for Advanced State Management Diagrams
+# Topic 8: Advanced State Management with AWS
+
+# Core diagram generation
+diagrams>=0.23.3
+graphviz>=0.20.1
+
+# Data visualization and analysis
+matplotlib>=3.7.1
+seaborn>=0.12.2
+numpy>=1.24.3
+pandas>=2.0.2
+
+# Image processing and enhancement
+Pillow>=9.5.0
+
+# AWS SDK for dynamic data (optional)
+boto3>=1.26.137
+botocore>=1.29.137
+
+# Development and testing
+pytest>=7.3.1
+black>=23.3.0
+flake8>=6.0.0
+
+# Documentation generation
+sphinx>=6.2.1
+sphinx-rtd-theme>=1.2.2
+
+# Version pinning for stability
+# Last updated: September 2025
+# Compatible with Python 3.9+

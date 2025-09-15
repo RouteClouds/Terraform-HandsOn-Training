@@ -1,0 +1,294 @@
+# ============================================================================
+# TERRAFORM VARIABLES CONFIGURATION EXAMPLES
+# Topic 8: Advanced State Management with AWS
+# ============================================================================
+#
+# This file contains example configurations for different scenarios.
+# Copy this file to terraform.tfvars and modify the values according to your needs.
+#
+# IMPORTANT: Never commit terraform.tfvars to version control as it may contain
+# sensitive information. Add terraform.tfvars to your .gitignore file.
+#
+# ============================================================================
+
+# ============================================================================
+# BASIC CONFIGURATION (REQUIRED)
+# ============================================================================
+
+# Student/Practitioner Information
+student_name = "john-doe"                    # Your name (lowercase, hyphens only)
+organization = "acme-corp"                   # Your organization name
+project_name = "advanced-state-management"   # Project identifier
+environment  = "lab"                        # Environment: development, staging, production, lab, test
+owner        = "john.doe@acme-corp.com"     # Resource owner email
+cost_center  = "training"                   # Cost center for billing
+
+# ============================================================================
+# AWS REGION CONFIGURATION
+# ============================================================================
+
+# Primary region for state management
+aws_region = "us-east-1"                    # Primary AWS region
+
+# Disaster recovery region
+dr_region = "us-west-2"                     # DR region (must be different from primary)
+
+# Monitoring region (can be same as primary)
+monitoring_region = "us-east-1"             # Centralized monitoring region
+
+# AWS API configuration
+max_retries = 3                             # Maximum API retries
+retry_mode  = "adaptive"                    # Retry mode: standard, adaptive
+
+# ============================================================================
+# SECURITY AND COMPLIANCE CONFIGURATION
+# ============================================================================
+
+# Security level configuration
+security_level = "high"                     # Security level: low, medium, high, critical
+
+# Compliance frameworks
+compliance_scope = [                        # Applicable compliance frameworks
+  "SOC2",
+  "PCI-DSS",
+  "HIPAA"
+]
+
+# Data classification
+data_classification = "confidential"        # Data classification: public, internal, confidential, restricted
+
+# Encryption settings
+encryption_algorithm = "aws:kms"            # Encryption: AES256, aws:kms
+
+# ============================================================================
+# CROSS-ACCOUNT ACCESS (OPTIONAL)
+# ============================================================================
+
+# Cross-account role ARNs (leave empty if not using cross-account access)
+assume_role_arn    = ""                     # Primary region assume role ARN
+dr_assume_role_arn = ""                     # DR region assume role ARN
+external_id        = ""                     # External ID for additional security
+
+# Example cross-account configuration:
+# assume_role_arn    = "arn:aws:iam::123456789012:role/TerraformStateRole"
+# dr_assume_role_arn = "arn:aws:iam::123456789012:role/TerraformStateDRRole"
+# external_id        = "unique-external-id-12345"
+
+# ============================================================================
+# STATE MANAGEMENT CONFIGURATION
+# ============================================================================
+
+# State bucket configuration
+state_bucket_prefix = "terraform-state"     # Prefix for state bucket names
+
+# Versioning and backup
+enable_versioning           = true          # Enable S3 versioning
+enable_mfa_delete           = false         # Enable MFA delete (requires MFA setup)
+versioning_retention_days   = 90            # Days to retain old versions
+
+# Cross-region replication
+enable_cross_region_replication = true     # Enable disaster recovery replication
+replication_storage_class       = "STANDARD_IA"  # Storage class for replicated objects
+
+# ============================================================================
+# DYNAMODB LOCKING CONFIGURATION
+# ============================================================================
+
+# DynamoDB billing and capacity
+lock_table_billing_mode   = "PAY_PER_REQUEST"  # Billing mode: PROVISIONED, PAY_PER_REQUEST
+lock_table_read_capacity  = 5                  # Read capacity (PROVISIONED mode only)
+lock_table_write_capacity = 5                  # Write capacity (PROVISIONED mode only)
+
+# DynamoDB features
+enable_point_in_time_recovery = true           # Enable point-in-time recovery
+
+# ============================================================================
+# MONITORING AND ALERTING CONFIGURATION
+# ============================================================================
+
+# Monitoring features
+enable_cloudwatch_monitoring = true            # Enable CloudWatch monitoring
+enable_cloudtrail_logging    = true            # Enable CloudTrail auditing
+cloudtrail_retention_days     = 90             # CloudTrail log retention
+
+# Notifications
+enable_sns_notifications = true                # Enable SNS notifications
+notification_email       = "admin@acme-corp.com"  # Email for alerts
+
+# ============================================================================
+# ADVANCED FEATURES CONFIGURATION
+# ============================================================================
+
+# Advanced security features
+enable_advanced_security = false               # Enable VPC endpoints, additional encryption
+
+# Cost optimization
+enable_cost_optimization     = true            # Enable intelligent tiering, lifecycle policies
+enable_cost_anomaly_detection = true           # Enable cost anomaly detection
+
+# Performance monitoring
+enable_performance_monitoring = true           # Enable detailed performance metrics
+
+# Workspace strategy
+workspace_strategy = "isolated"                # Workspace strategy: isolated, shared
+
+# ============================================================================
+# TESTING AND VALIDATION CONFIGURATION
+# ============================================================================
+
+# State validation
+enable_state_validation = true                 # Enable automated state validation
+validation_schedule     = "cron(0 2 * * ? *)"  # Daily at 2 AM UTC
+
+# Drift detection
+enable_drift_detection = true                  # Enable drift detection
+
+# ============================================================================
+# DISASTER RECOVERY CONFIGURATION
+# ============================================================================
+
+# Recovery objectives
+rto_minutes = 15                               # Recovery Time Objective (minutes)
+rpo_minutes = 5                                # Recovery Point Objective (minutes)
+
+# Automation
+enable_automated_failover = false              # Enable automated failover
+
+# ============================================================================
+# COST MANAGEMENT CONFIGURATION
+# ============================================================================
+
+# Budget settings
+budget_amount                = 50              # Monthly budget in USD
+budget_threshold_percentage  = 80              # Alert threshold percentage
+
+# ============================================================================
+# RESOURCE NAMING CONFIGURATION
+# ============================================================================
+
+# Resource naming
+resource_prefix        = ""                    # Custom resource prefix (optional)
+random_suffix_length   = 8                     # Length of random suffix
+
+# ============================================================================
+# SCENARIO-SPECIFIC CONFIGURATIONS
+# ============================================================================
+
+# -----------------------------------------------------------------------------
+# SCENARIO 1: DEVELOPMENT ENVIRONMENT
+# -----------------------------------------------------------------------------
+# Uncomment and modify for development environment:
+#
+# environment                     = "development"
+# security_level                  = "medium"
+# enable_cross_region_replication = false
+# enable_advanced_security        = false
+# versioning_retention_days       = 30
+# budget_amount                   = 25
+# compliance_scope                = ["SOC2"]
+
+# -----------------------------------------------------------------------------
+# SCENARIO 2: STAGING ENVIRONMENT
+# -----------------------------------------------------------------------------
+# Uncomment and modify for staging environment:
+#
+# environment                     = "staging"
+# security_level                  = "high"
+# enable_cross_region_replication = true
+# enable_advanced_security        = true
+# versioning_retention_days       = 60
+# budget_amount                   = 75
+# compliance_scope                = ["SOC2", "PCI-DSS"]
+
+# -----------------------------------------------------------------------------
+# SCENARIO 3: PRODUCTION ENVIRONMENT
+# -----------------------------------------------------------------------------
+# Uncomment and modify for production environment:
+#
+# environment                     = "production"
+# security_level                  = "critical"
+# enable_cross_region_replication = true
+# enable_advanced_security        = true
+# enable_mfa_delete               = true
+# versioning_retention_days       = 365
+# budget_amount                   = 200
+# compliance_scope                = ["SOC2", "PCI-DSS", "HIPAA"]
+# enable_automated_failover       = true
+# rto_minutes                     = 5
+# rpo_minutes                     = 1
+
+# -----------------------------------------------------------------------------
+# SCENARIO 4: HIGH-SECURITY ENVIRONMENT
+# -----------------------------------------------------------------------------
+# Uncomment and modify for high-security environment:
+#
+# security_level                  = "critical"
+# data_classification             = "restricted"
+# enable_advanced_security        = true
+# enable_mfa_delete               = true
+# compliance_scope                = ["SOC2", "PCI-DSS", "HIPAA", "FedRAMP"]
+# cloudtrail_retention_days       = 2555  # 7 years
+# versioning_retention_days       = 2555  # 7 years
+
+# -----------------------------------------------------------------------------
+# SCENARIO 5: COST-OPTIMIZED ENVIRONMENT
+# -----------------------------------------------------------------------------
+# Uncomment and modify for cost-optimized environment:
+#
+# enable_cost_optimization        = true
+# enable_cost_anomaly_detection   = true
+# lock_table_billing_mode         = "PAY_PER_REQUEST"
+# replication_storage_class       = "GLACIER"
+# versioning_retention_days       = 30
+# budget_amount                   = 20
+# budget_threshold_percentage     = 70
+
+# -----------------------------------------------------------------------------
+# SCENARIO 6: MULTI-ACCOUNT SETUP
+# -----------------------------------------------------------------------------
+# Uncomment and modify for multi-account setup:
+#
+# assume_role_arn    = "arn:aws:iam::ACCOUNT-ID:role/TerraformStateRole"
+# dr_assume_role_arn = "arn:aws:iam::ACCOUNT-ID:role/TerraformStateDRRole"
+# external_id        = "your-unique-external-id"
+# workspace_strategy = "shared"
+
+# ============================================================================
+# VALIDATION NOTES
+# ============================================================================
+#
+# Before applying this configuration, ensure:
+#
+# 1. AWS CLI is configured with appropriate permissions
+# 2. Terraform version is ~> 1.13.0
+# 3. AWS provider version is ~> 6.12.0
+# 4. All required IAM permissions are available
+# 5. Budget limits are appropriate for your use case
+# 6. Compliance requirements are correctly specified
+# 7. Cross-account roles are properly configured (if used)
+# 8. Email addresses for notifications are valid
+# 9. Regions support all required AWS services
+# 10. Cost implications are understood and approved
+#
+# ============================================================================
+
+# ============================================================================
+# COMMON VALIDATION COMMANDS
+# ============================================================================
+#
+# Validate configuration:
+# terraform validate
+#
+# Check plan:
+# terraform plan -var-file="terraform.tfvars"
+#
+# Apply configuration:
+# terraform apply -var-file="terraform.tfvars"
+#
+# Check state:
+# terraform state list
+#
+# Verify backend:
+# terraform state pull | jq '.backend'
+#
+# ============================================================================
