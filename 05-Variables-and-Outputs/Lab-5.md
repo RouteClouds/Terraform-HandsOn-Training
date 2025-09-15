@@ -621,9 +621,568 @@ terraform console
 4. **Dynamic Configuration**: Environment-specific variables enable code reuse while maintaining environment isolation
 5. **Validation Importance**: Comprehensive validation prevents configuration errors and ensures compliance
 
+## 🆕 **Bonus Section: Advanced Variable Management Patterns (2025)**
+
+### **Part 6: Enhanced Validation with Business Logic (20 minutes)**
+
+**Step 1: Advanced Multi-Validation Patterns**
+```bash
+# Create advanced validation configuration
+cat > advanced-validation.tf << 'EOF'
+# Complex infrastructure deployment variable with multiple validations
+variable "infrastructure_deployment" {
+  description = "Complete infrastructure deployment configuration with business rules"
+  type = object({
+    environment = string
+    region      = string
+
+    compute_config = object({
+      instance_type     = string
+      min_capacity      = number
+      max_capacity      = number
+      desired_capacity  = number
+      enable_spot       = bool
+    })
+
+    database_config = object({
+      engine_version    = string
+      instance_class    = string
+      allocated_storage = number
+      backup_retention  = number
+      multi_az         = bool
+    })
+
+    security_config = object({
+      enable_waf           = bool
+      enable_shield        = bool
+      ssl_policy          = string
+      encryption_at_rest  = bool
+      encryption_in_transit = bool
+    })
+  })
+
+  # Environment validation
+  validation {
+    condition = contains(["development", "staging", "production"], var.infrastructure_deployment.environment)
+    error_message = "Environment must be development, staging, or production."
+  }
+
+  # Capacity validation with business logic
+  validation {
+    condition = var.infrastructure_deployment.compute_config.min_capacity <= var.infrastructure_deployment.compute_config.desired_capacity
+    error_message = "Minimum capacity must be less than or equal to desired capacity."
+  }
+
+  validation {
+    condition = var.infrastructure_deployment.compute_config.desired_capacity <= var.infrastructure_deployment.compute_config.max_capacity
+    error_message = "Desired capacity must be less than or equal to maximum capacity."
+  }
+
+  # Production-specific validations
+  validation {
+    condition = var.infrastructure_deployment.database_config.backup_retention >= (var.infrastructure_deployment.environment == "production" ? 7 : 1)
+    error_message = "Production environments require minimum 7 days backup retention."
+  }
+
+  validation {
+    condition = var.infrastructure_deployment.security_config.encryption_at_rest == true || var.infrastructure_deployment.environment != "production"
+    error_message = "Production environments must have encryption at rest enabled."
+  }
+
+  validation {
+    condition = var.infrastructure_deployment.database_config.multi_az == true || var.infrastructure_deployment.environment != "production"
+    error_message = "Production environments must have Multi-AZ enabled for high availability."
+  }
+
+  # Instance type validation based on environment
+  validation {
+    condition = var.infrastructure_deployment.environment == "production" ? !can(regex("^t2\\.", var.infrastructure_deployment.compute_config.instance_type)) : true
+    error_message = "Production environments should not use t2 instance types. Use t3 or higher."
+  }
+}
+
+# Test the validation with different configurations
+variable "test_configs" {
+  description = "Test configurations for validation"
+  type = map(object({
+    environment = string
+    region      = string
+
+    compute_config = object({
+      instance_type     = string
+      min_capacity      = number
+      max_capacity      = number
+      desired_capacity  = number
+      enable_spot       = bool
+    })
+
+    database_config = object({
+      engine_version    = string
+      instance_class    = string
+      allocated_storage = number
+      backup_retention  = number
+      multi_az         = bool
+    })
+
+    security_config = object({
+      enable_waf           = bool
+      enable_shield        = bool
+      ssl_policy          = string
+      encryption_at_rest  = bool
+      encryption_in_transit = bool
+    })
+  }))
+
+  default = {
+    development = {
+      environment = "development"
+      region      = "us-east-1"
+
+      compute_config = {
+        instance_type     = "t3.micro"
+        min_capacity      = 1
+        max_capacity      = 3
+        desired_capacity  = 1
+        enable_spot       = true
+      }
+
+      database_config = {
+        engine_version    = "8.0"
+        instance_class    = "db.t3.micro"
+        allocated_storage = 20
+        backup_retention  = 1
+        multi_az         = false
+      }
+
+      security_config = {
+        enable_waf           = false
+        enable_shield        = false
+        ssl_policy          = "ELBSecurityPolicy-TLS-1-2-2017-01"
+        encryption_at_rest  = false
+        encryption_in_transit = true
+      }
+    }
+
+    production = {
+      environment = "production"
+      region      = "us-east-1"
+
+      compute_config = {
+        instance_type     = "t3.large"
+        min_capacity      = 2
+        max_capacity      = 10
+        desired_capacity  = 3
+        enable_spot       = false
+      }
+
+      database_config = {
+        engine_version    = "8.0"
+        instance_class    = "db.t3.medium"
+        allocated_storage = 100
+        backup_retention  = 7
+        multi_az         = true
+      }
+
+      security_config = {
+        enable_waf           = true
+        enable_shield        = true
+        ssl_policy          = "ELBSecurityPolicy-TLS-1-2-2017-01"
+        encryption_at_rest  = true
+        encryption_in_transit = true
+      }
+    }
+  }
+}
+
+# Output validation results
+output "validation_test_results" {
+  description = "Results of validation testing"
+  value = {
+    for env, config in var.test_configs : env => {
+      environment = config.environment
+      passes_validation = true  # If we get here, validation passed
+      config_summary = {
+        compute_instance_type = config.compute_config.instance_type
+        database_multi_az = config.database_config.multi_az
+        encryption_enabled = config.security_config.encryption_at_rest
+        backup_retention = config.database_config.backup_retention
+      }
+    }
+  }
+}
+EOF
+
+# Test validation with different configurations
+terraform plan -var="infrastructure_deployment=$(cat <<JSON
+{
+  "environment": "development",
+  "region": "us-east-1",
+  "compute_config": {
+    "instance_type": "t3.micro",
+    "min_capacity": 1,
+    "max_capacity": 3,
+    "desired_capacity": 1,
+    "enable_spot": true
+  },
+  "database_config": {
+    "engine_version": "8.0",
+    "instance_class": "db.t3.micro",
+    "allocated_storage": 20,
+    "backup_retention": 1,
+    "multi_az": false
+  },
+  "security_config": {
+    "enable_waf": false,
+    "enable_shield": false,
+    "ssl_policy": "ELBSecurityPolicy-TLS-1-2-2017-01",
+    "encryption_at_rest": false,
+    "encryption_in_transit": true
+  }
+}
+JSON
+)"
+```
+
+**Step 2: Dynamic Variable Processing with Functions**
+```bash
+# Create dynamic processing configuration
+cat > dynamic-processing.tf << 'EOF'
+# Environment-specific configurations
+locals {
+  environment_configs = {
+    development = {
+      instance_types = ["t3.micro", "t3.small"]
+      storage_types  = ["gp3"]
+      backup_schedule = "daily"
+      monitoring_level = "basic"
+      cost_optimization = true
+    }
+
+    staging = {
+      instance_types = ["t3.small", "t3.medium"]
+      storage_types  = ["gp3", "io1"]
+      backup_schedule = "twice-daily"
+      monitoring_level = "enhanced"
+      cost_optimization = true
+    }
+
+    production = {
+      instance_types = ["t3.large", "t3.xlarge", "m5.large", "m5.xlarge"]
+      storage_types  = ["gp3", "io1", "io2"]
+      backup_schedule = "continuous"
+      monitoring_level = "comprehensive"
+      cost_optimization = false
+    }
+  }
+
+  # Dynamic configuration selection
+  selected_config = local.environment_configs[var.environment]
+
+  # Advanced variable processing
+  computed_variables = {
+    # Dynamic instance type selection based on workload
+    optimal_instance_type = var.enable_cost_optimization ?
+      local.selected_config.instance_types[0] :
+      local.selected_config.instance_types[length(local.selected_config.instance_types) - 1]
+
+    # Dynamic storage configuration
+    storage_configuration = {
+      type = local.selected_config.storage_types[0]
+      size = var.database_storage_size
+      iops = contains(local.selected_config.storage_types, "io1") ?
+        max(100, var.database_storage_size * 3) : null
+      throughput = contains(local.selected_config.storage_types, "gp3") ? 125 : null
+    }
+
+    # Dynamic security configuration
+    security_settings = {
+      enable_detailed_monitoring = local.selected_config.monitoring_level == "comprehensive"
+      enable_cloudtrail = var.environment == "production"
+      enable_config_rules = var.environment != "development"
+      enable_guardduty = var.environment == "production"
+      enable_security_hub = var.environment == "production"
+    }
+
+    # Dynamic backup configuration
+    backup_settings = {
+      retention_days = var.environment == "production" ? 30 : (var.environment == "staging" ? 7 : 3)
+      backup_window = var.environment == "production" ? "03:00-04:00" : "02:00-03:00"
+      maintenance_window = var.environment == "production" ? "sun:04:00-sun:05:00" : "sun:03:00-sun:04:00"
+      delete_automated_backups = var.environment == "development"
+    }
+  }
+}
+
+# Output dynamic configurations
+output "dynamic_configuration_results" {
+  description = "Results of dynamic configuration processing"
+  value = {
+    environment = var.environment
+    selected_config = local.selected_config
+    computed_variables = local.computed_variables
+
+    recommendations = {
+      instance_type = local.computed_variables.optimal_instance_type
+      storage_type = local.computed_variables.storage_configuration.type
+      monitoring_level = local.selected_config.monitoring_level
+      security_features = length([
+        for k, v in local.computed_variables.security_settings : k if v == true
+      ])
+    }
+  }
+}
+EOF
+
+# Test dynamic processing
+terraform plan
+```
+
+### **Part 7: AWS Integration with Parameter Store and Secrets Manager (15 minutes)**
+
+**Step 1: Dynamic Parameter Management**
+```bash
+# Create AWS integration configuration
+cat > aws-integration.tf << 'EOF'
+# Dynamic parameter retrieval from AWS Parameter Store
+data "aws_ssm_parameters_by_path" "app_config" {
+  path = "/${var.environment}/app-config"
+
+  # Only retrieve if environment-specific parameters exist
+  count = var.environment != "development" ? 1 : 0
+}
+
+# Create environment-specific parameters
+resource "aws_ssm_parameter" "app_config" {
+  for_each = {
+    "database-url" = "mysql://localhost:3306/app_${var.environment}"
+    "api-endpoint" = "https://api-${var.environment}.example.com"
+    "cache-ttl" = var.environment == "production" ? "3600" : "300"
+    "log-level" = var.environment == "production" ? "INFO" : "DEBUG"
+  }
+
+  name  = "/${var.environment}/app-config/${each.key}"
+  type  = "String"
+  value = each.value
+
+  tags = merge(local.common_tags, {
+    Environment = var.environment
+    ParameterType = "app-config"
+  })
+}
+
+# Dynamic secrets management
+resource "aws_secretsmanager_secret" "dynamic_secrets" {
+  for_each = toset([
+    "database-credentials",
+    "api-keys",
+    "encryption-keys"
+  ])
+
+  name = "${local.name_prefix}-${each.key}"
+  description = "Dynamic secret for ${each.key} in ${var.environment}"
+
+  # Environment-specific rotation
+  rotation_rules {
+    automatically_after_days = var.environment == "production" ? 30 : 90
+  }
+
+  tags = merge(local.common_tags, {
+    SecretType = each.key
+    Environment = var.environment
+  })
+}
+
+# Generate random passwords for secrets
+resource "random_password" "secret_values" {
+  for_each = aws_secretsmanager_secret.dynamic_secrets
+
+  length  = 32
+  special = true
+}
+
+# Store secret values
+resource "aws_secretsmanager_secret_version" "secret_values" {
+  for_each = aws_secretsmanager_secret.dynamic_secrets
+
+  secret_id = each.value.id
+  secret_string = jsonencode({
+    password = random_password.secret_values[each.key].result
+    created_date = timestamp()
+    environment = var.environment
+  })
+}
+
+# Output AWS integration results
+output "aws_integration_results" {
+  description = "Results of AWS Parameter Store and Secrets Manager integration"
+  value = {
+    parameters_created = length(aws_ssm_parameter.app_config)
+    secrets_created = length(aws_secretsmanager_secret.dynamic_secrets)
+
+    parameter_names = [
+      for param in aws_ssm_parameter.app_config : param.name
+    ]
+
+    secret_arns = {
+      for k, secret in aws_secretsmanager_secret.dynamic_secrets : k => secret.arn
+    }
+
+    integration_summary = {
+      environment = var.environment
+      parameters_path = "/${var.environment}/app-config"
+      secrets_prefix = local.name_prefix
+      rotation_enabled = var.environment == "production"
+    }
+  }
+
+  sensitive = false
+}
+EOF
+
+# Apply AWS integration
+terraform plan -target=aws_ssm_parameter.app_config
+terraform apply -target=aws_ssm_parameter.app_config -auto-approve
+```
+
+### **Part 8: Advanced Output Patterns with Conditional Logic (10 minutes)**
+
+**Step 1: Conditional and Structured Outputs**
+```bash
+# Create advanced output configuration
+cat > advanced-outputs.tf << 'EOF'
+# Conditional outputs based on environment and configuration
+output "infrastructure_endpoints" {
+  description = "Dynamic infrastructure endpoints based on deployment configuration"
+  value = {
+    # Conditional web endpoints
+    web_endpoints = var.instance_count > 1 ? {
+      load_balancer_dns = try(aws_lb.main[0].dns_name, null)
+      load_balancer_zone_id = try(aws_lb.main[0].zone_id, null)
+      health_check_url = try("https://${aws_lb.main[0].dns_name}/health", null)
+      target_group_arn = try(aws_lb_target_group.web[0].arn, null)
+    } : {
+      instance_public_ip = try(aws_instance.web[0].public_ip, null)
+      instance_private_ip = try(aws_instance.web[0].private_ip, null)
+      direct_access_url = try("http://${aws_instance.web[0].public_ip}", null)
+    }
+
+    # Conditional database endpoints
+    database_endpoints = var.enable_database ? {
+      primary_endpoint = aws_db_instance.main[0].endpoint
+      port = aws_db_instance.main[0].port
+      reader_endpoint = var.enable_read_replica ? aws_db_instance.replica[0].endpoint : null
+    } : null
+
+    # Environment-specific monitoring endpoints
+    monitoring_endpoints = var.environment == "production" ? {
+      cloudwatch_dashboard = "https://console.aws.amazon.com/cloudwatch/home?region=${var.aws_region}#dashboards:name=${local.name_prefix}"
+      parameter_store_path = "https://console.aws.amazon.com/systems-manager/parameters/?region=${var.aws_region}&tab=Table#list_parameter_filters=Name:Contains:${var.environment}"
+      secrets_manager = "https://console.aws.amazon.com/secretsmanager/home?region=${var.aws_region}#/listSecrets"
+    } : null
+  }
+
+  sensitive = false
+}
+
+# Advanced sensitive output handling
+output "security_credentials" {
+  description = "Security credentials and sensitive configuration data"
+  value = var.output_sensitive_data ? {
+    database_connection = var.enable_database ? {
+      username = aws_db_instance.main[0].username
+      endpoint = aws_db_instance.main[0].endpoint
+      port     = aws_db_instance.main[0].port
+      secret_arn = aws_secretsmanager_secret.dynamic_secrets["database-credentials"].arn
+    } : null
+
+    api_keys = {
+      app_api_key_parameter = aws_ssm_parameter.app_config["api-endpoint"].name
+      secrets_arns = {
+        for k, v in aws_secretsmanager_secret.dynamic_secrets : k => v.arn
+      }
+    }
+
+    encryption_keys = var.enable_encryption ? {
+      kms_key_id = aws_kms_key.main[0].id
+      kms_key_arn = aws_kms_key.main[0].arn
+    } : null
+  } : null
+
+  sensitive = true
+}
+
+# Configuration summary output
+output "deployment_summary" {
+  description = "Comprehensive deployment summary"
+  value = {
+    environment = var.environment
+    region = var.aws_region
+
+    infrastructure = {
+      compute_instances = var.instance_count
+      database_enabled = var.enable_database
+      load_balancer_enabled = var.instance_count > 1
+      encryption_enabled = var.enable_encryption
+    }
+
+    configuration = {
+      selected_config = local.selected_config
+      computed_variables = local.computed_variables
+      aws_integration = {
+        parameters_count = length(aws_ssm_parameter.app_config)
+        secrets_count = length(aws_secretsmanager_secret.dynamic_secrets)
+      }
+    }
+
+    costs_estimate = {
+      monthly_compute = var.instance_count * (var.environment == "production" ? 50 : 20)
+      monthly_database = var.enable_database ? (var.environment == "production" ? 100 : 30) : 0
+      monthly_storage = var.enable_database ? 10 : 0
+      total_estimated = var.instance_count * (var.environment == "production" ? 50 : 20) +
+                       (var.enable_database ? (var.environment == "production" ? 110 : 40) : 0)
+    }
+  }
+}
+EOF
+
+# Test advanced outputs
+terraform plan
+terraform apply -auto-approve
+
+# View outputs
+terraform output infrastructure_endpoints
+terraform output deployment_summary
+```
+
+### **Validation and Testing**
+
+**Test All Advanced Features**:
+```bash
+# Test 1: Advanced validation patterns
+terraform validate
+
+# Test 2: Dynamic variable processing
+terraform console << 'EOF'
+local.computed_variables
+local.selected_config
+EOF
+
+# Test 3: AWS integration
+aws ssm get-parameters-by-path --path "/${var.environment}/app-config" --region us-east-1
+
+# Test 4: Conditional outputs
+terraform output -json | jq '.infrastructure_endpoints.value'
+
+# Test 5: Sensitive data handling
+terraform output -json security_credentials
+
+echo "🎉 All advanced variable management patterns tested successfully!"
+```
+
 ---
 
-**Lab Duration**: 90-120 minutes  
-**Difficulty**: Intermediate to Advanced  
-**Next Topic**: State Management with AWS (Topic 6)  
+**Lab Duration**: 120-150 minutes
+**Difficulty**: Intermediate to Advanced
+**Next Topic**: State Management with AWS (Topic 6)
 **Prerequisites for Next Lab**: Understanding of variable patterns and output structures
+**🆕 2025 Features**: Advanced Validation, Dynamic Processing, AWS Integration

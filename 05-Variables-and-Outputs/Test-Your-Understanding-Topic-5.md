@@ -405,8 +405,142 @@ output "cost_information" {
 6. **AWS Integration** - Knowledge of AWS services for configuration management
 7. **Best Practices** - Application of enterprise-grade patterns and standards
 
+## 🆕 **2025 Advanced Variable Management Scenarios**
+
+### **Scenario 9: Advanced Multi-Validation with Business Logic**
+**Difficulty**: Expert
+**Time**: 25 minutes
+
+Your organization requires sophisticated variable validation that enforces business rules across multiple configuration dimensions.
+
+**Requirements**:
+- Implement complex object variables with nested validation rules
+- Create environment-specific validation logic (production vs. non-production)
+- Implement cross-field validation (e.g., capacity constraints, security requirements)
+- Create meaningful error messages for business rule violations
+
+**Deliverables**:
+- Complex variable definition with multiple validation blocks
+- Environment-specific business rule enforcement
+- Cross-field validation implementation
+- Comprehensive error message documentation
+
+**Evaluation Criteria**:
+- Variable complexity and structure (4 points)
+- Business rule implementation (3 points)
+- Cross-field validation (2 points)
+- Error message quality (1 point)
+
+### **Scenario 10: Dynamic Variable Processing with Functions**
+**Difficulty**: Expert
+**Time**: 30 minutes
+
+Design a dynamic configuration system that adapts variable processing based on environment and business requirements.
+
+**Requirements**:
+- Create environment-specific configuration maps
+- Implement dynamic variable selection using Terraform functions
+- Build conditional processing logic for different deployment scenarios
+- Generate computed variables based on business logic
+
+**Deliverables**:
+- Environment-specific configuration maps
+- Dynamic variable processing with local values
+- Conditional logic implementation
+- Computed variable generation system
+
+**Evaluation Criteria**:
+- Dynamic processing complexity (4 points)
+- Environment adaptation logic (3 points)
+- Function usage and optimization (2 points)
+- Business logic integration (1 point)
+
+### **Scenario 11: AWS Integration with Parameter Store and Secrets Manager**
+**Difficulty**: Advanced
+**Time**: 20 minutes
+
+Integrate Terraform variables with AWS Parameter Store and Secrets Manager for enterprise-grade configuration management.
+
+**Requirements**:
+- Configure dynamic parameter retrieval from AWS Parameter Store
+- Implement secrets management with automatic rotation
+- Create environment-specific parameter organization
+- Establish secure credential handling patterns
+
+**Deliverables**:
+- Parameter Store integration configuration
+- Secrets Manager setup with rotation
+- Environment-specific parameter organization
+- Security best practices implementation
+
+**Evaluation Criteria**:
+- AWS service integration (3 points)
+- Security implementation (3 points)
+- Parameter organization (2 points)
+- Rotation and lifecycle management (2 points)
+
+### **Scenario 12: Advanced Output Patterns with Conditional Logic**
+**Difficulty**: Expert
+**Time**: 25 minutes
+
+Create sophisticated output patterns that adapt to configuration and provide structured data for automation and integration.
+
+**Requirements**:
+- Implement conditional outputs based on deployment configuration
+- Create structured outputs for different consumer types (humans vs. automation)
+- Design sensitive output handling with appropriate security measures
+- Build output chaining patterns for module integration
+
+**Deliverables**:
+- Conditional output implementation
+- Structured output design for multiple consumers
+- Sensitive data handling patterns
+- Module integration output patterns
+
+**Evaluation Criteria**:
+- Output complexity and structure (4 points)
+- Conditional logic implementation (3 points)
+- Security and sensitive data handling (2 points)
+- Integration and automation support (1 point)
+
+## 📊 **Enhanced Assessment Summary**
+
+### **Total Points**: 130 points
+- **Core Variable Management (1-8)**: 90 points
+- **Advanced 2025 Patterns (9-12)**: 40 points
+
+### **Grading Scale**:
+- **Expert (117-130 points)**: Mastery of all patterns including cutting-edge features
+- **Advanced (104-116 points)**: Strong understanding with minor gaps in advanced features
+- **Intermediate (91-103 points)**: Good grasp of core concepts, needs practice with modern features
+- **Beginner (78-90 points)**: Basic understanding, requires additional study
+- **Needs Review (<78 points)**: Fundamental concepts need reinforcement
+
+### **2025 Skills Validation**:
+- ✅ **Core Variables**: Types, validation, sensitive data mastery
+- ✅ **Advanced Validation**: Multi-rule validation with business logic
+- ✅ **Dynamic Processing**: Function-based variable computation
+- ✅ **AWS Integration**: Parameter Store and Secrets Manager patterns
+- ✅ **Output Mastery**: Conditional and structured output patterns
+- ✅ **Security Excellence**: Comprehensive sensitive data handling
+- ✅ **Enterprise Patterns**: Business rule integration and governance
+- ✅ **Modern Features**: Terraform 1.13 advanced capabilities
+
+### **Key Learning Outcomes**:
+1. **Complex Variable Design** - Ability to create sophisticated variable structures
+2. **Validation Implementation** - Skill in preventing configuration errors
+3. **Sensitive Data Management** - Knowledge of secure credential handling
+4. **Output Patterns** - Understanding of module integration and automation
+5. **Dynamic Configuration** - Ability to create flexible, environment-aware configurations
+6. **AWS Integration** - Knowledge of AWS services for configuration management
+7. **Best Practices** - Application of enterprise-grade patterns and standards
+8. **🆕 Advanced Validation** - Multi-rule business logic implementation
+9. **🆕 Dynamic Processing** - Function-based variable computation
+10. **🆕 Cloud Integration** - AWS Parameter Store and Secrets Manager mastery
+
 ---
 
-**Assessment Version**: 5.0  
-**Last Updated**: January 2025  
+**Assessment Version**: 6.0
+**Last Updated**: September 2025
 **Next Topic**: State Management with AWS (Topic 6)
+**2025 Features**: Advanced Validation, Dynamic Processing, AWS Integration
