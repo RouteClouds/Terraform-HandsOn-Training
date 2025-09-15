@@ -1,0 +1,289 @@
+# =============================================================================
+# AWS Terraform Training - Topic 6: State Management with AWS
+# Example Terraform Variables Configuration
+# =============================================================================
+# 
+# Instructions:
+# 1. Copy this file to terraform.tfvars
+# 2. Uncomment and modify values as needed for your environment
+# 3. Never commit terraform.tfvars to version control
+# 4. Use different variable files for different environments
+# 
+# =============================================================================
+
+# =============================================================================
+# Project and Environment Configuration
+# =============================================================================
+
+# Project name for resource naming and tagging
+project_name = "terraform-state-management-training"
+
+# Environment name (development, staging, production)
+environment = "development"
+
+# Owner of the resources for accountability
+owner = "terraform-training-team"
+
+# Cost center for billing and resource allocation
+cost_center = "training-infrastructure"
+
+# =============================================================================
+# AWS Configuration
+# =============================================================================
+
+# Primary AWS region for resource deployment
+aws_region = "us-east-1"
+
+# Secondary AWS region for backup and disaster recovery
+backup_region = "us-west-2"
+
+# =============================================================================
+# Cross-Account Access Configuration (Optional)
+# =============================================================================
+
+# ARN of the IAM role to assume for cross-account access
+# Uncomment and set if using cross-account deployment
+# assume_role_arn = "arn:aws:iam::123456789012:role/TerraformExecutionRole"
+
+# External ID for assume role operations (security best practice)
+# Uncomment and set if using cross-account deployment with external ID
+# external_id = "unique-external-id-for-security"
+
+# =============================================================================
+# State Backend Configuration
+# =============================================================================
+
+# Name of the S3 bucket for Terraform state storage
+# Leave null to auto-generate based on project name
+# state_bucket_name = "my-custom-terraform-state-bucket"
+
+# Name of the DynamoDB table for state locking
+dynamodb_table_name = "terraform-state-locks"
+
+# Enable server-side encryption for state files
+enable_state_encryption = true
+
+# KMS key ID for state file encryption (optional)
+# Leave null to use AWS managed encryption
+# kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
+
+# =============================================================================
+# Workspace and Environment Management
+# =============================================================================
+
+# Map of workspace names to environment configurations
+workspace_environments = {
+  development = {
+    environment_type  = "dev"
+    instance_types    = ["t3.micro", "t3.small"]
+    min_capacity      = 1
+    max_capacity      = 3
+    enable_monitoring = false
+    backup_retention  = 7
+  }
+  staging = {
+    environment_type  = "stage"
+    instance_types    = ["t3.medium", "m5.large"]
+    min_capacity      = 2
+    max_capacity      = 5
+    enable_monitoring = true
+    backup_retention  = 14
+  }
+  production = {
+    environment_type  = "prod"
+    instance_types    = ["m5.large", "m5.xlarge"]
+    min_capacity      = 3
+    max_capacity      = 10
+    enable_monitoring = true
+    backup_retention  = 30
+  }
+}
+
+# =============================================================================
+# Network Configuration
+# =============================================================================
+
+# CIDR block for the VPC
+vpc_cidr = "10.0.0.0/16"
+
+# List of availability zones to use
+availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+# =============================================================================
+# Security Configuration
+# =============================================================================
+
+# Enable VPC Flow Logs for network monitoring
+enable_vpc_flow_logs = true
+
+# Enable CloudTrail for API logging and auditing
+enable_cloudtrail = true
+
+# Number of days to retain CloudTrail logs
+cloudtrail_retention_days = 90
+
+# =============================================================================
+# Monitoring and Alerting
+# =============================================================================
+
+# Enable detailed CloudWatch monitoring
+enable_detailed_monitoring = false
+
+# Email address for notifications and alerts
+notification_email = "admin@example.com"
+
+# =============================================================================
+# Cost Management
+# =============================================================================
+
+# Enable cost allocation tags for billing analysis
+enable_cost_allocation_tags = true
+
+# Monthly budget limit in USD for cost monitoring
+budget_limit = 100
+
+# =============================================================================
+# Feature Flags
+# =============================================================================
+
+# Enable resources in backup region for disaster recovery
+enable_backup_region_resources = false
+
+# Enable cross-region replication for state backups
+enable_cross_region_replication = false
+
+# Enable versioning for state files
+enable_state_versioning = true
+
+# Number of state file versions to retain
+state_version_retention = 10
+
+# =============================================================================
+# Environment-Specific Examples
+# =============================================================================
+
+# Development Environment Example
+# Uncomment and modify for development environment
+# project_name = "terraform-state-dev"
+# environment = "development"
+# aws_region = "us-east-1"
+# enable_detailed_monitoring = false
+# budget_limit = 50
+# enable_backup_region_resources = false
+
+# Staging Environment Example
+# Uncomment and modify for staging environment
+# project_name = "terraform-state-staging"
+# environment = "staging"
+# aws_region = "us-east-1"
+# backup_region = "us-west-2"
+# enable_detailed_monitoring = true
+# budget_limit = 200
+# enable_backup_region_resources = true
+# enable_cross_region_replication = true
+
+# Production Environment Example
+# Uncomment and modify for production environment
+# project_name = "terraform-state-prod"
+# environment = "production"
+# aws_region = "us-east-1"
+# backup_region = "us-west-2"
+# enable_detailed_monitoring = true
+# budget_limit = 1000
+# enable_backup_region_resources = true
+# enable_cross_region_replication = true
+# cloudtrail_retention_days = 365
+# state_version_retention = 50
+
+# =============================================================================
+# Multi-Account Setup Example
+# =============================================================================
+
+# Shared Services Account (for state backend)
+# project_name = "terraform-state-shared"
+# environment = "shared-services"
+# aws_region = "us-east-1"
+# assume_role_arn = null
+# enable_cross_region_replication = true
+# cloudtrail_retention_days = 2555  # 7 years
+
+# Development Account (using shared state backend)
+# project_name = "app-development"
+# environment = "development"
+# aws_region = "us-east-1"
+# assume_role_arn = "arn:aws:iam::111111111111:role/TerraformDevelopmentRole"
+# external_id = "dev-external-id"
+# state_bucket_name = "shared-terraform-state-bucket"
+
+# Production Account (using shared state backend)
+# project_name = "app-production"
+# environment = "production"
+# aws_region = "us-east-1"
+# assume_role_arn = "arn:aws:iam::333333333333:role/TerraformProductionRole"
+# external_id = "prod-external-id"
+# state_bucket_name = "shared-terraform-state-bucket"
+
+# =============================================================================
+# Advanced Configuration Examples
+# =============================================================================
+
+# Custom KMS Key Configuration
+# kms_key_id = "arn:aws:kms:us-east-1:123456789012:key/12345678-1234-1234-1234-123456789012"
+# enable_state_encryption = true
+
+# Custom Networking Configuration
+# vpc_cidr = "172.16.0.0/16"
+# availability_zones = ["us-east-1a", "us-east-1b", "us-east-1d"]
+
+# Enhanced Security Configuration
+# enable_vpc_flow_logs = true
+# enable_cloudtrail = true
+# cloudtrail_retention_days = 2555  # 7 years for compliance
+# enable_detailed_monitoring = true
+
+# Cost Optimization Configuration
+# budget_limit = 500
+# enable_cost_allocation_tags = true
+# state_version_retention = 5  # Reduce for cost savings
+
+# =============================================================================
+# Workspace-Specific Variable Files
+# =============================================================================
+# 
+# For workspace-specific configurations, create separate .tfvars files:
+# 
+# development.tfvars:
+# environment = "development"
+# enable_detailed_monitoring = false
+# budget_limit = 50
+# 
+# staging.tfvars:
+# environment = "staging"
+# enable_detailed_monitoring = true
+# budget_limit = 200
+# 
+# production.tfvars:
+# environment = "production"
+# enable_detailed_monitoring = true
+# budget_limit = 1000
+# enable_backup_region_resources = true
+# 
+# Usage:
+# terraform apply -var-file="development.tfvars"
+# terraform apply -var-file="staging.tfvars"
+# terraform apply -var-file="production.tfvars"
+# 
+# =============================================================================
+
+# =============================================================================
+# Security Notes:
+# 
+# 1. Never commit terraform.tfvars to version control
+# 2. Use environment variables for sensitive values:
+#    export TF_VAR_external_id="your-secret-external-id"
+# 3. Consider using AWS Secrets Manager for sensitive configuration
+# 4. Use IAM roles instead of access keys when possible
+# 5. Enable MFA for production environments
+# 6. Regularly rotate external IDs and access credentials
+# 
+# =============================================================================
