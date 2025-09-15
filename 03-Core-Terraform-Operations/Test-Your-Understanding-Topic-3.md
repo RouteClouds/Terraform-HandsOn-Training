@@ -401,14 +401,114 @@ Upon successful completion of this assessment, you demonstrate:
 - [Terraform State Management](https://developer.hashicorp.com/terraform/language/state)
 - [Performance Optimization Guide](https://developer.hashicorp.com/terraform/internals/debugging)
 
+## 🆕 **2025 Advanced Scenarios**
+
+### **Scenario 9: Terraform 1.13 Stacks Implementation**
+**Difficulty**: Expert
+**Time**: 25 minutes
+
+Your organization needs to manage a complex multi-tier application with separate infrastructure and application stacks that have dependencies.
+
+**Requirements**:
+- Design a stack-based architecture using Terraform 1.13 features
+- Implement proper dependency management between stacks
+- Configure input/output passing between stack components
+- Create validation rules for stack configurations
+
+**Deliverables**:
+- Stack configuration files
+- Dependency mapping documentation
+- Input/output flow diagram
+- Validation and testing procedures
+
+**Evaluation Criteria**:
+- Stack architecture design (4 points)
+- Dependency management (3 points)
+- Input/output configuration (2 points)
+- Validation implementation (1 point)
+
+### **Scenario 10: Advanced Performance Optimization**
+**Difficulty**: Expert
+**Time**: 20 minutes
+
+Optimize a large-scale Terraform deployment with 100+ resources for maximum performance and reliability.
+
+**Requirements**:
+- Implement advanced parallelism strategies
+- Configure resource targeting for efficient deployments
+- Set up performance monitoring and alerting
+- Create optimization documentation and best practices
+
+**Deliverables**:
+- Performance optimization configuration
+- Monitoring and alerting setup
+- Benchmarking results and analysis
+- Best practices documentation
+
+**Evaluation Criteria**:
+- Parallelism optimization (3 points)
+- Monitoring implementation (3 points)
+- Performance analysis (2 points)
+- Documentation quality (2 points)
+
+### **Scenario 11: Enterprise CI/CD Integration**
+**Difficulty**: Advanced
+**Time**: 30 minutes
+
+Implement a complete CI/CD pipeline for Terraform operations with modern authentication and security practices.
+
+**Requirements**:
+- Create GitHub Actions workflow with OIDC authentication
+- Implement automated validation and testing
+- Set up plan approval workflows
+- Configure security scanning and compliance checks
+
+**Deliverables**:
+- Complete CI/CD pipeline configuration
+- Security and compliance integration
+- Approval workflow implementation
+- Testing and validation automation
+
+**Evaluation Criteria**:
+- Pipeline design (3 points)
+- Security implementation (3 points)
+- Approval workflow (2 points)
+- Testing automation (2 points)
+
+## 📊 **Enhanced Assessment Summary**
+
+### **Total Points**: 110 points
+- **Core Operations (1-8)**: 80 points
+- **Advanced 2025 Features (9-11)**: 30 points
+
+### **Grading Scale**:
+- **Expert (99-110 points)**: Mastery of all operations including cutting-edge features
+- **Advanced (88-98 points)**: Strong understanding with minor gaps in advanced features
+- **Intermediate (77-87 points)**: Good grasp of core concepts, needs practice with modern features
+- **Beginner (66-76 points)**: Basic understanding, requires additional study
+- **Needs Review (<66 points)**: Fundamental concepts need reinforcement
+
+### **2025 Skills Validation**:
+- ✅ **Core Workflow**: init, plan, apply, destroy mastery
+- ✅ **Resource Lifecycle**: Creation, updates, deletion patterns
+- ✅ **Dependency Management**: Implicit and explicit dependencies
+- ✅ **Performance Optimization**: Parallelism and targeting
+- ✅ **Error Recovery**: Systematic troubleshooting approaches
+- ✅ **Modern Features**: Terraform 1.13 stacks and validation
+- ✅ **CI/CD Integration**: Automated workflows and security
+- ✅ **Enterprise Patterns**: Team collaboration and governance
+
 ### **Practice Labs**
 - Complete Lab 3.2: Advanced Resource Management
 - Explore Lab 4.1: Resource Dependencies and Data Sources
 - Practice Lab 5.1: Variables and Outputs Management
+- **🆕 New**: Lab 3.3: Terraform 1.13 Stacks Implementation
+- **🆕 New**: Lab 3.4: Enterprise CI/CD Pipeline Setup
 
 ---
 
-**Assessment Version**: 3.0  
-**Last Updated**: January 2025  
-**Aligned with**: Terraform ~> 1.13.0, AWS Provider ~> 6.12.0  
+**Assessment Version**: 4.0
+**Last Updated**: September 2025
+**Aligned with**: Terraform ~> 1.13.0, AWS Provider ~> 6.12.0
 **Review Date**: Quarterly updates recommended
+**2025 Features**: Stacks, Enhanced Validation, Modern CI/CD

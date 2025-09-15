@@ -1,387 +1,703 @@
 #!/usr/bin/env python3
 """
-AWS Terraform Training - Core Terraform Operations
-Diagram as Code (DaC) Generation Script
+Professional Diagram Generation Script for Topic 3: Core Terraform Operations
 
-This script generates 5 professional diagrams for the Core Terraform Operations module:
-1. Terraform Core Workflow
-2. Resource Lifecycle States
-3. Dependency Graph Example
-4. Performance Optimization
-5. Error Recovery Patterns
+This script generates 5 high-quality architectural diagrams using Python and the diagrams library.
+All diagrams follow AWS brand guidelines and are optimized for 300 DPI resolution.
 
-Requirements:
-- Python 3.9+
-- diagrams library
-- Graphviz
+Author: AWS Terraform Training Team
+Version: 2.0
+Date: January 2025
 """
 
 import os
 import sys
 from pathlib import Path
 
-# Add current directory to path for imports
-sys.path.append(str(Path(__file__).parent))
-
+# Import required libraries
 try:
     from diagrams import Diagram, Cluster, Edge
-    from diagrams.aws.compute import EC2
+    from diagrams.aws.compute import EC2, AutoScaling
     from diagrams.aws.database import DynamodbTable
-    from diagrams.aws.network import VPC, ELB, InternetGateway
+    from diagrams.aws.network import VPC, ELB, InternetGateway, PublicSubnet, PrivateSubnet
     from diagrams.aws.security import IAM
+    from diagrams.generic.network import Firewall
     from diagrams.aws.storage import S3
-    from diagrams.aws.management import Cloudwatch
+    from diagrams.aws.management import Cloudwatch, Cloudtrail
     from diagrams.aws.general import General, Users
     from diagrams.onprem.vcs import Git
     from diagrams.onprem.ci import Jenkins
     from diagrams.onprem.client import Users as LocalUsers
+    from diagrams.onprem.iac import Terraform
     from diagrams.programming.language import Python
     from diagrams.generic.blank import Blank
     from diagrams.generic.compute import Rack
     from diagrams.generic.network import Switch
     from diagrams.generic.storage import Storage
     from diagrams.generic.os import Ubuntu, Windows, IOS
+    from diagrams.onprem.monitoring import Grafana
 except ImportError as e:
     print(f"Error importing required libraries: {e}")
     print("Please install required packages: pip install diagrams")
     sys.exit(1)
 
-# Configuration
-OUTPUT_DIR = Path(__file__).parent / "generated_diagrams"
-DPI = 300  # High resolution for professional quality
+# AWS Brand Colors (Official AWS Color Palette)
+COLORS = {
+    'primary': '#FF9900',      # AWS Orange
+    'secondary': '#232F3E',    # AWS Dark Blue
+    'accent': '#146EB4',       # AWS Blue
+    'success': '#7AA116',      # AWS Green
+    'warning': '#FF9900',      # AWS Orange
+    'background': '#F2F3F3',   # Light Gray
+    'text': '#232F3E'          # Dark Blue
+}
 
-def setup_output_directory():
-    """Create output directory if it doesn't exist."""
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    print(f"Output directory: {OUTPUT_DIR}")
+# Configuration for high-quality output
+DIAGRAM_CONFIG = {
+    'direction': 'TB',  # Top to Bottom
+    'graph_attr': {
+        'fontsize': '16',
+        'fontname': 'Arial',
+        'bgcolor': COLORS['background'],
+        'pad': '1.0',
+        'nodesep': '1.0',
+        'ranksep': '1.5',
+        'dpi': '300'  # High resolution for professional quality
+    },
+    'node_attr': {
+        'fontsize': '12',
+        'fontname': 'Arial',
+        'style': 'rounded,filled',
+        'fillcolor': 'white',
+        'color': COLORS['secondary']
+    },
+    'edge_attr': {
+        'fontsize': '10',
+        'fontname': 'Arial',
+        'color': COLORS['accent']
+    }
+}
 
-def generate_core_workflow():
-    """Generate Figure 3.1: Terraform Core Workflow."""
-    print("Generating Figure 3.1: Terraform Core Workflow...")
-    
+def ensure_output_directory():
+    """Create output directory if it doesn't exist"""
+    output_dir = Path("generated_diagrams")
+    output_dir.mkdir(exist_ok=True)
+    return output_dir
+def create_terraform_core_workflow():
+    """
+    Figure 3.1: Terraform Core Operations Workflow and Lifecycle
+
+    This diagram illustrates the complete Terraform workflow including
+    initialization, planning, applying, and destroying infrastructure.
+    """
+    output_dir = ensure_output_directory()
+
     with Diagram(
-        "Figure 3.1: Terraform Core Workflow",
-        filename=str(OUTPUT_DIR / "core_workflow"),
+        "Figure 3.1: Terraform Core Operations Workflow and Lifecycle",
+        filename=str(output_dir / "figure_3_1_terraform_core_workflow"),
         show=False,
         direction="TB",
-        graph_attr={
-            "dpi": str(DPI),
-            "bgcolor": "white",
-            "fontname": "Arial",
-            "fontsize": "16"
-        }
+        graph_attr=DIAGRAM_CONFIG['graph_attr'],
+        node_attr=DIAGRAM_CONFIG['node_attr'],
+        edge_attr=DIAGRAM_CONFIG['edge_attr']
     ):
-        # Developer
-        developer = LocalUsers("Developer")
-        
-        # Terraform Operations
-        with Cluster("Terraform Core Operations"):
-            # Init Phase
-            with Cluster("1. Initialize"):
-                init_cmd = General("terraform init")
-                provider_download = General("Download\nProviders")
-                backend_setup = General("Setup\nBackend")
-                
-            # Plan Phase
-            with Cluster("2. Plan"):
-                plan_cmd = General("terraform plan")
-                state_refresh = General("Refresh\nState")
-                generate_plan = General("Generate\nPlan")
-                
-            # Apply Phase
-            with Cluster("3. Apply"):
-                apply_cmd = General("terraform apply")
-                create_resources = General("Create\nResources")
-                update_state = General("Update\nState")
-                
-            # Destroy Phase
-            with Cluster("4. Destroy"):
-                destroy_cmd = General("terraform destroy")
-                delete_resources = General("Delete\nResources")
-                clean_state = General("Clean\nState")
-        
-        # Infrastructure
-        with Cluster("AWS Infrastructure"):
-            vpc = VPC("VPC")
-            ec2 = EC2("EC2")
-            s3 = S3("S3")
-            
-        # State Storage
-        state_backend = S3("State Backend")
-        
-        # Workflow connections
-        developer >> init_cmd >> [provider_download, backend_setup]
-        developer >> plan_cmd >> [state_refresh, generate_plan]
-        developer >> apply_cmd >> [create_resources, update_state]
-        developer >> destroy_cmd >> [delete_resources, clean_state]
-        
-        # Infrastructure connections
-        [create_resources, delete_resources] >> [vpc, ec2, s3]
-        [update_state, clean_state] >> state_backend
 
-def generate_resource_lifecycle():
-    """Generate Figure 3.2: Resource Lifecycle States."""
-    print("Generating Figure 3.2: Resource Lifecycle States...")
-    
+        # Developer Environment
+        with Cluster("Developer Environment"):
+            developer = LocalUsers("Developer")
+            terraform_config = Storage("Terraform Configuration")
+            git_repo = Git("Git Repository")
+
+            developer >> terraform_config >> git_repo
+
+        # Terraform Core Operations
+        with Cluster("Terraform Core Operations"):
+            # Initialization Phase
+            with Cluster("1. Initialization (terraform init)"):
+                terraform_init = Terraform("terraform init")
+                provider_download = Storage("Provider Download")
+                plugin_cache = Storage("Plugin Cache")
+                backend_init = Storage("Backend Initialization")
+                module_download = Storage("Module Download")
+
+                terraform_init >> [provider_download, plugin_cache, backend_init, module_download]
+
+            # Planning Phase
+            with Cluster("2. Planning (terraform plan)"):
+                terraform_plan = Terraform("terraform plan")
+                state_refresh = Storage("State Refresh")
+                dependency_graph = Storage("Dependency Graph")
+                change_calculation = Storage("Change Calculation")
+                plan_output = Storage("Plan Output")
+
+                terraform_plan >> [state_refresh, dependency_graph, change_calculation, plan_output]
+
+            # Validation Phase
+            with Cluster("3. Validation (terraform validate)"):
+                terraform_validate = Terraform("terraform validate")
+                syntax_check = Storage("Syntax Check")
+                configuration_check = Storage("Configuration Check")
+                provider_validation = Storage("Provider Validation")
+
+                terraform_validate >> [syntax_check, configuration_check, provider_validation]
+
+            # Application Phase
+            with Cluster("4. Application (terraform apply)"):
+                terraform_apply = Terraform("terraform apply")
+                resource_creation = Storage("Resource Creation")
+                resource_modification = Storage("Resource Modification")
+                state_update = Storage("State Update")
+                output_generation = Storage("Output Generation")
+
+                terraform_apply >> [resource_creation, resource_modification, state_update, output_generation]
+
+        # AWS Infrastructure Layer
+        with Cluster("AWS Infrastructure"):
+            # Networking
+            with Cluster("Networking"):
+                vpc = VPC("VPC")
+                subnets = PublicSubnet("Subnets")
+                igw = InternetGateway("Internet Gateway")
+
+                vpc >> [subnets, igw]
+
+            # Compute
+            with Cluster("Compute"):
+                ec2_instances = EC2("EC2 Instances")
+                auto_scaling = AutoScaling("Auto Scaling")
+                load_balancer = ELB("Load Balancer")
+
+                load_balancer >> auto_scaling >> ec2_instances
+
+            # Storage and Database
+            with Cluster("Storage & Database"):
+                s3_bucket = S3("S3 Bucket")
+                dynamodb = DynamodbTable("DynamoDB")
+
+        # State Management
+        with Cluster("State Management"):
+            local_state = Storage("Local State")
+            remote_state = S3("Remote State (S3)")
+            state_locking = DynamodbTable("State Locking")
+            state_backup = Storage("State Backup")
+
+            local_state >> remote_state >> state_locking
+            remote_state >> state_backup
+
+        # Monitoring and Logging
+        with Cluster("Monitoring & Logging"):
+            cloudwatch = Cloudwatch("CloudWatch")
+            cloudtrail = Cloudtrail("CloudTrail")
+            terraform_logs = Storage("Terraform Logs")
+
+        # Workflow Connections
+        terraform_config >> Edge(label="init", color=COLORS['success']) >> terraform_init
+        terraform_init >> Edge(label="plan", color=COLORS['accent']) >> terraform_plan
+        terraform_plan >> Edge(label="validate", color=COLORS['primary']) >> terraform_validate
+        terraform_validate >> Edge(label="apply", color=COLORS['warning']) >> terraform_apply
+
+        # Infrastructure Connections
+        terraform_apply >> Edge(label="creates", color=COLORS['success']) >> vpc
+        terraform_apply >> Edge(label="manages", color=COLORS['accent']) >> [ec2_instances, s3_bucket, dynamodb]
+
+        # State Management Connections
+        terraform_apply >> Edge(label="updates", color=COLORS['secondary']) >> remote_state
+
+        # Monitoring Connections
+        [vpc, ec2_instances, s3_bucket] >> cloudwatch
+        terraform_apply >> cloudtrail
+        terraform_apply >> terraform_logs
+def create_resource_lifecycle_management():
+    """
+    Figure 3.2: Terraform Resource Lifecycle Management and States
+
+    This diagram shows the complete lifecycle of Terraform resources
+    including creation, updates, and destruction with state transitions.
+    """
+    output_dir = ensure_output_directory()
+
     with Diagram(
-        "Figure 3.2: Resource Lifecycle States",
-        filename=str(OUTPUT_DIR / "resource_lifecycle"),
+        "Figure 3.2: Terraform Resource Lifecycle Management and States",
+        filename=str(output_dir / "figure_3_2_resource_lifecycle"),
         show=False,
-        direction="LR",
-        graph_attr={
-            "dpi": str(DPI),
-            "bgcolor": "white",
-            "fontname": "Arial",
-            "fontsize": "16"
-        }
+        direction="TB",
+        graph_attr=DIAGRAM_CONFIG['graph_attr'],
+        node_attr=DIAGRAM_CONFIG['node_attr'],
+        edge_attr=DIAGRAM_CONFIG['edge_attr']
     ):
-        # Lifecycle States
-        with Cluster("Resource Lifecycle"):
-            # Creation
-            with Cluster("Creation Phase"):
-                planned = General("Planned")
-                creating = General("Creating")
-                created = General("Created")
-                
-            # Update
-            with Cluster("Update Phase"):
-                updating = General("Updating")
-                updated = General("Updated")
-                
-            # Destruction
-            with Cluster("Destruction Phase"):
-                destroying = General("Destroying")
-                destroyed = General("Destroyed")
-        
+
         # Terraform Operations
         with Cluster("Terraform Operations"):
-            plan_op = General("terraform plan")
-            apply_op = General("terraform apply")
-            destroy_op = General("terraform destroy")
-            
-        # Meta-Arguments
-        with Cluster("Meta-Arguments"):
-            count_arg = General("count")
-            for_each_arg = General("for_each")
-            lifecycle_arg = General("lifecycle")
-            depends_on_arg = General("depends_on")
-        
-        # AWS Resources
-        with Cluster("AWS Resources"):
-            ec2_instance = EC2("EC2 Instance")
-            s3_bucket = S3("S3 Bucket")
-            vpc_resource = VPC("VPC")
-        
-        # Lifecycle flow
-        plan_op >> planned >> apply_op >> creating >> created
-        created >> updating >> updated
-        created >> destroy_op >> destroying >> destroyed
-        
-        # Meta-arguments influence
-        [count_arg, for_each_arg, lifecycle_arg, depends_on_arg] >> [creating, updating, destroying]
-        
-        # Resource examples
-        [created, updated] >> [ec2_instance, s3_bucket, vpc_resource]
+            terraform_plan = Terraform("terraform plan")
+            terraform_apply = Terraform("terraform apply")
+            terraform_destroy = Terraform("terraform destroy")
+            terraform_refresh = Terraform("terraform refresh")
+            terraform_taint = Terraform("terraform taint")
 
-def generate_dependency_graph():
-    """Generate Figure 3.3: Dependency Graph Example."""
-    print("Generating Figure 3.3: Dependency Graph Example...")
-    
+        # Resource Lifecycle States
+        with Cluster("Resource Lifecycle States"):
+            # Planning States
+            with Cluster("Planning States"):
+                to_create = Storage("To Create (+)")
+                to_update = Storage("To Update (~)")
+                to_destroy = Storage("To Destroy (-)")
+                no_change = Storage("No Change")
+
+            # Execution States
+            with Cluster("Execution States"):
+                creating = Storage("Creating")
+                updating = Storage("Updating")
+                destroying = Storage("Destroying")
+
+            # Final States
+            with Cluster("Final States"):
+                created = Storage("Created")
+                updated = Storage("Updated")
+                destroyed = Storage("Destroyed")
+                tainted = Storage("Tainted")
+
+        # Resource Meta-Arguments
+        with Cluster("Resource Meta-Arguments"):
+            count_meta = Storage("count")
+            for_each_meta = Storage("for_each")
+            lifecycle_meta = Storage("lifecycle")
+            depends_on_meta = Storage("depends_on")
+            provider_meta = Storage("provider")
+
+        # Lifecycle Rules
+        with Cluster("Lifecycle Rules"):
+            create_before_destroy = Storage("create_before_destroy")
+            prevent_destroy = Storage("prevent_destroy")
+            ignore_changes = Storage("ignore_changes")
+            replace_triggered_by = Storage("replace_triggered_by")
+
+        # AWS Resource Examples
+        with Cluster("AWS Resource Examples"):
+            # Simple Resources
+            with Cluster("Simple Resources"):
+                ec2_instance = EC2("EC2 Instance")
+                s3_bucket = S3("S3 Bucket")
+                iam_role = IAM("IAM Role")
+
+            # Complex Resources
+            with Cluster("Complex Resources"):
+                vpc_resource = VPC("VPC")
+                auto_scaling_group = AutoScaling("Auto Scaling Group")
+                load_balancer = ELB("Load Balancer")
+
+        # State Management
+        with Cluster("State Management"):
+            terraform_state = Storage("terraform.tfstate")
+            state_backup = Storage("State Backup")
+            state_lock = DynamodbTable("State Lock")
+
+        # Operation Flow
+        terraform_plan >> Edge(label="analyzes", color=COLORS['accent']) >> [to_create, to_update, to_destroy, no_change]
+
+        # Apply Operations
+        terraform_apply >> Edge(label="create", color=COLORS['success']) >> creating >> created
+        terraform_apply >> Edge(label="update", color=COLORS['warning']) >> updating >> updated
+        terraform_apply >> Edge(label="destroy", color="red") >> destroying >> destroyed
+
+        # Taint Operations
+        terraform_taint >> Edge(label="marks", style="dashed", color="red") >> tainted
+        tainted >> Edge(label="forces recreation", color="red") >> destroying
+
+        # Meta-Arguments Influence
+        [count_meta, for_each_meta] >> Edge(label="controls instances", color=COLORS['primary']) >> creating
+        lifecycle_meta >> Edge(label="controls behavior", color=COLORS['secondary']) >> [create_before_destroy, prevent_destroy, ignore_changes]
+        depends_on_meta >> Edge(label="explicit dependency", style="dashed", color=COLORS['accent']) >> creating
+
+        # Resource Examples
+        created >> [ec2_instance, s3_bucket, iam_role]
+        updated >> [vpc_resource, auto_scaling_group, load_balancer]
+
+        # State Management
+        [created, updated, destroyed] >> Edge(label="updates", color=COLORS['secondary']) >> terraform_state
+        terraform_state >> state_backup
+        terraform_apply >> state_lock
+
+def create_dependency_graph_and_ordering():
+    """
+    Figure 3.3: Terraform Dependency Graph and Resource Ordering
+
+    This diagram demonstrates how Terraform builds dependency graphs
+    and determines resource creation order for complex infrastructures.
+    """
+    output_dir = ensure_output_directory()
+
     with Diagram(
-        "Figure 3.3: Dependency Graph Example",
-        filename=str(OUTPUT_DIR / "dependency_graph"),
+        "Figure 3.3: Terraform Dependency Graph and Resource Ordering",
+        filename=str(output_dir / "figure_3_3_dependency_graph"),
         show=False,
         direction="TB",
-        graph_attr={
-            "dpi": str(DPI),
-            "bgcolor": "white",
-            "fontname": "Arial",
-            "fontsize": "16"
-        }
+        graph_attr=DIAGRAM_CONFIG['graph_attr'],
+        node_attr=DIAGRAM_CONFIG['node_attr'],
+        edge_attr=DIAGRAM_CONFIG['edge_attr']
     ):
-        # Infrastructure Components
-        with Cluster("VPC Infrastructure"):
+
+        # Dependency Types
+        with Cluster("Dependency Types"):
+            implicit_dep = Storage("Implicit Dependencies")
+            explicit_dep = Storage("Explicit Dependencies (depends_on)")
+            data_dep = Storage("Data Source Dependencies")
+            provider_dep = Storage("Provider Dependencies")
+
+        # Infrastructure Foundation Layer (Order 1)
+        with Cluster("Foundation Layer (Order 1)"):
             vpc = VPC("VPC")
-            igw = InternetGateway("Internet Gateway")
-            
-        with Cluster("Networking"):
-            public_subnet = General("Public Subnet")
-            private_subnet = General("Private Subnet")
-            route_table = General("Route Table")
-            
-        with Cluster("Security"):
-            security_group = General("Security Group")
-            
-        with Cluster("Compute"):
-            ec2_web = EC2("Web Server")
-            ec2_app = EC2("App Server")
-            
-        with Cluster("Load Balancing"):
-            alb = ELB("Application\nLoad Balancer")
-            
-        with Cluster("Storage"):
-            s3_bucket = S3("S3 Bucket")
-            
-        # Dependency relationships
-        vpc >> Edge(label="implicit") >> [public_subnet, private_subnet, security_group]
-        vpc >> Edge(label="implicit") >> igw
-        igw >> Edge(label="implicit") >> route_table
-        public_subnet >> Edge(label="implicit") >> route_table
-        
-        [public_subnet, security_group] >> Edge(label="implicit") >> ec2_web
-        [private_subnet, security_group] >> Edge(label="implicit") >> ec2_app
-        
-        [public_subnet, private_subnet, security_group] >> Edge(label="implicit") >> alb
-        igw >> Edge(label="depends_on") >> alb
-        
-        # Independent resource
-        s3_bucket
+            kms_key = Storage("KMS Key")
+            iam_role = IAM("IAM Role")
 
-def generate_performance_optimization():
-    """Generate Figure 3.4: Performance Optimization."""
-    print("Generating Figure 3.4: Performance Optimization...")
-    
+        # Network Layer (Order 2)
+        with Cluster("Network Layer (Order 2)"):
+            internet_gateway = InternetGateway("Internet Gateway")
+            public_subnet = PublicSubnet("Public Subnet")
+            private_subnet = PrivateSubnet("Private Subnet")
+            route_table = Storage("Route Table")
+            nat_gateway = Storage("NAT Gateway")
+
+        # Security Layer (Order 3)
+        with Cluster("Security Layer (Order 3)"):
+            security_group_web = Firewall("Web Security Group")
+            security_group_app = Firewall("App Security Group")
+            security_group_db = Firewall("DB Security Group")
+
+        # Application Layer (Order 4)
+        with Cluster("Application Layer (Order 4)"):
+            load_balancer = ELB("Application Load Balancer")
+            auto_scaling_group = AutoScaling("Auto Scaling Group")
+            ec2_instances = EC2("EC2 Instances")
+
+        # Data Layer (Order 5)
+        with Cluster("Data Layer (Order 5)"):
+            rds_subnet_group = Storage("RDS Subnet Group")
+            rds_instance = Storage("RDS Instance")
+            s3_bucket = S3("S3 Bucket")
+
+        # Monitoring Layer (Order 6)
+        with Cluster("Monitoring Layer (Order 6)"):
+            cloudwatch_alarms = Cloudwatch("CloudWatch Alarms")
+            cloudtrail = Cloudtrail("CloudTrail")
+
+        # Dependency Graph Visualization
+        with Cluster("Dependency Resolution"):
+            dependency_analyzer = Storage("Dependency Analyzer")
+            parallel_execution = Storage("Parallel Execution")
+            sequential_execution = Storage("Sequential Execution")
+            error_handling = Storage("Error Handling")
+
+        # Foundation Dependencies (Implicit)
+        vpc >> Edge(label="implicit", color=COLORS['success']) >> [internet_gateway, public_subnet, private_subnet]
+        vpc >> Edge(label="implicit", color=COLORS['success']) >> [security_group_web, security_group_app, security_group_db]
+
+        # Network Dependencies (Implicit)
+        internet_gateway >> Edge(label="implicit", color=COLORS['success']) >> route_table
+        public_subnet >> Edge(label="implicit", color=COLORS['success']) >> nat_gateway
+        [public_subnet, private_subnet] >> Edge(label="implicit", color=COLORS['success']) >> rds_subnet_group
+
+        # Security Dependencies (Implicit)
+        [public_subnet, security_group_web] >> Edge(label="implicit", color=COLORS['success']) >> load_balancer
+        [private_subnet, security_group_app] >> Edge(label="implicit", color=COLORS['success']) >> auto_scaling_group
+        auto_scaling_group >> Edge(label="implicit", color=COLORS['success']) >> ec2_instances
+
+        # Data Dependencies (Implicit)
+        [rds_subnet_group, security_group_db] >> Edge(label="implicit", color=COLORS['success']) >> rds_instance
+
+        # Explicit Dependencies (depends_on)
+        load_balancer >> Edge(label="depends_on", style="dashed", color=COLORS['warning']) >> internet_gateway
+        rds_instance >> Edge(label="depends_on", style="dashed", color=COLORS['warning']) >> kms_key
+
+        # Data Source Dependencies
+        ec2_instances >> Edge(label="data source", style="dotted", color=COLORS['accent']) >> iam_role
+
+        # Monitoring Dependencies
+        [ec2_instances, rds_instance, load_balancer] >> Edge(label="implicit", color=COLORS['success']) >> cloudwatch_alarms
+        s3_bucket >> Edge(label="implicit", color=COLORS['success']) >> cloudtrail
+
+        # Dependency Resolution Process
+        [implicit_dep, explicit_dep, data_dep] >> dependency_analyzer
+        dependency_analyzer >> [parallel_execution, sequential_execution]
+        sequential_execution >> error_handling
+
+def create_performance_optimization_strategies():
+    """
+    Figure 3.4: Terraform Performance Optimization Strategies and Techniques
+
+    This diagram shows various techniques for optimizing Terraform performance
+    including parallelism, caching, targeting, and state management.
+    """
+    output_dir = ensure_output_directory()
+
     with Diagram(
-        "Figure 3.4: Performance Optimization",
-        filename=str(OUTPUT_DIR / "performance_optimization"),
+        "Figure 3.4: Terraform Performance Optimization Strategies",
+        filename=str(output_dir / "figure_3_4_performance_optimization"),
         show=False,
         direction="TB",
-        graph_attr={
-            "dpi": str(DPI),
-            "bgcolor": "white",
-            "fontname": "Arial",
-            "fontsize": "16"
-        }
+        graph_attr=DIAGRAM_CONFIG['graph_attr'],
+        node_attr=DIAGRAM_CONFIG['node_attr'],
+        edge_attr=DIAGRAM_CONFIG['edge_attr']
     ):
-        # Performance Strategies
-        with Cluster("Performance Optimization Strategies"):
-            # Parallelism
+
+        # Performance Challenges
+        with Cluster("Performance Challenges"):
+            large_infrastructure = Storage("Large Infrastructure")
+            slow_providers = Storage("Slow Provider APIs")
+            network_latency = Storage("Network Latency")
+            state_size = Storage("Large State Files")
+
+        # Optimization Strategies
+        with Cluster("Optimization Strategies"):
+            # Parallelism Control
             with Cluster("Parallelism Control"):
-                parallel_config = General("terraform apply\n-parallelism=20")
-                parallel_env = General("TF_CLI_ARGS_apply=\n'-parallelism=15'")
-                
-            # Provider Caching
-            with Cluster("Provider Caching"):
-                cache_dir = General("TF_PLUGIN_CACHE_DIR")
-                cache_config = General("plugin_cache_dir\nin .terraformrc")
-                
+                parallelism_flag = Storage("-parallelism=N")
+                parallelism_env = Storage("TF_CLI_ARGS_apply")
+                parallelism_config = Storage("Default: 10 concurrent")
+
+                parallelism_flag >> parallelism_config
+                parallelism_env >> parallelism_config
+
+            # Provider Optimization
+            with Cluster("Provider Optimization"):
+                plugin_cache = Storage("Plugin Cache Directory")
+                provider_mirror = Storage("Provider Network Mirror")
+                provider_lock = Storage("Provider Lock File")
+
+                plugin_cache >> provider_mirror >> provider_lock
+
             # Resource Targeting
             with Cluster("Resource Targeting"):
-                target_resource = General("terraform apply\n-target=aws_instance.web")
-                target_module = General("terraform apply\n-target=module.networking")
-                
+                target_resource = Storage("-target=resource")
+                target_module = Storage("-target=module")
+                target_data = Storage("-target=data")
+
             # State Optimization
             with Cluster("State Optimization"):
-                refresh_disable = General("terraform plan\n-refresh=false")
-                state_backend = General("Remote State\nBackend")
-        
+                refresh_only = Storage("-refresh-only")
+                no_refresh = Storage("-refresh=false")
+                partial_refresh = Storage("Partial Refresh")
+                state_backend_optimization = S3("Optimized Backend")
+
+        # Performance Monitoring
+        with Cluster("Performance Monitoring"):
+            execution_time = Cloudwatch("Execution Time")
+            resource_count = Storage("Resource Count")
+            api_calls = Storage("API Call Count")
+            memory_usage = Storage("Memory Usage")
+
+        # Optimization Techniques
+        with Cluster("Advanced Techniques"):
+            # Configuration Optimization
+            with Cluster("Configuration Optimization"):
+                resource_splitting = Storage("Resource Splitting")
+                module_composition = Storage("Module Composition")
+                data_source_optimization = Storage("Data Source Optimization")
+
+            # Infrastructure Patterns
+            with Cluster("Infrastructure Patterns"):
+                layered_approach = Storage("Layered Infrastructure")
+                environment_separation = Storage("Environment Separation")
+                workspace_strategy = Storage("Workspace Strategy")
+
         # Performance Metrics
         with Cluster("Performance Metrics"):
-            time_before = General("Before: 5 minutes")
-            time_after = General("After: 2 minutes")
-            
-        # Infrastructure Scale
-        with Cluster("Infrastructure Scale"):
-            small_infra = General("10 Resources")
-            medium_infra = General("50 Resources")
-            large_infra = General("200+ Resources")
-        
-        # Optimization impact
-        [parallel_config, cache_dir, target_resource] >> time_after
-        time_before >> Edge(label="optimization") >> time_after
-        
-        # Scale considerations
-        small_infra >> parallel_config
-        medium_infra >> [parallel_config, cache_dir]
-        large_infra >> [parallel_config, cache_dir, target_resource, state_backend]
+            baseline_performance = Grafana("Baseline: 10 min")
+            optimized_performance = Grafana("Optimized: 3 min")
+            performance_gain = Grafana("70% Improvement")
 
-def generate_error_recovery():
-    """Generate Figure 3.5: Error Recovery Patterns."""
-    print("Generating Figure 3.5: Error Recovery Patterns...")
-    
+        # Optimization Flow
+        large_infrastructure >> Edge(label="causes", color="red") >> slow_providers
+        slow_providers >> Edge(label="optimization", color=COLORS['success']) >> parallelism_config
+
+        # Provider Optimization Flow
+        network_latency >> Edge(label="optimization", color=COLORS['success']) >> plugin_cache
+        plugin_cache >> Edge(label="reduces", color=COLORS['accent']) >> network_latency
+
+        # Targeting Optimization
+        large_infrastructure >> Edge(label="selective updates", color=COLORS['primary']) >> target_resource
+        target_resource >> Edge(label="faster execution", color=COLORS['success']) >> optimized_performance
+
+        # State Optimization Flow
+        state_size >> Edge(label="optimization", color=COLORS['success']) >> no_refresh
+        no_refresh >> Edge(label="faster planning", color=COLORS['accent']) >> optimized_performance
+
+        # Advanced Techniques
+        [resource_splitting, module_composition] >> Edge(label="improves", color=COLORS['primary']) >> execution_time
+        layered_approach >> Edge(label="reduces complexity", color=COLORS['secondary']) >> resource_count
+
+        # Performance Monitoring
+        [execution_time, resource_count, api_calls, memory_usage] >> performance_gain
+        baseline_performance >> Edge(label="optimization", color=COLORS['success']) >> optimized_performance
+
+def create_error_recovery_and_troubleshooting():
+    """
+    Figure 3.5: Terraform Error Recovery and Troubleshooting Patterns
+
+    This diagram shows common Terraform errors and their recovery patterns,
+    including state management issues, resource conflicts, and debugging techniques.
+    """
+    output_dir = ensure_output_directory()
+
     with Diagram(
-        "Figure 3.5: Error Recovery Patterns",
-        filename=str(OUTPUT_DIR / "error_recovery"),
+        "Figure 3.5: Terraform Error Recovery and Troubleshooting",
+        filename=str(output_dir / "figure_3_5_error_recovery"),
         show=False,
         direction="TB",
-        graph_attr={
-            "dpi": str(DPI),
-            "bgcolor": "white",
-            "fontname": "Arial",
-            "fontsize": "16"
-        }
+        graph_attr=DIAGRAM_CONFIG['graph_attr'],
+        node_attr=DIAGRAM_CONFIG['node_attr'],
+        edge_attr=DIAGRAM_CONFIG['edge_attr']
     ):
-        # Error Scenarios
+
+        # Common Error Scenarios
         with Cluster("Common Error Scenarios"):
-            state_lock = General("State Lock\nError")
-            resource_exists = General("Resource Already\nExists")
-            provider_version = General("Provider Version\nConflict")
-            partial_apply = General("Partial Apply\nFailure")
-            
-        # Recovery Actions
-        with Cluster("Recovery Actions"):
-            # State Lock Recovery
-            force_unlock = General("terraform\nforce-unlock")
-            
-            # Resource Import
-            import_resource = General("terraform import\naws_instance.web\ni-1234567890abcdef0")
-            
-            # Provider Upgrade
-            init_upgrade = General("terraform init\n-upgrade")
-            
-            # State Management
-            state_backup = General("cp terraform.tfstate\nterraform.tfstate.backup")
-            state_restore = General("cp terraform.tfstate.backup\nterraform.tfstate")
-            
-        # Validation Steps
-        with Cluster("Validation and Prevention"):
-            validate_config = General("terraform validate")
-            format_code = General("terraform fmt")
-            plan_check = General("terraform plan\n-detailed-exitcode")
-            
-        # Monitoring
-        with Cluster("Monitoring and Logging"):
-            debug_logging = General("TF_LOG=DEBUG")
-            apply_logging = General("terraform apply\n| tee apply.log")
-            
-        # Recovery flows
-        state_lock >> force_unlock
-        resource_exists >> import_resource
-        provider_version >> init_upgrade
-        partial_apply >> [state_backup, state_restore]
-        
-        # Prevention flows
-        [validate_config, format_code, plan_check] >> Edge(label="prevents") >> [resource_exists, provider_version]
-        [debug_logging, apply_logging] >> Edge(label="helps diagnose") >> [state_lock, partial_apply]
+            # State Errors
+            with Cluster("State Management Errors"):
+                state_lock_error = Storage("State Lock Error")
+                state_corruption = Storage("State Corruption")
+                state_drift = Storage("Configuration Drift")
+
+            # Resource Errors
+            with Cluster("Resource Management Errors"):
+                resource_exists = Storage("Resource Already Exists")
+                resource_not_found = Storage("Resource Not Found")
+                dependency_error = Storage("Dependency Error")
+
+            # Provider Errors
+            with Cluster("Provider and Configuration Errors"):
+                provider_version_conflict = Storage("Provider Version Conflict")
+                authentication_error = Storage("Authentication Error")
+                api_rate_limit = Storage("API Rate Limit")
+                syntax_error = Storage("Configuration Syntax Error")
+
+        # Recovery Actions and Commands
+        with Cluster("Recovery Actions and Commands"):
+            # State Recovery
+            with Cluster("State Recovery"):
+                force_unlock = Terraform("terraform force-unlock")
+                state_pull = Terraform("terraform state pull")
+                state_push = Terraform("terraform state push")
+                state_backup = Storage("State Backup")
+
+            # Resource Recovery
+            with Cluster("Resource Recovery"):
+                terraform_import = Terraform("terraform import")
+                terraform_taint = Terraform("terraform taint")
+                terraform_untaint = Terraform("terraform untaint")
+                state_rm = Terraform("terraform state rm")
+
+            # Configuration Recovery
+            with Cluster("Configuration Recovery"):
+                terraform_init_upgrade = Terraform("terraform init -upgrade")
+                terraform_validate = Terraform("terraform validate")
+                terraform_fmt = Terraform("terraform fmt")
+                provider_reconfigure = Terraform("terraform init -reconfigure")
+
+        # Debugging and Monitoring Tools
+        with Cluster("Debugging and Monitoring"):
+            # Logging
+            with Cluster("Logging and Debugging"):
+                debug_logging = Storage("TF_LOG=DEBUG")
+                trace_logging = Storage("TF_LOG=TRACE")
+                log_path = Storage("TF_LOG_PATH")
+
+            # Validation Tools
+            with Cluster("Validation and Testing"):
+                plan_detailed = Terraform("terraform plan -detailed-exitcode")
+                refresh_only = Terraform("terraform plan -refresh-only")
+                dry_run = Storage("Dry Run Testing")
+
+            # Monitoring
+            with Cluster("Monitoring and Alerting"):
+                cloudwatch_logs = Cloudwatch("CloudWatch Logs")
+                error_alerts = Storage("Error Alerts")
+                performance_monitoring = Grafana("Performance Monitoring")
+
+        # Prevention Strategies
+        with Cluster("Prevention Strategies"):
+            # Best Practices
+            with Cluster("Best Practices"):
+                version_constraints = Storage("Version Constraints")
+                state_locking = DynamodbTable("State Locking")
+                backup_strategy = S3("Backup Strategy")
+
+            # Automation
+            with Cluster("Automation and CI/CD"):
+                automated_testing = Jenkins("Automated Testing")
+                pre_commit_hooks = Git("Pre-commit Hooks")
+                policy_validation = Storage("Policy Validation")
+
+        # Error Recovery Flows
+        state_lock_error >> Edge(label="resolve", color=COLORS['success']) >> force_unlock
+        state_corruption >> Edge(label="restore", color=COLORS['warning']) >> state_backup
+        state_drift >> Edge(label="refresh", color=COLORS['accent']) >> refresh_only
+
+        # Resource Recovery Flows
+        resource_exists >> Edge(label="import", color=COLORS['success']) >> terraform_import
+        resource_not_found >> Edge(label="remove from state", color=COLORS['warning']) >> state_rm
+        dependency_error >> Edge(label="recreate", color="red") >> terraform_taint
+
+        # Provider Recovery Flows
+        provider_version_conflict >> Edge(label="upgrade", color=COLORS['primary']) >> terraform_init_upgrade
+        authentication_error >> Edge(label="reconfigure", color=COLORS['secondary']) >> provider_reconfigure
+        syntax_error >> Edge(label="validate", color=COLORS['accent']) >> terraform_validate
+
+        # Prevention Flows
+        version_constraints >> Edge(label="prevents", color=COLORS['success']) >> state_lock_error
+        state_locking >> Edge(label="prevents", color=COLORS['success']) >> state_corruption
+        backup_strategy >> Edge(label="prevents", color=COLORS['success']) >> state_corruption
+        automated_testing >> Edge(label="catches early", color=COLORS['primary']) >> syntax_error
+        pre_commit_hooks >> Edge(label="catches early", color=COLORS['primary']) >> dependency_error
+
+        # Monitoring Integration
+        debug_logging >> cloudwatch_logs >> error_alerts
+        trace_logging >> cloudwatch_logs
+        performance_monitoring >> Edge(label="tracks", color=COLORS['accent']) >> api_rate_limit
+        performance_monitoring >> Edge(label="tracks", color=COLORS['accent']) >> state_drift
 
 def main():
-    """Main function to generate all diagrams."""
-    print("🎨 Starting Core Terraform Operations Diagram Generation")
+    """
+    Main function to generate all diagrams for Topic 3: Core Terraform Operations
+    """
+    print("🎨 Generating Professional Core Terraform Operations Diagrams...")
     print("=" * 80)
-    
-    # Setup
-    setup_output_directory()
-    
+
     try:
+        # Ensure output directory exists
+        output_dir = ensure_output_directory()
+        print(f"📁 Output directory: {output_dir.absolute()}")
+
         # Generate all diagrams
-        generate_core_workflow()
-        generate_resource_lifecycle()
-        generate_dependency_graph()
-        generate_performance_optimization()
-        generate_error_recovery()
-        
-        print("\n✅ All diagrams generated successfully!")
-        print(f"📁 Output location: {OUTPUT_DIR}")
-        print("\nGenerated diagrams:")
-        print("- Figure 3.1: core_workflow.png")
-        print("- Figure 3.2: resource_lifecycle.png")
-        print("- Figure 3.3: dependency_graph.png")
-        print("- Figure 3.4: performance_optimization.png")
-        print("- Figure 3.5: error_recovery.png")
-        print(f"\n🎯 All diagrams are {DPI} DPI for professional quality")
-        
+        diagrams = [
+            ("Figure 3.1: Terraform Core Workflow", create_terraform_core_workflow),
+            ("Figure 3.2: Resource Lifecycle Management", create_resource_lifecycle_management),
+            ("Figure 3.3: Dependency Graph and Ordering", create_dependency_graph_and_ordering),
+            ("Figure 3.4: Performance Optimization", create_performance_optimization_strategies),
+            ("Figure 3.5: Error Recovery and Troubleshooting", create_error_recovery_and_troubleshooting)
+        ]
+
+        for diagram_name, diagram_function in diagrams:
+            print(f"🔄 Generating {diagram_name}...")
+            diagram_function()
+            print(f"✅ {diagram_name} completed successfully!")
+
+        print("\n" + "=" * 80)
+        print("🎉 All diagrams generated successfully!")
+        print(f"📂 Diagrams saved to: {output_dir.absolute()}")
+        print("\n📋 Generated Files:")
+
+        # List generated files
+        for file in sorted(output_dir.glob("*.png")):
+            print(f"   • {file.name}")
+
+        print("\n💡 Integration Notes:")
+        print("   • All diagrams are 300 DPI for professional presentations")
+        print("   • AWS brand colors and styling applied consistently")
+        print("   • Diagrams are referenced in Concept.md and Lab-3.md")
+        print("   • Use these diagrams to enhance learning and understanding")
+
     except Exception as e:
         print(f"❌ Error generating diagrams: {e}")
+        print("Please check your environment and dependencies.")
         sys.exit(1)
 
 if __name__ == "__main__":

@@ -709,11 +709,250 @@ Upon successful completion, you should have:
 - **Error handling** and recovery with state management
 - **Enterprise workflow** patterns for team collaboration
 
+## 🆕 **Bonus Section: Terraform 1.13 Advanced Features (20 minutes)**
+
+### **Part 6: Enhanced Validation and Stacks (Optional)**
+
+**Step 1: Advanced Validation Testing**
+```bash
+# Test enhanced validation features
+terraform validate -json > validation-results.json
+
+# View detailed validation output
+cat validation-results.json | jq '.diagnostics[]'
+
+# Test experimental features (if available)
+terraform validate -experimental-features
+```
+
+**Step 2: Stack-Based Architecture (Simulation)**
+```bash
+# Create a stack configuration example
+cat > stack-example.tf << 'EOF'
+# Example stack configuration for Terraform 1.13+
+# Note: This is for demonstration - actual stacks require Terraform 1.13+
+
+locals {
+  stack_config = {
+    infrastructure = {
+      source = "./infrastructure"
+      inputs = {
+        environment = var.environment
+        region      = var.aws_region
+      }
+    }
+
+    applications = {
+      source = "./applications"
+      inputs = {
+        vpc_id      = "vpc-from-infrastructure-stack"
+        environment = var.environment
+      }
+      depends_on = ["infrastructure"]
+    }
+  }
+}
+
+# Output stack configuration for reference
+output "stack_configuration" {
+  description = "Example stack configuration for Terraform 1.13+"
+  value       = local.stack_config
+}
+EOF
+
+# Plan with the stack example
+terraform plan
+```
+
+### **Part 7: Modern CI/CD Integration Patterns**
+
+**Step 1: Create GitHub Actions Workflow**
+```bash
+# Create GitHub Actions workflow for Terraform
+mkdir -p .github/workflows
+cat > .github/workflows/terraform-core-ops.yml << 'EOF'
+name: Terraform Core Operations CI/CD
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ~1.13.0
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate -json
+
+      - name: Terraform Plan
+        run: terraform plan -detailed-exitcode -out=tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve tfplan
+
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: terraform-plan
+          path: tfplan
+EOF
+```
+
+**Step 2: Advanced Performance Monitoring**
+```bash
+# Create performance monitoring script
+cat > monitor-performance.sh << 'EOF'
+#!/bin/bash
+# Terraform Performance Monitoring Script
+
+echo "🔍 Terraform Performance Analysis"
+echo "================================="
+
+# Enable detailed logging
+export TF_LOG=INFO
+export TF_LOG_PATH="./terraform-performance.log"
+
+# Time the operations
+echo "⏱️  Timing Terraform Operations:"
+
+echo "1. Init Performance:"
+time terraform init -upgrade
+
+echo "2. Validation Performance:"
+time terraform validate
+
+echo "3. Plan Performance:"
+time terraform plan -out=perf-test.tfplan
+
+echo "4. Resource Count Analysis:"
+terraform show -json perf-test.tfplan | jq '.resource_changes | length'
+
+echo "5. Provider Analysis:"
+terraform providers
+
+echo "📊 Performance Summary:"
+echo "- Check terraform-performance.log for detailed timing"
+echo "- Review resource count for optimization opportunities"
+echo "- Monitor provider download times"
+
+# Cleanup
+rm -f perf-test.tfplan
+EOF
+
+chmod +x monitor-performance.sh
+
+# Run performance analysis
+./monitor-performance.sh
+```
+
+### **Part 8: Enterprise Error Recovery Simulation**
+
+**Step 1: Simulate and Recover from Common Errors**
+```bash
+# Simulate state lock error
+echo "🔒 Simulating state lock scenario..."
+
+# Create a fake lock file (for demonstration)
+mkdir -p .terraform
+echo '{"ID":"fake-lock","Operation":"apply","Info":"","Who":"test@example.com","Version":"1.13.0","Created":"2025-01-15T10:00:00Z","Path":"terraform.tfstate"}' > .terraform/terraform.tfstate.lock.info
+
+# Try to run terraform (will fail with lock error)
+terraform plan || echo "Expected lock error occurred"
+
+# Recover from lock error
+rm -f .terraform/terraform.tfstate.lock.info
+echo "✅ Lock error resolved"
+
+# Test recovery
+terraform plan
+```
+
+**Step 2: State Backup and Recovery Testing**
+```bash
+# Create comprehensive backup strategy
+cat > backup-strategy.sh << 'EOF'
+#!/bin/bash
+# Terraform State Backup and Recovery Strategy
+
+BACKUP_DIR="./state-backups"
+TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+
+echo "💾 Terraform State Backup Strategy"
+echo "=================================="
+
+# Create backup directory
+mkdir -p $BACKUP_DIR
+
+# Backup current state
+echo "1. Creating state backup..."
+terraform state pull > "$BACKUP_DIR/terraform-state-$TIMESTAMP.json"
+
+# Backup terraform files
+echo "2. Creating configuration backup..."
+tar -czf "$BACKUP_DIR/terraform-config-$TIMESTAMP.tar.gz" *.tf *.tfvars
+
+# List backups
+echo "3. Available backups:"
+ls -la $BACKUP_DIR/
+
+echo "✅ Backup strategy complete"
+echo "📋 Recovery command: terraform state push <backup-file>"
+EOF
+
+chmod +x backup-strategy.sh
+./backup-strategy.sh
+```
+
+### **Validation and Testing**
+
+**Test All Enhanced Features**:
+```bash
+# Test 1: Enhanced validation
+terraform validate -json | jq '.valid'
+
+# Test 2: Performance optimization
+terraform plan -parallelism=20
+
+# Test 3: Resource targeting
+terraform plan -target=aws_vpc.main
+
+# Test 4: State operations
+terraform state list | head -5
+
+# Test 5: Format checking
+terraform fmt -check -diff
+
+echo "🎉 All enhanced features tested successfully!"
+```
+
 ### **Next Steps:**
 1. **Explore advanced resource management** with modules and data sources
 2. **Implement remote state management** for team collaboration
 3. **Add automated testing** and validation workflows
 4. **Integrate with CI/CD pipelines** for automated deployments
+5. **🆕 Experiment with Terraform 1.13 stacks** for complex architectures
+6. **🆕 Implement advanced validation rules** for better error prevention
+7. **🆕 Set up performance monitoring** for large-scale deployments
 
 ---
 
