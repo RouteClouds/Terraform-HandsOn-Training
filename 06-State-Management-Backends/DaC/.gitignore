@@ -1,0 +1,381 @@
+# DaC (Diagram as Code) - Topic 6: State Management & Backends
+# Git Ignore Configuration for Professional Diagram Generation
+#
+# This file specifies which files and directories should be excluded from
+# version control when working with the Diagram as Code implementation.
+# It follows best practices for Python projects and diagram generation workflows.
+
+# =============================================================================
+# PYTHON SPECIFIC IGNORES
+# =============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# pipenv
+#   According to pypa/pipenv#598, it is recommended to include Pipfile.lock in version control.
+#   However, in case of collaboration, if having platform-specific dependencies or dependencies
+#   having no cross-platform support, pipenv may install dependencies that don't work, or not
+#   install all needed dependencies.
+#Pipfile.lock
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# =============================================================================
+# DIAGRAM GENERATION SPECIFIC IGNORES
+# =============================================================================
+
+# Temporary diagram files
+*.tmp
+*.temp
+*_temp.*
+*_tmp.*
+
+# Graphviz temporary files
+*.dot
+*.gv
+*.xdot
+
+# Image processing temporary files
+*.bak
+*.backup
+*_backup.*
+
+# Diagram generation logs
+diagram_generation.log
+generation_*.log
+*.log.*
+
+# Temporary output directories
+temp_diagrams/
+tmp_output/
+.temp/
+.tmp/
+
+# Intermediate processing files
+*.intermediate
+*.processing
+*_processing.*
+
+# Cache directories
+.cache/
+cache/
+diagram_cache/
+
+# =============================================================================
+# DEVELOPMENT ENVIRONMENT IGNORES
+# =============================================================================
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows specific
+*.lnk
+
+# Linux specific
+*~
+
+# =============================================================================
+# PROFESSIONAL WORKFLOW IGNORES
+# =============================================================================
+
+# Backup files
+*.backup
+*.bak
+*_backup
+*_bak
+
+# Version control artifacts
+.git/
+.gitattributes
+.gitmodules
+
+# CI/CD artifacts
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# Documentation build artifacts
+docs/_build/
+docs/build/
+_build/
+_static/
+_templates/
+
+# =============================================================================
+# SECURITY AND SENSITIVE DATA
+# =============================================================================
+
+# Environment variables and secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# API keys and credentials
+*.key
+*.pem
+*.p12
+*.pfx
+credentials.json
+secrets.json
+
+# Configuration files with sensitive data
+config.ini
+settings.ini
+local_config.py
+
+# =============================================================================
+# PERFORMANCE AND OPTIMIZATION
+# =============================================================================
+
+# Large temporary files
+*.large
+*.big
+*_large.*
+*_big.*
+
+# Memory dumps
+*.dump
+*.dmp
+core.*
+
+# Performance profiling
+*.prof
+*.profile
+profiling_*
+
+# =============================================================================
+# CUSTOM PROJECT IGNORES
+# =============================================================================
+
+# Custom diagram templates (if sensitive)
+custom_templates/
+private_templates/
+
+# Client-specific customizations
+client_*/
+customer_*/
+
+# Experimental features
+experimental/
+prototype/
+poc/
+
+# Archive directories
+archive/
+old/
+deprecated/
+
+# =============================================================================
+# GENERATED CONTENT MANAGEMENT
+# =============================================================================
+
+# Note: generated_diagrams/ is intentionally NOT ignored
+# These are the primary output artifacts that should be version controlled
+# for integration with training materials and documentation
+
+# However, we ignore specific temporary or intermediate files within it:
+generated_diagrams/*.tmp
+generated_diagrams/*.temp
+generated_diagrams/*_temp.*
+generated_diagrams/*.log
+generated_diagrams/.processing
+
+# Keep the generation report but ignore debug versions
+generated_diagrams/generation_report_debug.txt
+generated_diagrams/generation_report_*.log
+
+# =============================================================================
+# DOCUMENTATION AND REPORTING
+# =============================================================================
+
+# Temporary documentation files
+*.md.tmp
+*.md.backup
+*.rst.tmp
+*.rst.backup
+
+# Report generation artifacts
+reports/*.tmp
+reports/*.temp
+reports/debug_*
+
+# =============================================================================
+# TESTING AND VALIDATION
+# =============================================================================
+
+# Test output directories
+test_output/
+test_diagrams/
+validation_output/
+
+# Test artifacts
+*.test
+*_test.*
+test_*.png
+test_*.jpg
+
+# Validation reports
+validation_*.txt
+validation_*.log
+
+# =============================================================================
+# NOTES AND COMMENTS
+# =============================================================================
+
+# This .gitignore is designed to:
+# 1. Exclude all temporary and intermediate files
+# 2. Keep the final generated diagrams for version control
+# 3. Maintain security by excluding sensitive configuration
+# 4. Support professional development workflows
+# 5. Optimize repository size by excluding large temporary files
+#
+# The generated diagrams (PNG files) are intentionally included in version
+# control because they are:
+# - Primary deliverables for the training program
+# - Referenced by documentation and training materials
+# - Required for offline access and distribution
+# - Relatively small in size (1-5MB each)
+# - Essential for maintaining training material consistency
+#
+# If you need to exclude generated diagrams temporarily:
+# git update-index --assume-unchanged generated_diagrams/*.png
+#
+# To re-include them:
+# git update-index --no-assume-unchanged generated_diagrams/*.png
