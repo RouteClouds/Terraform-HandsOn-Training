@@ -1,0 +1,353 @@
+# Terraform Variables Example Configuration
+# Infrastructure as Code Lab 1.1 - Topic 1: Infrastructure as Code Concepts & AWS Integration
+#
+# This file provides example values for all configurable variables.
+# Copy this file to terraform.tfvars and customize the values for your environment.
+#
+# Usage:
+# 1. Copy: cp terraform.tfvars.example terraform.tfvars
+# 2. Edit: Update values according to your requirements
+# 3. Deploy: terraform plan -var-file="terraform.tfvars"
+#
+# Security Note: Never commit terraform.tfvars to version control
+# as it may contain sensitive information.
+#
+# Last Updated: January 2025
+
+# =============================================================================
+# PROJECT AND ENVIRONMENT CONFIGURATION
+# =============================================================================
+
+# Project identification and naming
+project_name = "iac-lab-1"
+environment  = "dev"
+created_by   = "terraform-student"
+
+# Organizational structure
+business_unit = "training"
+student_group = "terraform-basics-2025-q1"
+
+# =============================================================================
+# AWS PROVIDER CONFIGURATION
+# =============================================================================
+
+# AWS region - standardized for all labs
+aws_region = "us-east-1"
+
+# Optional: AWS CLI profile (leave commented to use default)
+# aws_profile = "default"
+
+# Optional: Cross-account role assumption (for advanced scenarios)
+# assume_role_arn = "arn:aws:iam::123456789012:role/TerraformRole"
+
+# =============================================================================
+# NETWORK CONFIGURATION
+# =============================================================================
+
+# VPC CIDR block - adjust if conflicts with existing networks
+vpc_cidr = "10.0.0.0/16"
+
+# Availability zones - using first two in us-east-1
+availability_zones = ["us-east-1a", "us-east-1b"]
+
+# DNS configuration
+enable_dns_hostnames = true
+enable_dns_support   = true
+
+# NAT Gateway configuration
+enable_nat_gateway   = true
+single_nat_gateway   = false  # Set to true for cost optimization in dev
+
+# =============================================================================
+# COMPUTE CONFIGURATION
+# =============================================================================
+
+# EC2 instance configuration
+instance_type = "t3.micro"  # Free tier eligible
+
+# Auto Scaling Group configuration
+min_size         = 1
+max_size         = 3
+desired_capacity = 2
+
+# Monitoring configuration
+enable_detailed_monitoring = true
+
+# Optional: EC2 Key Pair for SSH access
+# key_pair_name = "my-key-pair"
+
+# =============================================================================
+# DATABASE CONFIGURATION
+# =============================================================================
+
+# RDS instance configuration
+db_instance_class = "db.t3.micro"  # Free tier eligible
+db_allocated_storage = 20          # Minimum for free tier
+db_engine_version = "8.0"
+
+# Backup configuration
+db_backup_retention_period = 7
+
+# High availability (disable for cost optimization in dev)
+db_multi_az = false
+
+# =============================================================================
+# SECURITY CONFIGURATION
+# =============================================================================
+
+# Data classification and compliance
+data_classification = "internal"
+compliance_scope    = "none"
+
+# Encryption settings
+encryption_at_rest    = true
+encryption_in_transit = true
+
+# Audit and compliance
+enable_cloudtrail = true
+enable_config     = false  # Disable for cost optimization in dev
+
+# =============================================================================
+# COST AND GOVERNANCE CONFIGURATION
+# =============================================================================
+
+# Financial management
+cost_center  = "training"
+owner_email  = "student@company.com"
+budget_limit = 50  # USD per month
+
+# Cost optimization
+auto_shutdown_enabled  = true
+auto_shutdown_schedule = "0 22 * * MON-FRI"  # 10 PM UTC, Mon-Fri
+
+# =============================================================================
+# MONITORING AND OPERATIONS CONFIGURATION
+# =============================================================================
+
+# Monitoring level
+monitoring_level = "basic"
+
+# Backup requirements
+backup_required = "yes"
+
+# Lifecycle management
+lifecycle_stage = "development"
+
+# Maintenance window (UTC)
+maintenance_window = "sun:03:00-sun:04:00"
+
+# Support level
+support_level = "basic"
+
+# Optional: Notification email for alerts
+# notification_email = "alerts@company.com"
+
+# Performance monitoring
+enable_performance_insights = false  # Disable for cost optimization
+
+# Log retention
+log_retention_days = 14
+
+# =============================================================================
+# EXAMPLE CONFIGURATIONS FOR DIFFERENT ENVIRONMENTS
+# =============================================================================
+
+# Development Environment (Cost Optimized)
+# Uncomment and modify for development use:
+#
+# project_name = "iac-lab-dev"
+# environment = "dev"
+# instance_type = "t3.micro"
+# min_size = 1
+# max_size = 2
+# desired_capacity = 1
+# db_instance_class = "db.t3.micro"
+# db_multi_az = false
+# single_nat_gateway = true
+# auto_shutdown_enabled = true
+# enable_performance_insights = false
+# log_retention_days = 7
+
+# Staging Environment (Balanced)
+# Uncomment and modify for staging use:
+#
+# project_name = "iac-lab-staging"
+# environment = "staging"
+# instance_type = "t3.small"
+# min_size = 2
+# max_size = 4
+# desired_capacity = 2
+# db_instance_class = "db.t3.small"
+# db_multi_az = false
+# single_nat_gateway = false
+# auto_shutdown_enabled = false
+# enable_performance_insights = true
+# log_retention_days = 30
+
+# Production Environment (High Availability)
+# Uncomment and modify for production use:
+#
+# project_name = "iac-lab-prod"
+# environment = "prod"
+# instance_type = "t3.medium"
+# min_size = 2
+# max_size = 6
+# desired_capacity = 3
+# db_instance_class = "db.t3.medium"
+# db_multi_az = true
+# single_nat_gateway = false
+# auto_shutdown_enabled = false
+# enable_performance_insights = true
+# log_retention_days = 90
+# data_classification = "confidential"
+# compliance_scope = "soc2"
+# monitoring_level = "comprehensive"
+# support_level = "enterprise"
+
+# =============================================================================
+# ADVANCED CONFIGURATION OPTIONS
+# =============================================================================
+
+# Custom tagging for specific requirements
+# Uncomment and modify as needed:
+#
+# Additional tags can be added through the provider default_tags
+# or by modifying the local.common_tags in main.tf
+
+# Network customization
+# For custom CIDR blocks or specific subnet configurations:
+#
+# vpc_cidr = "172.16.0.0/16"  # Alternative CIDR range
+# availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]  # Three AZs
+
+# Security customization
+# For specific compliance requirements:
+#
+# data_classification = "restricted"
+# compliance_scope = "hipaa"
+# enable_config = true
+# enable_cloudtrail = true
+
+# Performance customization
+# For higher performance requirements:
+#
+# instance_type = "c5.large"
+# db_instance_class = "db.m5.large"
+# enable_detailed_monitoring = true
+# enable_performance_insights = true
+
+# =============================================================================
+# VALIDATION AND TESTING CONFIGURATIONS
+# =============================================================================
+
+# Minimal Configuration (for testing)
+# Uncomment for minimal resource deployment:
+#
+# min_size = 1
+# max_size = 1
+# desired_capacity = 1
+# db_allocated_storage = 20
+# single_nat_gateway = true
+# enable_performance_insights = false
+# log_retention_days = 1
+
+# Maximum Configuration (for comprehensive testing)
+# Uncomment for full feature testing:
+#
+# min_size = 2
+# max_size = 6
+# desired_capacity = 3
+# db_allocated_storage = 100
+# db_multi_az = true
+# enable_performance_insights = true
+# enable_config = true
+# monitoring_level = "comprehensive"
+# log_retention_days = 90
+
+# =============================================================================
+# TROUBLESHOOTING AND DEBUG CONFIGURATIONS
+# =============================================================================
+
+# Debug Configuration
+# Uncomment for troubleshooting deployments:
+#
+# enable_detailed_monitoring = true
+# log_retention_days = 30
+# monitoring_level = "enhanced"
+
+# Quick Deployment Configuration
+# Uncomment for rapid testing cycles:
+#
+# single_nat_gateway = true
+# db_multi_az = false
+# enable_performance_insights = false
+# auto_shutdown_enabled = true
+
+# =============================================================================
+# COST ESTIMATION EXAMPLES
+# =============================================================================
+
+# Based on the configuration above, estimated monthly costs:
+#
+# Development Environment:
+# - EC2 (1x t3.micro): ~$8.50
+# - RDS (1x db.t3.micro): ~$12.50
+# - ALB: ~$16.20
+# - NAT Gateway (1): ~$32.40
+# - S3 and misc: ~$5.00
+# Total: ~$75/month
+#
+# Staging Environment:
+# - EC2 (2x t3.small): ~$34.00
+# - RDS (1x db.t3.small): ~$25.00
+# - ALB: ~$16.20
+# - NAT Gateway (2): ~$64.80
+# - S3 and misc: ~$10.00
+# Total: ~$150/month
+#
+# Production Environment:
+# - EC2 (3x t3.medium): ~$102.00
+# - RDS (1x db.t3.medium): ~$50.00
+# - ALB: ~$16.20
+# - NAT Gateway (2): ~$64.80
+# - S3 and misc: ~$20.00
+# Total: ~$253/month
+#
+# Note: Costs are estimates and may vary based on usage patterns,
+# data transfer, and additional AWS services.
+
+# =============================================================================
+# IMPORTANT NOTES AND BEST PRACTICES
+# =============================================================================
+
+# 1. Security:
+#    - Never commit terraform.tfvars to version control
+#    - Use AWS IAM roles instead of access keys when possible
+#    - Enable encryption for all data at rest and in transit
+#    - Regularly rotate passwords and access keys
+
+# 2. Cost Management:
+#    - Enable auto-shutdown for development environments
+#    - Use t3.micro instances for learning and testing
+#    - Monitor costs regularly using AWS Cost Explorer
+#    - Set up billing alerts for budget management
+
+# 3. High Availability:
+#    - Use multiple availability zones for production
+#    - Enable Multi-AZ for RDS in production environments
+#    - Configure proper health checks and auto-scaling
+
+# 4. Monitoring:
+#    - Enable detailed monitoring for production workloads
+#    - Set up appropriate log retention policies
+#    - Configure CloudWatch alarms for critical metrics
+
+# 5. Compliance:
+#    - Set appropriate data classification levels
+#    - Enable audit logging for compliance requirements
+#    - Implement proper backup and retention policies
+
+# 6. Maintenance:
+#    - Schedule maintenance windows during low-usage periods
+#    - Keep Terraform and provider versions up to date
+#    - Regularly review and update security configurations
