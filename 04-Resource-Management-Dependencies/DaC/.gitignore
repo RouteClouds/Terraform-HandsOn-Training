@@ -1,0 +1,211 @@
+# AWS Terraform Training - Topic 4 DaC (Diagram as Code) .gitignore
+# Resource Management & Dependencies - Diagram Generation
+#
+# This file specifies which files and directories should be excluded from
+# version control when working with the Diagram as Code implementation.
+
+# Python Environment and Dependencies
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.env
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Diagram Generation Temporary Files
+*.tmp
+*.temp
+diagram_generation.log
+*.log
+.cache/
+temp_diagrams/
+
+# System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup Files
+*.bak
+*.backup
+*.orig
+
+# Testing and Coverage
+.coverage
+.pytest_cache/
+.tox/
+.nox/
+htmlcov/
+.coverage.*
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Documentation Build
+docs/_build/
+.readthedocs.yml
+
+# Jupyter Notebooks (if used for development)
+.ipynb_checkpoints
+
+# Keep Generated Diagrams (These should be committed)
+# The generated_diagrams/ directory and its contents should be tracked
+# to ensure diagrams are available for training materials
+!generated_diagrams/
+!generated_diagrams/*.png
+!generated_diagrams/*.jpg
+!generated_diagrams/*.svg
+!generated_diagrams/README.md
+
+# Professional Development Tools
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Security and Credentials (Never commit these)
+*.pem
+*.key
+*.crt
+*.p12
+.env.local
+.env.production
+secrets.json
+credentials.json
+
+# Performance Profiling
+*.prof
+*.pstats
+
+# Local Configuration Overrides
+local_config.py
+config_local.py
+settings_local.py
+
+# Diagram Generation Artifacts
+*.dot
+*.gv
+graphviz_output/
+temp_graph_files/
+
+# Platform-specific Files
+# Windows
+*.exe
+*.msi
+*.msm
+*.msp
+
+# macOS
+.AppleDouble
+.LSOverride
+Icon?
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# Development and Testing Utilities
+test_output/
+debug_diagrams/
+experimental/
+sandbox/
+
+# Documentation Generation
+sphinx_build/
+_build/
+_static/
+_templates/
+
+# Package Management
+poetry.lock
+Pipfile.lock
+requirements-dev.txt
+requirements-test.txt
+
+# CI/CD Artifacts
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+azure-pipelines.yml
+
+# Monitoring and Analytics
+.monitoring/
+analytics/
+metrics/
+
+# Comments and Notes:
+#
+# 1. Generated Diagrams Policy:
+#    - All generated PNG/JPG/SVG diagrams should be committed
+#    - These are essential assets for the training materials
+#    - They provide visual learning aids that enhance comprehension
+#
+# 2. Development Environment:
+#    - Virtual environments are excluded to prevent conflicts
+#    - IDE configurations are excluded for developer flexibility
+#    - Temporary files are excluded to keep repository clean
+#
+# 3. Security Considerations:
+#    - No credentials or sensitive data should ever be committed
+#    - Environment files with secrets are explicitly excluded
+#    - Certificate and key files are blocked
+#
+# 4. Professional Standards:
+#    - Log files are excluded but can be generated locally
+#    - Testing artifacts are excluded except for essential results
+#    - Documentation builds are excluded (source files are tracked)
+#
+# 5. Collaboration Guidelines:
+#    - Platform-specific files are excluded for cross-platform compatibility
+#    - Editor-specific configurations are excluded for team flexibility
+#    - Backup files are excluded to prevent confusion
+#
+# For questions about this .gitignore configuration:
+# - Review the AWS Terraform Training documentation
+# - Consult the DaC implementation guide in README.md
+# - Follow enterprise development standards and practices
