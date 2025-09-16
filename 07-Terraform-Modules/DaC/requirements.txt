@@ -1,0 +1,181 @@
+# Python Dependencies for AWS Terraform Training - Topic 7 DaC (Diagram as Code)
+# Terraform Modules - Professional Diagram Generation
+#
+# This file specifies the exact versions of Python packages required for generating
+# high-quality architectural diagrams for Terraform Modules including module
+# architecture patterns, composition strategies, versioning workflows, testing
+# frameworks, and enterprise module governance.
+#
+# Installation: pip install -r requirements.txt
+# Python Version: 3.9+
+# Last Updated: January 2025
+
+# Core Diagram Generation Library
+diagrams==0.23.4
+# The primary library for creating infrastructure diagrams programmatically
+# Supports AWS, Azure, GCP, and other cloud providers with official icons
+# Version 0.23.4 includes latest AWS service icons and improved rendering
+
+# Graphics and Image Processing
+Pillow==10.2.0
+# Python Imaging Library for image processing and manipulation
+# Required for high-resolution output and image optimization
+# Version 10.2.0 provides security updates and performance improvements
+
+graphviz==0.20.1
+# Python interface to Graphviz graph visualization software
+# Required by diagrams library for layout and rendering
+# Version 0.20.1 includes stability improvements and bug fixes
+
+# Data Processing and Utilities
+pydot==2.0.0
+# Python interface to Graphviz's Dot language
+# Used for advanced graph customization and layout control
+# Version 2.0.0 provides Python 3.9+ compatibility
+
+# Color and Styling Support
+matplotlib==3.8.2
+# Comprehensive plotting library for color management and styling
+# Used for AWS brand color validation and custom color schemes
+# Version 3.8.2 includes performance optimizations
+
+# File and Path Management
+pathlib2==2.3.7
+# Enhanced path handling for cross-platform compatibility
+# Ensures consistent file operations across different operating systems
+# Version 2.3.7 provides Python 3.9+ compatibility
+
+# Development and Testing Dependencies (Optional)
+pytest==7.4.4
+# Testing framework for validating diagram generation
+# Used for automated testing of diagram creation functions
+# Version 7.4.4 includes latest testing features
+
+pytest-cov==4.1.0
+# Coverage reporting for pytest
+# Ensures comprehensive testing of diagram generation code
+# Version 4.1.0 provides accurate coverage metrics
+
+# Documentation Generation (Optional)
+sphinx==7.2.6
+# Documentation generator for creating comprehensive guides
+# Used for generating detailed documentation for diagram usage
+# Version 7.2.6 includes modern documentation features
+
+sphinx-rtd-theme==2.0.0
+# Read the Docs theme for Sphinx documentation
+# Provides professional documentation styling
+# Version 2.0.0 includes responsive design improvements
+
+# Code Quality and Formatting (Development)
+black==23.12.1
+# Code formatter for consistent Python code styling
+# Ensures professional code quality in diagram generation scripts
+# Version 23.12.1 includes latest formatting rules
+
+flake8==7.0.0
+# Linting tool for code quality validation
+# Ensures adherence to Python coding standards
+# Version 7.0.0 includes comprehensive linting rules
+
+# System Requirements and Compatibility Notes:
+#
+# Operating System Support:
+# - Linux: Ubuntu 20.04+, CentOS 8+, Amazon Linux 2
+# - macOS: 10.15+ (Catalina and later)
+# - Windows: Windows 10+ with WSL2 recommended
+#
+# System Dependencies (must be installed separately):
+# - Graphviz: Required for diagram rendering
+#   - Ubuntu/Debian: sudo apt-get install graphviz
+#   - CentOS/RHEL: sudo yum install graphviz
+#   - macOS: brew install graphviz
+#   - Windows: Download from https://graphviz.org/download/
+#
+# Memory Requirements:
+# - Minimum: 2GB RAM for basic diagram generation
+# - Recommended: 4GB+ RAM for complex enterprise diagrams
+# - High-resolution (300 DPI) diagrams require additional memory
+#
+# Storage Requirements:
+# - Minimum: 100MB for package installation
+# - Generated diagrams: 1-5MB per diagram (300 DPI PNG)
+# - Temporary files: 50-100MB during generation
+#
+# Performance Optimization:
+# - SSD storage recommended for faster diagram generation
+# - Multi-core CPU beneficial for batch diagram processing
+# - Graphics acceleration not required (CPU-based rendering)
+#
+# Security Considerations:
+# - All packages are from official PyPI repositories
+# - Version pinning prevents supply chain attacks
+# - Regular security updates recommended
+# - No network access required during diagram generation
+#
+# Troubleshooting Common Issues:
+#
+# 1. Graphviz Installation Issues:
+#    - Ensure Graphviz is installed system-wide
+#    - Add Graphviz to system PATH
+#    - Restart terminal after installation
+#
+# 2. Permission Errors:
+#    - Use virtual environment for package installation
+#    - Ensure write permissions for output directory
+#    - Run with appropriate user privileges
+#
+# 3. Memory Issues with Large Diagrams:
+#    - Reduce diagram complexity
+#    - Generate diagrams individually rather than batch
+#    - Increase system memory or swap space
+#
+# 4. Font Rendering Issues:
+#    - Install system fonts: Arial, Helvetica
+#    - Update font cache: fc-cache -fv (Linux)
+#    - Use default fonts if custom fonts unavailable
+#
+# Version Compatibility Matrix:
+# Python 3.9: ✅ Fully supported and tested
+# Python 3.10: ✅ Fully supported and tested
+# Python 3.11: ✅ Fully supported and tested
+# Python 3.12: ✅ Supported (latest features)
+# Python 3.8: ⚠️ Legacy support (not recommended)
+# Python 3.7: ❌ Not supported (EOL)
+#
+# AWS Integration Notes:
+# - Diagrams library includes official AWS service icons
+# - Icons are updated regularly with new AWS services
+# - Custom AWS branding colors are pre-configured
+# - Supports all major AWS services and architectures
+#
+# Professional Quality Standards:
+# - 300 DPI resolution for print-ready output
+# - AWS brand compliance for colors and styling
+# - Consistent typography and layout
+# - Enterprise-grade diagram quality
+#
+# Continuous Integration Support:
+# - Compatible with GitHub Actions, GitLab CI, Jenkins
+# - Headless operation for automated diagram generation
+# - Docker container support available
+# - Batch processing capabilities for multiple diagrams
+#
+# Educational Integration:
+# - Diagrams support learning objectives alignment
+# - Visual aids enhance comprehension and retention
+# - Professional quality suitable for presentations
+# - Cross-referenced with training materials
+#
+# Module-Specific Features:
+# - Module architecture visualization
+# - Composition pattern illustrations
+# - Versioning workflow diagrams
+# - Testing framework representations
+# - Enterprise governance visualizations
+#
+# For additional support and documentation:
+# - Official diagrams documentation: https://diagrams.mingrammer.com/
+# - AWS Architecture Icons: https://aws.amazon.com/architecture/icons/
+# - Graphviz documentation: https://graphviz.org/documentation/
+# - Training materials integration guide: See README.md
