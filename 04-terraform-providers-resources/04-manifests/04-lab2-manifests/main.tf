@@ -1,7 +1,17 @@
 # Resource Creation Lab
 
 provider "aws" {
-  region = var.aws_region
+  region = "us-east-1"
+  default_tags {
+    tags = {
+      Environment      = var.environment
+      Project          = var.project_name
+      ManagedBy        = "terraform"
+      TerraformVersion = "1.13.x"
+      ProviderVersion  = "6.12.x"
+      TrainingModule   = "04-terraform-providers-resources"
+    }
+  }
 }
 
 # S3 Bucket with versioning

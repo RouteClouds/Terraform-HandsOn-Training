@@ -1,0 +1,371 @@
+# .gitignore for AWS Terraform Training - Topic 1 DaC (Diagram as Code)
+# Infrastructure as Code Concepts & AWS Integration - Diagram Generation
+#
+# This file specifies which files and directories should be excluded from
+# version control when working with the Diagram as Code implementation.
+#
+# Last Updated: January 2025
+
+# =============================================================================
+# Python Environment and Dependencies
+# =============================================================================
+
+# Virtual Environment Directories
+venv/
+env/
+ENV/
+.venv/
+.env/
+.python-version
+
+# Python Bytecode and Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit Test and Coverage
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# =============================================================================
+# Diagram Generation Temporary Files
+# =============================================================================
+
+# Graphviz Temporary Files
+*.dot
+*.gv
+*.tmp
+.graphviz_cache/
+
+# Diagram Generation Logs
+diagram_generation.log
+generation_*.log
+*.log
+
+# Temporary Image Files
+temp_*.png
+temp_*.svg
+temp_*.pdf
+.temp_diagrams/
+
+# Backup Files
+*.bak
+*.backup
+*~
+.#*
+#*#
+
+# =============================================================================
+# IDE and Editor Files
+# =============================================================================
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Atom
+.atom/
+
+# =============================================================================
+# Operating System Files
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.tmp
+*.temp
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# =============================================================================
+# Development and Testing Files
+# =============================================================================
+
+# Local Configuration Files
+config.local.py
+settings.local.py
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Test Output
+test_output/
+test_diagrams/
+.test_cache/
+
+# Profiling Data
+*.prof
+*.profile
+
+# Debug Files
+debug.log
+debug_*.png
+debug_output/
+
+# =============================================================================
+# Documentation Build Files
+# =============================================================================
+
+# Sphinx Documentation
+docs/_build/
+docs/build/
+.doctrees/
+.buildinfo
+
+# MkDocs
+site/
+
+# =============================================================================
+# Package Manager Files
+# =============================================================================
+
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# pipenv
+Pipfile.lock
+
+# poetry
+poetry.lock
+
+# conda
+.conda/
+
+# =============================================================================
+# Cloud and Deployment Files
+# =============================================================================
+
+# AWS Credentials (should never be committed)
+.aws/
+aws-credentials.json
+*.pem
+*.key
+
+# Docker
+.dockerignore
+Dockerfile.local
+docker-compose.override.yml
+
+# Kubernetes
+*.kubeconfig
+
+# =============================================================================
+# Custom Diagram Files (Optional Exclusions)
+# =============================================================================
+
+# Uncomment the following lines if you want to exclude generated diagrams
+# from version control (not recommended for training materials)
+#
+# generated_diagrams/*.png
+# generated_diagrams/*.svg
+# generated_diagrams/*.pdf
+
+# Custom Diagram Variations (exclude personal customizations)
+custom_diagrams/
+personal_diagrams/
+experimental_diagrams/
+
+# Large High-Resolution Files (if storage is a concern)
+# generated_diagrams/*_4k.png
+# generated_diagrams/*_8k.png
+# generated_diagrams/*.tiff
+
+# =============================================================================
+# Security and Sensitive Information
+# =============================================================================
+
+# API Keys and Secrets
+*.secret
+secrets.json
+api_keys.txt
+.secrets/
+
+# Personal Information
+personal_notes.md
+private_config.py
+
+# =============================================================================
+# Performance and Optimization Files
+# =============================================================================
+
+# Profiling Output
+*.cprof
+*.pstats
+
+# Memory Dumps
+*.dump
+*.mem
+
+# Performance Logs
+performance.log
+timing_*.log
+
+# =============================================================================
+# Backup and Archive Files
+# =============================================================================
+
+# Archive Files
+*.zip
+*.tar
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.rar
+*.7z
+
+# Backup Directories
+backup/
+backups/
+.backup/
+
+# =============================================================================
+# Jupyter Notebook Files (if used for development)
+# =============================================================================
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# Jupyter Notebook Output (optional)
+# *.ipynb
+
+# =============================================================================
+# Database Files (if used for diagram metadata)
+# =============================================================================
+
+# SQLite
+*.db
+*.sqlite
+*.sqlite3
+
+# =============================================================================
+# Monitoring and Analytics Files
+# =============================================================================
+
+# Analytics Data
+analytics/
+metrics/
+usage_stats.json
+
+# Monitoring Logs
+monitoring.log
+health_check.log
+
+# =============================================================================
+# Comments and Usage Notes
+# =============================================================================
+
+# This .gitignore file is designed to:
+# 1. Exclude Python environment and dependency files
+# 2. Prevent temporary diagram generation files from being committed
+# 3. Exclude IDE and editor configuration files
+# 4. Filter out operating system specific files
+# 5. Protect sensitive information and credentials
+# 6. Maintain clean repository structure for educational materials
+#
+# Generated diagrams (PNG files) are typically INCLUDED in version control
+# for training materials to ensure students have access to visual aids
+# without needing to generate them locally.
+#
+# If you need to exclude generated diagrams from version control:
+# 1. Uncomment the lines in the "Custom Diagram Files" section
+# 2. Ensure students have clear instructions for local generation
+# 3. Consider providing pre-generated diagrams through alternative means
+#
+# For educational repositories, it's recommended to:
+# - Include generated diagrams for immediate access
+# - Exclude development and testing artifacts
+# - Protect any sensitive configuration or credentials
+# - Maintain clean, professional repository structure
