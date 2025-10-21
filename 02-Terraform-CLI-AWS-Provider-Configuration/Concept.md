@@ -13,6 +13,9 @@ By the end of this module, you will be able to:
 
 ## 📋 Terraform CLI Installation and Management
 
+🎓 **Certification Note**: The Terraform workflow is critical for the exam. Remember: init → validate → plan → apply → destroy. Know what each command does and when to use it.
+**Exam Objectives 2.1, 2.2, 2.3, 2.4**
+
 ### Modern Installation Methods (2024-2025)
 
 #### 1. **Official HashiCorp Repository (Recommended)**
@@ -99,6 +102,9 @@ export AWS_RETRY_MODE=adaptive
 ## 🔐 AWS Provider Authentication Methods
 
 ### 1. **IAM Roles (Production Recommended)**
+
+💡 **Exam Tip**: The exam tests provider configuration. Know how to configure AWS credentials (environment variables, AWS CLI, IAM roles). Understand the difference between provider blocks and provider configuration. Know the credential precedence order.
+**Exam Objective 3.2**: Configure AWS provider
 
 #### EC2 Instance Profiles
 ```hcl

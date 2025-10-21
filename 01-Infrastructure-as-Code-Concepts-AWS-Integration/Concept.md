@@ -51,6 +51,9 @@ Infrastructure as Code (IaC) represents a paradigm shift from traditional, manua
 
 **Infrastructure as Code (IaC)** is the practice of managing and provisioning computing infrastructure through machine-readable definition files, rather than physical hardware configuration or interactive configuration tools. This approach enables organizations to treat infrastructure with the same rigor and best practices applied to application code development.
 
+🎓 **Certification Note**: The exam expects you to define IaC and explain its core principles. Know that IaC treats infrastructure like code with version control, testing, and automation. This is fundamental to understanding Terraform's purpose.
+**Exam Objective 1.1**: Explain what IaC is
+
 **Core IaC Principles:**
 
 1. **Declarative Configuration**
@@ -82,6 +85,9 @@ Infrastructure as Code (IaC) represents a paradigm shift from traditional, manua
    - Enable developer self-service for infrastructure resources
    - Reduce time-to-market for new applications and features
    - Standardize infrastructure patterns across the organization
+
+💡 **Exam Tip**: The exam frequently asks about IaC benefits. Remember: consistency, repeatability, version control, and automation are key advantages. Be able to explain each one with real-world examples.
+**Exam Objective 1.2**: Describe advantages of IaC
 
 #### **Traditional Infrastructure Management Challenges**
 
@@ -144,6 +150,9 @@ Before IaC adoption, organizations faced significant operational and financial c
 3. **Advanced State Management**: Sophisticated dependency resolution and state backends
 4. **Plan Preview**: See changes before applying them with detailed execution plans
 5. **Modular Design**: Reusable components and standardized patterns for enterprise scale
+
+🎓 **Certification Note**: Know the differences between Terraform (multi-cloud, HCL) and CloudFormation (AWS-only, JSON/YAML). The exam tests your understanding of when to use each tool. Terraform is preferred for multi-cloud environments; CloudFormation for AWS-only deployments.
+**Exam Objective 1.4**: Distinguish between IaC tools
 
 ### **2.2 AWS Service Integration Patterns**
 
