@@ -11,6 +11,9 @@ By the end of this topic, you will be able to:
 5. **Optimize State Performance**: Implement state partitioning, workspace strategies, and performance optimization
 6. **Troubleshoot State Issues**: Diagnose and resolve complex state corruption, locking, and synchronization problems
 
+🎓 **Certification Note**: Know the state commands: list, show, rm, mv, replace-provider. The exam tests your ability to manipulate state safely without destroying resources. Know state locking mechanisms and how to force-unlock if needed.
+**Exam Objectives 4.1, 4.4, 4.5, 4.6**: Backend configuration, state management, state locking, backup/recovery
+
 ## 📚 **Advanced State Management Fundamentals**
 
 ### **State Management Evolution in Enterprise AWS**

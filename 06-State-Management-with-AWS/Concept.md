@@ -26,6 +26,9 @@ By completing this topic, you will achieve measurable mastery in:
 - **Operational Reliability**: Achieve 99.9% state availability with automated backup and recovery
 - **Cost Optimization**: Reduce state management costs by 40% through intelligent storage tiering
 
+🎓 **Certification Note**: The state file is critical. It maps your configuration to real AWS resources. Never commit it to Git. Always use remote backends in production. Know the difference between local and remote backends. Remote backends enable team collaboration and state locking.
+**Exam Objectives 4.1, 4.4, 4.5, 4.6**: Backend configuration, state management, state locking, backup/recovery
+
 ---
 
 ## 🏗️ **Enterprise State Management Architecture**

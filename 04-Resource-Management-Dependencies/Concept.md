@@ -11,6 +11,9 @@ By the end of this module, you will be able to:
 5. **Handle dependency conflicts** and circular dependency resolution strategies
 6. **Apply enterprise resource organization** patterns for scalable infrastructure management
 
+🎓 **Certification Note**: Know the resource syntax: `resource "type" "name" { ... }`. The exam tests your ability to identify resource types and names correctly. Understand resource addressing and how to reference resources.
+**Exam Objectives 3.3, 3.5, 3.6**: Manage resource addressing, interact with state, manage dependencies
+
 ## 📋 Understanding Resource Dependencies
 
 ### The Foundation of Infrastructure Orchestration

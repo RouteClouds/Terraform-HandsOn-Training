@@ -11,6 +11,9 @@ By the end of this module, you will be able to:
 5. **Handle errors and recovery** with systematic troubleshooting approaches
 6. **Apply enterprise workflow patterns** for team collaboration and production deployments
 
+🎓 **Certification Note**: The Terraform workflow is critical for the exam. Remember: init → validate → plan → apply → destroy. Know what each command does and when to use it.
+**Exam Objectives 3.1, 3.2, 3.3, 6.1, 6.2**: Core operations and workflow
+
 ## 📋 The Core Terraform Workflow
 
 ### Modern Terraform Operations (2024-2025)
@@ -90,6 +93,9 @@ terraform plan -var="instance_count=5"
 # Plan for destroy operation
 terraform plan -destroy
 ```
+
+💡 **Exam Tip**: Always run `terraform plan` before `terraform apply` to review changes. The exam expects you to know that plan shows what will change without actually making changes.
+**Exam Objective 3.3**: Generate and review an execution plan
 
 #### 3. **terraform apply - Infrastructure Deployment**
 ```bash

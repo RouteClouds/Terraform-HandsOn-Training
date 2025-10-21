@@ -26,6 +26,9 @@ By completing this topic, you will achieve measurable mastery in:
 - **Automation Integration**: Enable seamless CI/CD integration with structured output patterns
 - **Maintainability**: Reduce configuration management overhead by 60% through organized variable architecture
 
+🎓 **Certification Note**: Know all variable types (string, number, bool, list, map, set, object, tuple) and when to use each. The exam tests your understanding of type constraints and validation. Know variable precedence: CLI > .tfvars > environment > defaults.
+**Exam Objectives 3.4, 3.5**: Understand variable scope and interact with state
+
 ---
 
 ## 🏗️ **Enterprise Variable Architecture**
