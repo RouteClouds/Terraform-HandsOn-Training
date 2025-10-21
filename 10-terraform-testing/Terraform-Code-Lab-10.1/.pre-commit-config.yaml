@@ -1,0 +1,49 @@
+# Topic 10 Lab: Pre-commit Configuration
+# .pre-commit-config.yaml - Automated validation hooks
+
+repos:
+  # Terraform formatting and validation
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.81.0
+    hooks:
+      # Format Terraform code
+      - id: terraform_fmt
+        args: [--args=-recursive]
+      
+      # Validate Terraform syntax
+      - id: terraform_validate
+      
+      # Lint Terraform code
+      - id: terraform_tflint
+        args: [--args=--config=.tflint.hcl]
+      
+      # Generate Terraform documentation
+      - id: terraform_docs
+        args: [--args=--sort-by-required]
+
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      # Check YAML syntax
+      - id: check-yaml
+      
+      # Check JSON syntax
+      - id: check-json
+      
+      # Detect private keys
+      - id: detect-private-key
+      
+      # Fix end of file
+      - id: end-of-file-fixer
+      
+      # Trim trailing whitespace
+      - id: trailing-whitespace
+
+  # Security scanning
+  - repo: https://github.com/aquasecurity/tfsec
+    rev: v1.28.0
+    hooks:
+      - id: tfsec-docker
+        args: [--args=--minimum-severity=HIGH]
+
