@@ -1,0 +1,297 @@
+# cost-budget-enforcement.sentinel
+# Advanced cost calculation policy with detailed resource pricing
+# Calculates estimated monthly costs for EC2, RDS, and EBS resources
+# Enforces budget limits based on environment
+
+import "tfplan/v2" as tfplan
+import "decimal"
+import "strings"
+
+# EC2 instance pricing (hourly, us-east-1, On-Demand)
+ec2_pricing = {
+    # T3 instances
+    "t3.micro":    decimal.new(0.0104),
+    "t3.small":    decimal.new(0.0208),
+    "t3.medium":   decimal.new(0.0416),
+    "t3.large":    decimal.new(0.0832),
+    "t3.xlarge":   decimal.new(0.1664),
+    "t3.2xlarge":  decimal.new(0.3328),
+    
+    # M5 instances
+    "m5.large":    decimal.new(0.096),
+    "m5.xlarge":   decimal.new(0.192),
+    "m5.2xlarge":  decimal.new(0.384),
+    "m5.4xlarge":  decimal.new(0.768),
+    
+    # C5 instances
+    "c5.large":    decimal.new(0.085),
+    "c5.xlarge":   decimal.new(0.17),
+    "c5.2xlarge":  decimal.new(0.34),
+    
+    # R5 instances
+    "r5.large":    decimal.new(0.126),
+    "r5.xlarge":   decimal.new(0.252),
+    "r5.2xlarge":  decimal.new(0.504),
+}
+
+# RDS instance pricing (hourly, us-east-1, On-Demand)
+rds_pricing = {
+    "db.t3.micro":   decimal.new(0.017),
+    "db.t3.small":   decimal.new(0.034),
+    "db.t3.medium":  decimal.new(0.068),
+    "db.t3.large":   decimal.new(0.136),
+    "db.m5.large":   decimal.new(0.192),
+    "db.m5.xlarge":  decimal.new(0.384),
+    "db.m5.2xlarge": decimal.new(0.768),
+    "db.r5.large":   decimal.new(0.24),
+    "db.r5.xlarge":  decimal.new(0.48),
+}
+
+# EBS pricing (per GB-month, us-east-1)
+ebs_pricing = {
+    "gp2":      decimal.new(0.10),   # General Purpose SSD
+    "gp3":      decimal.new(0.08),   # General Purpose SSD (newer)
+    "io1":      decimal.new(0.125),  # Provisioned IOPS SSD
+    "io2":      decimal.new(0.125),  # Provisioned IOPS SSD (newer)
+    "st1":      decimal.new(0.045),  # Throughput Optimized HDD
+    "sc1":      decimal.new(0.015),  # Cold HDD
+    "standard": decimal.new(0.05),   # Magnetic
+}
+
+# Constants
+hours_per_month = decimal.new(730)  # Average hours per month
+
+# Get environment from workspace name
+get_environment = func() {
+    workspace_name = strings.to_lower(tfplan.workspace.name)
+    if strings.has_prefix(workspace_name, "prod") {
+        return "production"
+    } else if strings.has_prefix(workspace_name, "stg") or strings.has_prefix(workspace_name, "staging") {
+        return "staging"
+    }
+    return "development"
+}
+
+# Calculate monthly cost for EC2 instances
+calculate_ec2_cost = func() {
+    total_cost = decimal.new(0)
+    instance_count = 0
+    cost_details = []
+    
+    for tfplan.resource_changes as address, rc {
+        if rc.type == "aws_instance" and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            
+            instance_type = rc.change.after.instance_type
+            if instance_type in keys(ec2_pricing) {
+                instance_cost = decimal.mul(ec2_pricing[instance_type], hours_per_month)
+                total_cost = decimal.add(total_cost, instance_cost)
+                instance_count += 1
+                
+                append(cost_details, {
+                    "address": address,
+                    "type": instance_type,
+                    "monthly_cost": instance_cost,
+                })
+            } else {
+                print("⚠️  Unknown EC2 instance type:", instance_type, "- cost not calculated")
+            }
+        }
+    }
+    
+    return {
+        "total": total_cost,
+        "count": instance_count,
+        "details": cost_details,
+    }
+}
+
+# Calculate monthly cost for RDS instances
+calculate_rds_cost = func() {
+    total_cost = decimal.new(0)
+    instance_count = 0
+    cost_details = []
+    
+    for tfplan.resource_changes as address, rc {
+        if rc.type == "aws_db_instance" and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            
+            instance_class = rc.change.after.instance_class
+            if instance_class in keys(rds_pricing) {
+                instance_cost = decimal.mul(rds_pricing[instance_class], hours_per_month)
+                
+                # Add multi-AZ cost (double the cost)
+                is_multi_az = false
+                if "multi_az" in keys(rc.change.after) and rc.change.after.multi_az == true {
+                    instance_cost = decimal.mul(instance_cost, decimal.new(2))
+                    is_multi_az = true
+                }
+                
+                # Add storage cost
+                if "allocated_storage" in keys(rc.change.after) {
+                    storage_gb = decimal.new(rc.change.after.allocated_storage)
+                    storage_type = "gp2"  # default
+                    if "storage_type" in keys(rc.change.after) {
+                        storage_type = rc.change.after.storage_type
+                    }
+                    
+                    if storage_type in keys(ebs_pricing) {
+                        storage_cost = decimal.mul(storage_gb, ebs_pricing[storage_type])
+                        instance_cost = decimal.add(instance_cost, storage_cost)
+                    }
+                }
+                
+                total_cost = decimal.add(total_cost, instance_cost)
+                instance_count += 1
+                
+                append(cost_details, {
+                    "address": address,
+                    "class": instance_class,
+                    "multi_az": is_multi_az,
+                    "monthly_cost": instance_cost,
+                })
+            } else {
+                print("⚠️  Unknown RDS instance class:", instance_class, "- cost not calculated")
+            }
+        }
+    }
+    
+    return {
+        "total": total_cost,
+        "count": instance_count,
+        "details": cost_details,
+    }
+}
+
+# Calculate monthly cost for EBS volumes
+calculate_ebs_cost = func() {
+    total_cost = decimal.new(0)
+    volume_count = 0
+    cost_details = []
+    
+    for tfplan.resource_changes as address, rc {
+        if rc.type == "aws_ebs_volume" and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            
+            if "size" in keys(rc.change.after) {
+                size_gb = decimal.new(rc.change.after.size)
+                volume_type = "gp2"  # default
+                
+                if "type" in keys(rc.change.after) {
+                    volume_type = rc.change.after.type
+                }
+                
+                if volume_type in keys(ebs_pricing) {
+                    volume_cost = decimal.mul(size_gb, ebs_pricing[volume_type])
+                    total_cost = decimal.add(total_cost, volume_cost)
+                    volume_count += 1
+                    
+                    append(cost_details, {
+                        "address": address,
+                        "type": volume_type,
+                        "size_gb": size_gb,
+                        "monthly_cost": volume_cost,
+                    })
+                }
+            }
+        }
+    }
+    
+    return {
+        "total": total_cost,
+        "count": volume_count,
+        "details": cost_details,
+    }
+}
+
+# Budget limits by environment (monthly, USD)
+budget_limits = {
+    "development": decimal.new(500),
+    "staging":     decimal.new(2000),
+    "production":  decimal.new(10000),
+}
+
+# Calculate costs
+environment = get_environment()
+ec2_result = calculate_ec2_cost()
+rds_result = calculate_rds_cost()
+ebs_result = calculate_ebs_cost()
+
+# Calculate total cost
+total_cost = decimal.new(0)
+total_cost = decimal.add(total_cost, ec2_result.total)
+total_cost = decimal.add(total_cost, rds_result.total)
+total_cost = decimal.add(total_cost, ebs_result.total)
+
+budget_limit = budget_limits[environment]
+budget_remaining = decimal.sub(budget_limit, total_cost)
+budget_utilization = decimal.div(decimal.mul(total_cost, decimal.new(100)), budget_limit)
+
+# Print cost summary
+print("=" * 70)
+print("Cost Budget Enforcement Policy")
+print("=" * 70)
+print("Environment:", environment)
+print("Budget Limit: $" + string(budget_limit) + "/month")
+print("")
+
+print("Resource Costs:")
+print("  EC2 Instances (" + string(ec2_result.count) + "):", " " * (20 - length(string(ec2_result.count))), "$" + string(ec2_result.total))
+print("  RDS Instances (" + string(rds_result.count) + "):", " " * (20 - length(string(rds_result.count))), "$" + string(rds_result.total))
+print("  EBS Volumes (" + string(ebs_result.count) + "):", " " * (22 - length(string(ebs_result.count))), "$" + string(ebs_result.total))
+print("  " + "-" * 50)
+print("  Total Monthly Cost:                    $" + string(total_cost))
+print("")
+
+print("Budget Analysis:")
+print("  Budget Utilization:", string(budget_utilization) + "%")
+print("  Budget Remaining:  $" + string(budget_remaining))
+print("")
+
+# Print detailed breakdown
+if ec2_result.count > 0 {
+    print("EC2 Instance Details:")
+    for ec2_result.details as detail {
+        print("  -", detail.address)
+        print("    Type:", detail.type, "| Monthly Cost: $" + string(detail.monthly_cost))
+    }
+    print("")
+}
+
+if rds_result.count > 0 {
+    print("RDS Instance Details:")
+    for rds_result.details as detail {
+        multi_az_str = ""
+        if detail.multi_az {
+            multi_az_str = " (Multi-AZ)"
+        }
+        print("  -", detail.address)
+        print("    Class:", detail.class + multi_az_str, "| Monthly Cost: $" + string(detail.monthly_cost))
+    }
+    print("")
+}
+
+if ebs_result.count > 0 {
+    print("EBS Volume Details:")
+    for ebs_result.details as detail {
+        print("  -", detail.address)
+        print("    Type:", detail.type, "| Size:", string(detail.size_gb) + " GB", "| Monthly Cost: $" + string(detail.monthly_cost))
+    }
+    print("")
+}
+
+print("=" * 70)
+
+# Main rule: enforce budget limit
+main = rule {
+    decimal.less_than_or_equal(total_cost, budget_limit)
+}
+
+# Warning rule: alert if budget utilization > 80%
+budget_warning = rule {
+    decimal.less_than(budget_utilization, decimal.new(80))
+}
+

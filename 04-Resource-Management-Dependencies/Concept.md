@@ -237,6 +237,9 @@ resource "aws_lb" "main" {
 }
 ```
 
+![Figure 4.1: Resource Dependency Graph](DaC/generated_diagrams/figure_4_1_resource_dependency_graph.png)
+*Figure 4.1: Comprehensive resource dependency graph illustrating implicit and explicit dependencies between AWS resources including VPC, subnets, security groups, EC2 instances, RDS databases, and load balancers with proper orchestration ordering*
+
 ## 🔄 Meta-Arguments for Resource Management
 
 ### The Power of Resource Meta-Arguments
@@ -427,6 +430,9 @@ resource "aws_instance" "environment_instances" {
 }
 ```
 
+![Figure 4.2: Meta-Arguments Comparison](DaC/generated_diagrams/figure_4_2_meta_arguments_comparison.png)
+*Figure 4.2: Comprehensive comparison of Terraform meta-arguments including count, for_each, depends_on, and lifecycle with their use cases, benefits, and best practices for resource management*
+
 ## ♻️ Lifecycle Meta-Argument
 
 ### Advanced Resource Lifecycle Management
@@ -565,6 +571,9 @@ resource "aws_lb_listener" "web" {
 }
 ```
 
+![Figure 4.3: Lifecycle Management Patterns](DaC/generated_diagrams/figure_4_3_lifecycle_management.png)
+*Figure 4.3: Advanced lifecycle management patterns showing create_before_destroy, prevent_destroy, ignore_changes, and replace_triggered_by strategies with real-world use cases and implementation examples*
+
 ## 🔧 Advanced Dependency Patterns
 
 ### Complex Real-World Scenarios
@@ -649,6 +658,9 @@ resource "aws_cloudfront_distribution" "app_cdn" {
 - Plan for zero-downtime deployments with create_before_destroy
 - Use ignore_changes judiciously to prevent configuration drift
 - Implement proper backup strategies before destructive changes
+
+![Figure 4.4: Complex Dependency Resolution](DaC/generated_diagrams/figure_4_4_complex_dependencies.png)
+*Figure 4.4: Complex dependency resolution patterns for multi-tier applications showing database, application, load balancer, and CDN tiers with proper orchestration, conditional dependencies, and cross-module dependency management*
 
 ## 🆕 **Advanced Resource Management Patterns (2025)**
 
@@ -908,14 +920,8 @@ resource "aws_subnet" "private" {
 - Implement enterprise governance
 - Establish advanced troubleshooting
 
----
-
-**Figure References:**
-- Figure 4.1: Resource Dependency Graph (see `../DaC/generated_diagrams/figure_4_1_resource_dependency_graph.png`)
-- Figure 4.2: Meta-Arguments Comparison (see `../DaC/generated_diagrams/figure_4_2_meta_arguments_comparison.png`)
-- Figure 4.3: Lifecycle Management Patterns (see `../DaC/generated_diagrams/figure_4_3_lifecycle_management.png`)
-- Figure 4.4: Complex Dependency Resolution (see `../DaC/generated_diagrams/figure_4_4_complex_dependencies.png`)
-- Figure 4.5: Resource Management Workflow (see `../DaC/generated_diagrams/figure_4_5_resource_management_workflow.png`)
+![Figure 4.5: Resource Management Workflow](DaC/generated_diagrams/figure_4_5_resource_management_workflow.png)
+*Figure 4.5: Complete enterprise resource management workflow showing the end-to-end process from planning and dependency analysis through implementation, validation, and ongoing optimization with best practices and governance patterns*
 
 ---
 

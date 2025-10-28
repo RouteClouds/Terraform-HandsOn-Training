@@ -1,0 +1,192 @@
+name: 'Terraform Production Deployment'
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+
+env:
+  TF_VERSION: '1.13.0'
+  AWS_REGION: 'us-east-1'
+  ENVIRONMENT: 'prod'
+
+jobs:
+  terraform-plan:
+    name: 'Terraform Production Plan'
+    runs-on: ubuntu-latest
+    environment: production
+    
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform-manifests
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+    
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Terraform Format Check
+      id: fmt
+      run: terraform fmt -check -recursive
+      continue-on-error: true
+    
+    - name: Terraform Init
+      id: init
+      run: terraform init -backend-config=../environments/${{ env.ENVIRONMENT }}/backend-config.hcl
+    
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+    
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -var-file=../environments/${{ env.ENVIRONMENT }}/terraform.tfvars -no-color -out=tfplan
+    
+    - name: Upload Plan
+      uses: actions/upload-artifact@v4
+      with:
+        name: tfplan
+        path: terraform-manifests/tfplan
+        retention-days: 5
+    
+    - name: Plan Summary
+      run: |
+        echo "## Terraform Plan Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Environment:** ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Action:** ${{ github.event.inputs.action }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        terraform show -no-color tfplan >> $GITHUB_STEP_SUMMARY
+  
+  terraform-apply:
+    name: 'Terraform Production Apply'
+    runs-on: ubuntu-latest
+    needs: terraform-plan
+    if: github.event.inputs.action == 'apply'
+    environment: 
+      name: production
+      url: ${{ steps.output.outputs.application_url }}
+    
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform-manifests
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+    
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Terraform Init
+      run: terraform init -backend-config=../environments/${{ env.ENVIRONMENT }}/backend-config.hcl
+    
+    - name: Download Plan
+      uses: actions/download-artifact@v4
+      with:
+        name: tfplan
+        path: terraform-manifests/
+    
+    - name: Manual Approval Required
+      uses: trstringer/manual-approval@v1
+      with:
+        secret: ${{ github.TOKEN }}
+        approvers: ${{ secrets.PROD_APPROVERS }}
+        minimum-approvals: 2
+        issue-title: "🚨 PRODUCTION DEPLOYMENT APPROVAL REQUIRED 🚨"
+        issue-body: |
+          ## Production Deployment Approval
+          
+          **Environment:** Production
+          **Triggered by:** @${{ github.actor }}
+          **Commit:** ${{ github.sha }}
+          
+          Please review the plan carefully before approving.
+          
+          **Required Approvals:** 2
+    
+    - name: Terraform Apply
+      run: terraform apply -auto-approve tfplan
+    
+    - name: Get Outputs
+      id: output
+      run: |
+        terraform output -json > outputs.json
+        APPLICATION_URL=$(terraform output -raw application_url)
+        echo "application_url=$APPLICATION_URL" >> $GITHUB_OUTPUT
+    
+    - name: Post-Deployment Validation
+      run: |
+        echo "Running post-deployment validation..."
+        APPLICATION_URL=$(terraform output -raw application_url)
+        echo "Testing application at: $APPLICATION_URL"
+        
+        # Wait for ALB to be ready
+        sleep 30
+        
+        # Test HTTP endpoint
+        HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" $APPLICATION_URL || echo "000")
+        echo "HTTP Response Code: $HTTP_CODE"
+        
+        if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "301" ] || [ "$HTTP_CODE" = "302" ]; then
+          echo "✅ Application is responding"
+        else
+          echo "⚠️ Application returned unexpected status code: $HTTP_CODE"
+        fi
+    
+    - name: Deployment Summary
+      run: |
+        echo "## Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ **Deployment Successful**" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Environment:** ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Deployed by:** @${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Application URL:** ${{ steps.output.outputs.application_url }}" >> $GITHUB_STEP_SUMMARY
+    
+    - name: Notify Success
+      if: success()
+      run: |
+        echo "✅ Production environment deployed successfully!"
+        echo "Environment: ${{ env.ENVIRONMENT }}"
+        echo "Commit: ${{ github.sha }}"
+        echo "Application URL: ${{ steps.output.outputs.application_url }}"
+    
+    - name: Notify Failure
+      if: failure()
+      run: |
+        echo "❌ Production deployment failed!"
+        echo "Environment: ${{ env.ENVIRONMENT }}"
+        echo "Commit: ${{ github.sha }}"
+        echo "Please investigate immediately!"
+

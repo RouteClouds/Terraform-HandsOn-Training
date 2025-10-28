@@ -154,12 +154,15 @@ terraform destroy -var-file="production.tfvars"
 # Prevent accidental destruction
 resource "aws_instance" "critical" {
   # ... configuration ...
-  
+
   lifecycle {
     prevent_destroy = true
   }
 }
 ```
+
+![Figure 3.1: Terraform Core Workflow](DaC/generated_diagrams/figure_3_1_terraform_core_workflow.png)
+*Figure 3.1: Complete Terraform core workflow showing the sequence of init, validate, plan, apply, and destroy operations with their respective purposes, outputs, and best practices for enterprise infrastructure management*
 
 ## 🔄 Resource Lifecycle Management
 
@@ -295,6 +298,9 @@ resource "aws_instance" "database" {
 }
 ```
 
+![Figure 3.2: Resource Lifecycle States](DaC/generated_diagrams/figure_3_2_resource_lifecycle.png)
+*Figure 3.2: Detailed resource lifecycle state diagram showing the complete journey of Terraform resources through creation, update, and deletion phases, including in-place updates, replacement strategies, and lifecycle meta-arguments*
+
 ## 🔗 Dependency Management
 
 ### Implicit Dependencies
@@ -404,6 +410,9 @@ terraform graph | dot -Tpng > graph.png
 terraform graph > dependencies.dot
 ```
 
+![Figure 3.3: Dependency Graph Example](DaC/generated_diagrams/figure_3_3_dependency_graph.png)
+*Figure 3.3: Comprehensive dependency graph visualization showing implicit and explicit dependencies between AWS resources including VPC, subnets, internet gateways, route tables, security groups, and EC2 instances with their relationship flows*
+
 ## ⚡ Performance Optimization
 
 ### Parallelism Control
@@ -444,6 +453,9 @@ terraform apply -target=aws_instance.web -target=aws_security_group.web
 # Target entire modules
 terraform apply -target=module.networking
 ```
+
+![Figure 3.4: Performance Optimization](DaC/generated_diagrams/figure_3_4_performance_optimization.png)
+*Figure 3.4: Terraform performance optimization strategies including parallelism control, provider caching, resource targeting, and best practices for managing large-scale infrastructure deployments efficiently*
 
 ## 🔧 Advanced Operations
 
@@ -539,6 +551,9 @@ terraform state rm aws_instance.problematic
 # Re-import if necessary
 terraform import aws_instance.problematic i-1234567890abcdef0
 ```
+
+![Figure 3.5: Error Recovery Patterns](DaC/generated_diagrams/figure_3_5_error_recovery.png)
+*Figure 3.5: Comprehensive error handling and recovery patterns for Terraform operations including state lock resolution, resource import strategies, partial apply recovery, and systematic troubleshooting workflows*
 
 ## 📊 Monitoring and Logging
 
@@ -787,15 +802,6 @@ terraform state pull > state-backup-$(date +%Y%m%d-%H%M%S).json
 - Deploy stack-based architecture
 - Implement advanced monitoring
 - Establish enterprise governance
-
----
-
-**Figure References:**
-- Figure 3.1: Terraform Core Workflow (see `../DaC/generated_diagrams/figure_3_1_terraform_core_workflow.png`)
-- Figure 3.2: Resource Lifecycle States (see `../DaC/generated_diagrams/figure_3_2_resource_lifecycle.png`)
-- Figure 3.3: Dependency Graph Example (see `../DaC/generated_diagrams/figure_3_3_dependency_graph.png`)
-- Figure 3.4: Performance Optimization (see `../DaC/generated_diagrams/figure_3_4_performance_optimization.png`)
-- Figure 3.5: Error Recovery Patterns (see `../DaC/generated_diagrams/figure_3_5_error_recovery.png`)
 
 ---
 

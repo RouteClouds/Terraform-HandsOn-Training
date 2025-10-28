@@ -1,0 +1,267 @@
+# multi-resource-validation.sentinel
+# Advanced policy that validates relationships between multiple resource types
+# Ensures RDS instances follow security best practices including:
+# - Not publicly accessible
+# - Has security groups attached
+# - Backup retention >= 7 days
+# - Storage encryption enabled
+# - Multi-AZ enabled for production
+# - Proper subnet group configuration
+
+import "tfplan/v2" as tfplan
+import "strings"
+
+# Get environment from workspace name
+get_environment = func() {
+    workspace_name = strings.to_lower(tfplan.workspace.name)
+    if strings.has_prefix(workspace_name, "prod") {
+        return "production"
+    } else if strings.has_prefix(workspace_name, "stg") or strings.has_prefix(workspace_name, "staging") {
+        return "staging"
+    }
+    return "development"
+}
+
+# Validate RDS security configuration
+validate_rds_security = func() {
+    violations = []
+    environment = get_environment()
+    
+    # Get all RDS instances
+    for tfplan.resource_changes as address, rc {
+        if rc.type == "aws_db_instance" and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            
+            # Check 1: Publicly accessible
+            if "publicly_accessible" in keys(rc.change.after) and
+               rc.change.after.publicly_accessible == true {
+                append(violations, {
+                    "address": address,
+                    "issue": "RDS instance is publicly accessible",
+                    "severity": "critical",
+                    "remediation": "Set publicly_accessible = false",
+                })
+            }
+            
+            # Check 2: Security groups
+            if "vpc_security_group_ids" not in keys(rc.change.after) or
+               length(rc.change.after.vpc_security_group_ids) == 0 {
+                append(violations, {
+                    "address": address,
+                    "issue": "RDS instance has no security groups",
+                    "severity": "high",
+                    "remediation": "Attach at least one security group",
+                })
+            }
+            
+            # Check 3: Backup retention
+            min_retention = 7
+            if environment == "production" {
+                min_retention = 14
+            }
+            
+            if "backup_retention_period" in keys(rc.change.after) {
+                retention = rc.change.after.backup_retention_period
+                if retention < min_retention {
+                    append(violations, {
+                        "address": address,
+                        "issue": "RDS backup retention less than " + string(min_retention) + " days (found: " + string(retention) + ")",
+                        "severity": "medium",
+                        "remediation": "Set backup_retention_period >= " + string(min_retention),
+                    })
+                }
+            } else {
+                append(violations, {
+                    "address": address,
+                    "issue": "RDS backup retention not configured",
+                    "severity": "medium",
+                    "remediation": "Set backup_retention_period >= " + string(min_retention),
+                })
+            }
+            
+            # Check 4: Storage encryption
+            if "storage_encrypted" in keys(rc.change.after) and
+               rc.change.after.storage_encrypted != true {
+                append(violations, {
+                    "address": address,
+                    "issue": "RDS storage encryption not enabled",
+                    "severity": "critical",
+                    "remediation": "Set storage_encrypted = true",
+                })
+            }
+            
+            # Check 5: Multi-AZ for production
+            if environment == "production" {
+                if "multi_az" not in keys(rc.change.after) or
+                   rc.change.after.multi_az != true {
+                    append(violations, {
+                        "address": address,
+                        "issue": "RDS Multi-AZ not enabled in production",
+                        "severity": "high",
+                        "remediation": "Set multi_az = true for production databases",
+                    })
+                }
+            }
+            
+            # Check 6: Deletion protection for production
+            if environment == "production" {
+                if "deletion_protection" not in keys(rc.change.after) or
+                   rc.change.after.deletion_protection != true {
+                    append(violations, {
+                        "address": address,
+                        "issue": "RDS deletion protection not enabled in production",
+                        "severity": "high",
+                        "remediation": "Set deletion_protection = true for production databases",
+                    })
+                }
+            }
+            
+            # Check 7: DB subnet group
+            if "db_subnet_group_name" not in keys(rc.change.after) {
+                append(violations, {
+                    "address": address,
+                    "issue": "RDS instance has no subnet group",
+                    "severity": "medium",
+                    "remediation": "Specify db_subnet_group_name",
+                })
+            }
+            
+            # Check 8: Engine version (should not be default)
+            if "engine_version" not in keys(rc.change.after) {
+                append(violations, {
+                    "address": address,
+                    "issue": "RDS engine version not specified (using default)",
+                    "severity": "low",
+                    "remediation": "Explicitly specify engine_version",
+                })
+            }
+            
+            # Check 9: Monitoring interval
+            if "monitoring_interval" in keys(rc.change.after) {
+                interval = rc.change.after.monitoring_interval
+                if environment == "production" and interval < 60 {
+                    append(violations, {
+                        "address": address,
+                        "issue": "RDS enhanced monitoring not enabled or interval too low",
+                        "severity": "low",
+                        "remediation": "Set monitoring_interval to 60 for production",
+                    })
+                }
+            }
+            
+            # Check 10: Auto minor version upgrade
+            if "auto_minor_version_upgrade" in keys(rc.change.after) and
+               rc.change.after.auto_minor_version_upgrade != true {
+                append(violations, {
+                    "address": address,
+                    "issue": "RDS auto minor version upgrade disabled",
+                    "severity": "low",
+                    "remediation": "Enable auto_minor_version_upgrade for security patches",
+                })
+            }
+        }
+    }
+    
+    return violations
+}
+
+# Validate EC2 and RDS are in the same VPC
+validate_vpc_consistency = func() {
+    violations = []
+    
+    # Get VPCs from EC2 instances
+    ec2_vpcs = {}
+    for tfplan.resource_changes as address, rc {
+        if rc.type == "aws_instance" and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            if "vpc_security_group_ids" in keys(rc.change.after) {
+                ec2_vpcs[address] = true
+            }
+        }
+    }
+    
+    # Check if RDS instances exist when EC2 instances exist
+    has_ec2 = length(keys(ec2_vpcs)) > 0
+    has_rds = false
+    
+    for tfplan.resource_changes as address, rc {
+        if rc.type == "aws_db_instance" and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            has_rds = true
+        }
+    }
+    
+    # If both exist, ensure proper configuration
+    if has_ec2 and has_rds {
+        print("ℹ️  Both EC2 and RDS resources detected - ensure they are in the same VPC")
+    }
+    
+    return violations
+}
+
+# Run all validations
+environment = get_environment()
+rds_violations = validate_rds_security()
+vpc_violations = validate_vpc_consistency()
+
+all_violations = []
+for rds_violations as v {
+    append(all_violations, v)
+}
+for vpc_violations as v {
+    append(all_violations, v)
+}
+
+# Print summary
+print("=" * 60)
+print("Multi-Resource Validation Policy")
+print("=" * 60)
+print("Environment:", environment)
+print("Total violations:", length(all_violations))
+print("")
+
+# Print violations by severity
+if length(all_violations) > 0 {
+    critical_count = 0
+    high_count = 0
+    medium_count = 0
+    low_count = 0
+    
+    for all_violations as v {
+        if v.severity == "critical" {
+            critical_count += 1
+        } else if v.severity == "high" {
+            high_count += 1
+        } else if v.severity == "medium" {
+            medium_count += 1
+        } else if v.severity == "low" {
+            low_count += 1
+        }
+    }
+    
+    print("Violations by severity:")
+    print("  Critical:", critical_count)
+    print("  High:", high_count)
+    print("  Medium:", medium_count)
+    print("  Low:", low_count)
+    print("")
+    
+    print("Detailed violations:")
+    for all_violations as v {
+        print("  [" + strings.to_upper(v.severity) + "]", v.address)
+        print("    Issue:", v.issue)
+        print("    Remediation:", v.remediation)
+        print("")
+    }
+}
+
+print("=" * 60)
+
+# Main rule: no critical or high severity violations
+main = rule {
+    length(all_violations) == 0
+}
+

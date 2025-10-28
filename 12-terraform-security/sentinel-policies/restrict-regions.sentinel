@@ -1,0 +1,144 @@
+# Policy: restrict-regions.sentinel
+# Description: Limits AWS deployments to approved regions
+# Enforcement Level: hard-mandatory
+# Version: 1.0
+
+import "tfplan/v2" as tfplan
+import "strings"
+
+# Allowed AWS regions
+allowed_regions = [
+    "us-east-1",      # N. Virginia
+    "us-west-2",      # Oregon
+    "eu-west-1",      # Ireland
+]
+
+# Rationale for allowed regions:
+# - us-east-1: Primary region, lowest cost
+# - us-west-2: West coast presence, disaster recovery
+# - eu-west-1: GDPR compliance, European customers
+
+# Find AWS provider configurations
+find_aws_providers = func() {
+    providers = {}
+    
+    # Check root module providers
+    if "providers" in keys(tfplan.config) {
+        for tfplan.config.providers as name, provider {
+            if strings.has_prefix(name, "aws") {
+                providers[name] = provider
+            }
+        }
+    }
+    
+    return providers
+}
+
+# Find resources with explicit region configuration
+find_resources_with_regions = func() {
+    resources = {}
+    
+    for tfplan.resource_changes as address, rc {
+        if rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            
+            # Check if resource has region attribute
+            region = rc.change.after.region else null
+            
+            if region != null {
+                resources[address] = {
+                    "type": rc.type,
+                    "region": region,
+                }
+            }
+        }
+    }
+    
+    return resources
+}
+
+# Validate provider region
+validate_provider_region = func(provider) {
+    # Get region from provider configuration
+    region = null
+    
+    if "config" in keys(provider) and "region" in keys(provider.config) {
+        if "constant_value" in keys(provider.config.region) {
+            region = provider.config.region.constant_value
+        } else if "references" in keys(provider.config.region) {
+            # Region is set via variable - check if we can determine it
+            print("Warning: Provider region is set via variable/reference, cannot validate at policy time")
+            return true  # Allow if region is dynamic
+        }
+    }
+    
+    if region == null {
+        print("Warning: Could not determine provider region")
+        return true  # Allow if region cannot be determined
+    }
+    
+    return region in allowed_regions
+}
+
+# Validate resource region
+validate_resource_region = func(region) {
+    return region in allowed_regions
+}
+
+# Main validation
+providers = find_aws_providers()
+resources_with_regions = find_resources_with_regions()
+violations = []
+
+print("Allowed AWS Regions:", strings.join(allowed_regions, ", "))
+print("")
+
+# Check provider configurations
+for providers as name, provider {
+    if not validate_provider_region(provider) {
+        region = provider.config.region.constant_value else "unknown"
+        violations = violations + [{
+            "type": "provider",
+            "name": name,
+            "region": region,
+            "issue": "Provider configured with disallowed region",
+        }]
+    }
+}
+
+# Check resources with explicit regions
+for resources_with_regions as address, resource {
+    if not validate_resource_region(resource.region) {
+        violations = violations + [{
+            "type": "resource",
+            "name": address,
+            "region": resource.region,
+            "issue": "Resource configured with disallowed region",
+        }]
+    }
+}
+
+# Print violations
+if length(violations) > 0 {
+    print("\n=== Region Policy Violations ===")
+    for violations as violation {
+        print("Type:", violation.type)
+        print("  Name:", violation.name)
+        print("  Region:", violation.region)
+        print("  Issue:", violation.issue)
+        print("")
+    }
+    print("Allowed regions:", strings.join(allowed_regions, ", "))
+    print("================================\n")
+}
+
+# Main rule: No violations allowed
+main = rule {
+    length(violations) == 0
+}
+
+# Violation message
+violation_message = "One or more resources or providers are configured with disallowed AWS regions. " +
+                   "Allowed regions: " + strings.join(allowed_regions, ", ") + ". " +
+                   "This restriction is in place for data sovereignty, compliance, and cost optimization."
+

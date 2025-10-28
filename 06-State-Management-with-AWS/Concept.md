@@ -35,7 +35,7 @@ By completing this topic, you will achieve measurable mastery in:
 
 ### **1. AWS S3 Backend with Advanced Security**
 
-![State Management Architecture](DaC/generated_diagrams/state_management_architecture.png)
+![Figure 6.1: State Management Architecture](DaC/generated_diagrams/figure_6_1_state_backend_architecture.png)
 *Figure 6.1: Enterprise state management architecture with AWS S3, DynamoDB, and advanced security controls*
 
 #### **S3 Backend Configuration with Security**
@@ -204,7 +204,7 @@ resource "aws_s3_bucket_notification" "terraform_state" {
 
 ### **2. DynamoDB State Locking with High Availability**
 
-![State Locking Architecture](DaC/generated_diagrams/state_locking_architecture.png)
+![Figure 6.2: State Locking Architecture](DaC/generated_diagrams/figure_6_2_state_locking_workflow.png)
 *Figure 6.2: Advanced state locking architecture with DynamoDB, monitoring, and conflict resolution*
 
 #### **DynamoDB Table with Enterprise Features**
@@ -436,7 +436,7 @@ resource "aws_iam_role_policy" "terraform_state_dynamodb" {
 
 ### **1. Advanced Workspace Strategies**
 
-![Workspace Management](DaC/generated_diagrams/workspace_management.png)
+![Figure 6.3: Workspace Management](DaC/generated_diagrams/figure_6_3_workspace_management.png)
 *Figure 6.3: Enterprise workspace management with environment isolation and promotion workflows*
 
 #### **Environment-Based Workspace Pattern**
@@ -540,7 +540,7 @@ echo "📁 Backup saved to: $BACKUP_DIR/terraform.tfstate.backup.$TIMESTAMP"
 
 ### **1. State Health Monitoring**
 
-![State Monitoring](DaC/generated_diagrams/state_monitoring.png)
+![Figure 6.4: State Monitoring](DaC/generated_diagrams/figure_6_4_state_migration.png)
 *Figure 6.4: Comprehensive state monitoring with CloudWatch, alerting, and automated remediation*
 
 #### **CloudWatch Monitoring for State Operations**
@@ -1033,6 +1033,9 @@ resource "aws_cloudwatch_metric_alarm" "state_access_anomaly" {
 - **Risk Reduction**: 95% reduction in state-related incidents
 - **Cost Optimization**: 40% reduction in infrastructure management overhead
 - **Competitive Advantage**: 2-month faster deployment cycles
+
+![Figure 6.5: Enterprise Governance Patterns](DaC/generated_diagrams/figure_6_5_enterprise_governance.png)
+*Figure 6.5: Enterprise state governance patterns showing compliance frameworks, audit trails, access controls, and best practices for large-scale state management*
 
 ## 🎯 **2025 Best Practices Summary**
 

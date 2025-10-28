@@ -60,6 +60,9 @@ docker run --rm -v $(pwd):/workspace -w /workspace hashicorp/terraform:1.13.2 ve
 alias terraform='docker run --rm -v $(pwd):/workspace -w /workspace hashicorp/terraform:1.13.2'
 ```
 
+![Figure 2.1: Terraform CLI Installation Methods](DaC/generated_diagrams/figure_2_1_terraform_installation_methods.png)
+*Figure 2.1: Comprehensive overview of Terraform CLI installation methods including official HashiCorp repositories, version management with tfenv, and Docker-based installations for different operating systems and CI/CD environments*
+
 ### CLI Configuration and Optimization
 
 #### 1. **Terraform CLI Configuration File**
@@ -237,6 +240,9 @@ export AWS_ACCESS_KEY_ID="AKIAXXXXXXXXXX"
 export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxx"
 export AWS_DEFAULT_REGION="us-east-1"
 ```
+
+![Figure 2.2: AWS Authentication Flow](DaC/generated_diagrams/figure_2_2_aws_authentication_flow.png)
+*Figure 2.2: Comprehensive AWS authentication flow diagram showing the credential precedence order and various authentication methods including IAM roles, AWS CLI profiles, SSO integration, and environment variables for Terraform AWS provider configuration*
 
 ## ⚙️ Advanced Provider Configuration
 
@@ -448,7 +454,7 @@ resource "aws_instance" "web" {
   count         = local.instance_counts[local.environment]
   instance_type = local.instance_types[local.environment]
   ami           = data.aws_ami.amazon_linux.id
-  
+
   tags = {
     Name        = "web-${local.environment}-${count.index + 1}"
     Environment = local.environment
@@ -456,6 +462,9 @@ resource "aws_instance" "web" {
   }
 }
 ```
+
+![Figure 2.3: Multi-Environment Setup](DaC/generated_diagrams/figure_2_3_multi_environment_setup.png)
+*Figure 2.3: Multi-environment infrastructure architecture showing Terraform workspace management, environment-specific configurations, and state isolation patterns for development, staging, and production environments*
 
 ### 2. **Remote State Backend Configuration**
 ```hcl
@@ -575,6 +584,12 @@ esac
 
 echo "✅ Terraform ${ACTION} completed successfully!"
 ```
+
+![Figure 2.4: Provider Configuration Patterns](DaC/generated_diagrams/figure_2_4_provider_configuration_patterns.png)
+*Figure 2.4: Advanced AWS provider configuration patterns including multi-region setups, provider aliases, version constraints, and enterprise-grade security configurations with default tags and ignore tags*
+
+![Figure 2.5: Development Workflow](DaC/generated_diagrams/figure_2_5_development_workflow.png)
+*Figure 2.5: Complete Terraform development workflow showing IDE integration, automation scripts, pre-commit hooks, and the full lifecycle from code development through validation, planning, and deployment*
 
 ## 🔍 Troubleshooting and Debugging
 
@@ -904,10 +919,3 @@ aws sts assume-role \
 4. **Monitoring**: Implement infrastructure monitoring and alerting
 
 ---
-
-**Figure References:**
-- Figure 2.1: Terraform CLI Installation Methods (see `../DaC/generated_diagrams/cli_installation.png`)
-- Figure 2.2: AWS Authentication Flow (see `../DaC/generated_diagrams/aws_auth_flow.png`)
-- Figure 2.3: Multi-Environment Architecture (see `../DaC/generated_diagrams/multi_env_setup.png`)
-- Figure 2.4: Provider Configuration Patterns (see `../DaC/generated_diagrams/provider_patterns.png`)
-- Figure 2.5: Development Workflow (see `../DaC/generated_diagrams/dev_workflow.png`)

@@ -1,0 +1,94 @@
+name: 'Terraform Staging Deployment'
+
+on:
+  push:
+    branches:
+      - staging
+    paths:
+      - 'terraform-manifests/**'
+      - 'environments/staging/**'
+      - '.github/workflows/terraform-staging.yml'
+  workflow_dispatch:
+
+env:
+  TF_VERSION: '1.13.0'
+  AWS_REGION: 'us-east-1'
+  ENVIRONMENT: 'staging'
+
+jobs:
+  terraform:
+    name: 'Terraform Staging'
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform-manifests
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+    
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Terraform Format Check
+      id: fmt
+      run: terraform fmt -check -recursive
+      continue-on-error: true
+    
+    - name: Terraform Init
+      id: init
+      run: terraform init -backend-config=../environments/${{ env.ENVIRONMENT }}/backend-config.hcl
+    
+    - name: Terraform Validate
+      id: validate
+      run: terraform validate -no-color
+    
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -var-file=../environments/${{ env.ENVIRONMENT }}/terraform.tfvars -no-color -out=tfplan
+    
+    - name: Manual Approval Required
+      uses: trstringer/manual-approval@v1
+      if: github.event_name == 'workflow_dispatch'
+      with:
+        secret: ${{ github.TOKEN }}
+        approvers: ${{ secrets.APPROVERS }}
+        minimum-approvals: 1
+        issue-title: "Approve Staging Deployment"
+        issue-body: "Please review and approve the staging deployment"
+    
+    - name: Terraform Apply
+      run: terraform apply -auto-approve tfplan
+    
+    - name: Post-Deployment Validation
+      run: |
+        echo "Running post-deployment validation..."
+        terraform output -json > outputs.json
+        cat outputs.json
+    
+    - name: Notify Success
+      if: success()
+      run: |
+        echo "✅ Staging environment deployed successfully!"
+        echo "Environment: ${{ env.ENVIRONMENT }}"
+        echo "Commit: ${{ github.sha }}"
+    
+    - name: Notify Failure
+      if: failure()
+      run: |
+        echo "❌ Deployment failed!"
+        echo "Environment: ${{ env.ENVIRONMENT }}"
+        echo "Commit: ${{ github.sha }}"
+

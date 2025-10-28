@@ -42,6 +42,9 @@ terraform-aws-vpc/
     └── security-groups/
 ```
 
+![Figure 7.1: Module Architecture](DaC/generated_diagrams/figure_7_1_module_architecture.png)
+*Figure 7.1: Enterprise module architecture showing structure, composition patterns, input/output interfaces, and best practices for reusable infrastructure components*
+
 ## 🏗️ **AWS-Specific Module Patterns**
 
 ### **1. VPC Module Pattern**
@@ -295,6 +298,9 @@ resource "aws_security_group_rule" "ingress" {
 ```
 
 ## 📊 **Module Testing and Validation**
+
+![Figure 7.5: Testing and Automation Patterns](DaC/generated_diagrams/figure_7_5_testing_automation.png)
+*Figure 7.5: Comprehensive module testing and automation patterns showing validation strategies, CI/CD integration, automated testing frameworks, and quality assurance workflows*
 
 ### **1. Input Validation**
 
@@ -551,6 +557,9 @@ resource "aws_iam_role_policy" "app_policy" {
 
 ## 🔄 **Module Lifecycle Management**
 
+![Figure 7.2: Module Development Lifecycle](DaC/generated_diagrams/figure_7_2_development_lifecycle.png)
+*Figure 7.2: Complete module development lifecycle showing versioning, testing, publishing, and maintenance workflows with CI/CD integration and best practices*
+
 ### **1. Versioning Strategy**
 
 ```hcl
@@ -613,6 +622,9 @@ jobs:
           scan-type: 'config'
           scan-ref: 'modules/'
 ```
+
+![Figure 7.3: Module Registry Ecosystem](DaC/generated_diagrams/figure_7_3_registry_ecosystem.png)
+*Figure 7.3: Module registry ecosystem showing public Terraform Registry, private registries, versioning strategies, and module distribution patterns for enterprise environments*
 
 ## 🎯 **Enterprise Module Patterns**
 
@@ -692,6 +704,9 @@ module "compliant_workload" {
 - [AWS Well-Architected Framework](https://aws.amazon.com/architecture/well-architected/)
 
 ## 🆕 **Advanced Module Development Patterns (2025)**
+
+![Figure 7.4: Enterprise Governance Patterns](DaC/generated_diagrams/figure_7_4_enterprise_governance.png)
+*Figure 7.4: Enterprise module governance patterns showing policy enforcement, compliance frameworks, security controls, and best practices for large-scale module management*
 
 ### **Meta-Modules and Module Composition**
 
@@ -1154,6 +1169,680 @@ resource "null_resource" "module_publishing" {
 - **Cost Optimization**: 50% reduction in infrastructure deployment overhead
 - **Competitive Advantage**: 4-month faster time-to-market
 
+---
+
+## 📦 **Private Module Registry**
+
+### **What is a Private Module Registry?**
+
+A Private Module Registry is a centralized repository for storing, versioning, and distributing Terraform modules within an organization. HCP Terraform (formerly Terraform Cloud) and Terraform Enterprise provide built-in private module registries that enable teams to share and consume modules securely.
+
+**Key Benefits:**
+- **Centralized Distribution**: Single source of truth for all organizational modules
+- **Version Control**: Semantic versioning with automatic version detection
+- **Access Control**: Fine-grained permissions and team-based access
+- **Discovery**: Searchable catalog with documentation
+- **Integration**: Seamless integration with VCS (GitHub, GitLab, Bitbucket)
+- **Compliance**: Audit trail and governance enforcement
+
+### **Registry Architecture**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                  HCP Terraform / Terraform Enterprise        │
+│                                                              │
+│  ┌────────────────────────────────────────────────────┐    │
+│  │         Private Module Registry                     │    │
+│  │                                                      │    │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────┐ │    │
+│  │  │   Module A   │  │   Module B   │  │ Module C │ │    │
+│  │  │   v1.0.0     │  │   v2.1.0     │  │  v1.5.0  │ │    │
+│  │  │   v1.1.0     │  │   v2.2.0     │  │  v1.6.0  │ │    │
+│  │  └──────────────┘  └──────────────┘  └──────────┘ │    │
+│  │                                                      │    │
+│  │  Features:                                          │    │
+│  │  • Version Management                               │    │
+│  │  • Access Control                                   │    │
+│  │  • Documentation                                    │    │
+│  │  • VCS Integration                                  │    │
+│  └────────────────────────────────────────────────────┘    │
+│                                                              │
+│  ┌────────────────────────────────────────────────────┐    │
+│  │              VCS Integration                        │    │
+│  │  GitHub • GitLab • Bitbucket • Azure DevOps        │    │
+│  └────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+                            ▲
+                            │
+                            │ Consume Modules
+                            │
+                ┌───────────┴───────────┐
+                │                       │
+         ┌──────▼──────┐        ┌──────▼──────┐
+         │  Workspace  │        │  Workspace  │
+         │     Dev     │        │    Prod     │
+         └─────────────┘        └─────────────┘
+```
+
+### **Module Publishing Workflow**
+
+#### **1. Module Repository Structure**
+
+For a module to be published to the private registry, it must follow this structure:
+
+```
+terraform-aws-vpc/
+├── main.tf                 # Primary resources
+├── variables.tf            # Input variables
+├── outputs.tf              # Output values
+├── versions.tf             # Provider requirements
+├── README.md               # Module documentation
+├── LICENSE                 # License file
+├── .gitignore              # Git ignore rules
+├── examples/               # Usage examples
+│   ├── basic/
+│   │   ├── main.tf
+│   │   └── README.md
+│   └── complete/
+│       ├── main.tf
+│       └── README.md
+└── tests/                  # Module tests
+    └── basic_test.go
+```
+
+#### **2. Repository Naming Convention**
+
+HCP Terraform requires specific naming conventions:
+
+**Format**: `terraform-<PROVIDER>-<NAME>`
+
+**Examples**:
+- `terraform-aws-vpc` ✅
+- `terraform-aws-ec2-instance` ✅
+- `terraform-azurerm-virtual-network` ✅
+- `my-vpc-module` ❌ (incorrect format)
+
+#### **3. Publishing Process**
+
+**Step 1: Prepare the Module**
+
+```bash
+# 1. Create module repository with correct naming
+git init terraform-aws-vpc
+cd terraform-aws-vpc
+
+# 2. Add module files
+cat > main.tf <<'EOF'
+resource "aws_vpc" "this" {
+  cidr_block           = var.cidr_block
+  enable_dns_hostnames = var.enable_dns_hostnames
+  enable_dns_support   = var.enable_dns_support
+
+  tags = merge(
+    var.tags,
+    {
+      Name = var.name
+    }
+  )
+}
+EOF
+
+cat > variables.tf <<'EOF'
+variable "name" {
+  description = "Name of the VPC"
+  type        = string
+}
+
+variable "cidr_block" {
+  description = "CIDR block for the VPC"
+  type        = string
+}
+
+variable "enable_dns_hostnames" {
+  description = "Enable DNS hostnames in the VPC"
+  type        = bool
+  default     = true
+}
+
+variable "enable_dns_support" {
+  description = "Enable DNS support in the VPC"
+  type        = bool
+  default     = true
+}
+
+variable "tags" {
+  description = "Tags to apply to resources"
+  type        = map(string)
+  default     = {}
+}
+EOF
+
+cat > outputs.tf <<'EOF'
+output "vpc_id" {
+  description = "ID of the VPC"
+  value       = aws_vpc.this.id
+}
+
+output "vpc_cidr_block" {
+  description = "CIDR block of the VPC"
+  value       = aws_vpc.this.cidr_block
+}
+EOF
+
+# 3. Create README.md with documentation
+cat > README.md <<'EOF'
+# AWS VPC Terraform Module
+
+This module creates an AWS VPC with configurable options.
+
+## Usage
+
+```hcl
+module "vpc" {
+  source = "app.terraform.io/my-org/vpc/aws"
+  version = "1.0.0"
+
+  name       = "production-vpc"
+  cidr_block = "10.0.0.0/16"
+
+  tags = {
+    Environment = "production"
+    Team        = "platform"
+  }
+}
+```
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 1.6.0 |
+| aws | >= 5.0 |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| name | Name of the VPC | `string` | n/a | yes |
+| cidr_block | CIDR block for the VPC | `string` | n/a | yes |
+| enable_dns_hostnames | Enable DNS hostnames | `bool` | `true` | no |
+| enable_dns_support | Enable DNS support | `bool` | `true` | no |
+| tags | Tags to apply | `map(string)` | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| vpc_id | ID of the VPC |
+| vpc_cidr_block | CIDR block of the VPC |
+EOF
+
+# 4. Commit and push to VCS
+git add .
+git commit -m "Initial module version"
+git tag v1.0.0
+git push origin main
+git push origin v1.0.0
+```
+
+**Step 2: Connect VCS to HCP Terraform**
+
+1. Navigate to HCP Terraform → Settings → VCS Providers
+2. Click "Add VCS Provider"
+3. Select your VCS (GitHub, GitLab, etc.)
+4. Complete OAuth authentication
+5. Authorize HCP Terraform access
+
+**Step 3: Publish Module to Registry**
+
+1. Navigate to Registry → Modules → "Publish" → "Module"
+2. Select VCS provider
+3. Choose repository (e.g., `terraform-aws-vpc`)
+4. Click "Publish Module"
+
+HCP Terraform will:
+- Detect the module structure
+- Parse README.md for documentation
+- Extract inputs and outputs
+- Create registry entry
+- Monitor for new version tags
+
+### **Module Versioning**
+
+#### **Semantic Versioning**
+
+Modules should follow [Semantic Versioning](https://semver.org/) (SemVer):
+
+**Format**: `MAJOR.MINOR.PATCH`
+
+- **MAJOR**: Breaking changes (e.g., removed variables, changed outputs)
+- **MINOR**: New features (backward compatible)
+- **PATCH**: Bug fixes (backward compatible)
+
+**Examples**:
+```bash
+# Initial release
+git tag v1.0.0
+
+# Bug fix (backward compatible)
+git tag v1.0.1
+
+# New feature (backward compatible)
+git tag v1.1.0
+
+# Breaking change
+git tag v2.0.0
+```
+
+#### **Version Constraints in Consumption**
+
+```hcl
+# Exact version
+module "vpc" {
+  source  = "app.terraform.io/my-org/vpc/aws"
+  version = "1.0.0"
+}
+
+# Pessimistic constraint (recommended)
+module "vpc" {
+  source  = "app.terraform.io/my-org/vpc/aws"
+  version = "~> 1.0"  # >= 1.0.0, < 2.0.0
+}
+
+# Range constraint
+module "vpc" {
+  source  = "app.terraform.io/my-org/vpc/aws"
+  version = ">= 1.0.0, < 2.0.0"
+}
+
+# Latest version (not recommended for production)
+module "vpc" {
+  source  = "app.terraform.io/my-org/vpc/aws"
+  # No version specified = latest
+}
+```
+
+### **Consuming Modules from Private Registry**
+
+#### **Basic Consumption**
+
+```hcl
+# main.tf
+terraform {
+  required_version = ">= 1.6.0"
+
+  # HCP Terraform backend (required for private registry)
+  cloud {
+    organization = "my-organization"
+
+    workspaces {
+      name = "production-infrastructure"
+    }
+  }
+}
+
+# Consume module from private registry
+module "vpc" {
+  source  = "app.terraform.io/my-organization/vpc/aws"
+  version = "~> 1.0"
+
+  name       = "production-vpc"
+  cidr_block = "10.0.0.0/16"
+
+  tags = {
+    Environment = "production"
+    ManagedBy   = "terraform"
+  }
+}
+
+# Use module outputs
+resource "aws_subnet" "public" {
+  vpc_id     = module.vpc.vpc_id
+  cidr_block = "10.0.1.0/24"
+
+  tags = {
+    Name = "public-subnet"
+  }
+}
+```
+
+#### **Authentication**
+
+To consume private modules, you need to authenticate:
+
+**Method 1: HCP Terraform CLI Login**
+```bash
+terraform login
+# Opens browser for authentication
+# Saves token to ~/.terraform.d/credentials.tfrc.json
+```
+
+**Method 2: Environment Variable**
+```bash
+export TF_TOKEN_app_terraform_io="your-token-here"
+terraform init
+```
+
+**Method 3: Credentials File**
+```hcl
+# ~/.terraform.d/credentials.tfrc.json
+{
+  "credentials": {
+    "app.terraform.io": {
+      "token": "your-token-here"
+    }
+  }
+}
+```
+
+### **Module Registry Best Practices**
+
+#### **1. Documentation Standards**
+
+**README.md Template**:
+```markdown
+# Module Name
+
+Brief description of what the module does.
+
+## Usage
+
+```hcl
+module "example" {
+  source  = "app.terraform.io/org/name/provider"
+  version = "~> 1.0"
+
+  # Required variables
+  name = "example"
+}
+```
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 1.6.0 |
+| aws | >= 5.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| aws | >= 5.0 |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| name | Resource name | `string` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| id | Resource ID |
+
+## Examples
+
+See `examples/` directory for complete examples.
+
+## License
+
+Apache 2.0
+```
+
+#### **2. Version Management Strategy**
+
+**Pre-release Versions**:
+```bash
+# Alpha release (early testing)
+git tag v1.0.0-alpha.1
+
+# Beta release (feature complete, testing)
+git tag v1.0.0-beta.1
+
+# Release candidate
+git tag v1.0.0-rc.1
+
+# Stable release
+git tag v1.0.0
+```
+
+**Version Lifecycle**:
+```
+Development → Alpha → Beta → RC → Stable → Deprecated
+```
+
+#### **3. Module Testing Before Publishing**
+
+```bash
+# Test module locally before publishing
+cd terraform-aws-vpc
+
+# 1. Validate syntax
+terraform fmt -check -recursive
+terraform validate
+
+# 2. Run automated tests
+cd tests
+go test -v -timeout 30m
+
+# 3. Test with example
+cd ../examples/basic
+terraform init
+terraform plan
+
+# 4. Tag and publish
+cd ../..
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+### **CI/CD Integration for Module Publishing**
+
+#### **GitHub Actions Workflow**
+
+```yaml
+# .github/workflows/module-publish.yml
+name: Module Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  validate:
+    name: Validate Module
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        run: |
+          terraform init -backend=false
+          terraform validate
+
+      - name: Run TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: TFLint
+        run: |
+          tflint --init
+          tflint --recursive
+
+  test:
+    name: Test Module
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Run Tests
+        run: |
+          cd tests
+          go test -v -timeout 30m
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+  publish:
+    name: Publish to Registry
+    runs-on: ubuntu-latest
+    needs: [validate, test]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract Version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ steps.version.outputs.VERSION }}
+          body: |
+            Module version ${{ steps.version.outputs.VERSION }}
+
+            See CHANGELOG.md for details.
+          draft: false
+          prerelease: false
+
+      - name: Notify HCP Terraform
+        run: |
+          echo "Module published: v${{ steps.version.outputs.VERSION }}"
+          echo "HCP Terraform will automatically detect the new version"
+```
+
+### **Module Governance and Access Control**
+
+#### **Team-Based Access**
+
+In HCP Terraform:
+
+1. **Navigate to**: Organization Settings → Teams
+2. **Create Teams**:
+   - `module-publishers` - Can publish and update modules
+   - `module-consumers` - Can only consume modules
+   - `module-admins` - Full control over registry
+
+3. **Set Permissions**:
+   ```
+   module-publishers:
+     - Read modules
+     - Publish modules
+     - Update module versions
+
+   module-consumers:
+     - Read modules only
+
+   module-admins:
+     - All permissions
+     - Delete modules
+     - Manage access control
+   ```
+
+#### **Module Approval Workflow**
+
+```yaml
+# .github/workflows/module-approval.yml
+name: Module Approval
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  review:
+    name: Module Review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for Breaking Changes
+        run: |
+          # Compare with previous version
+          git fetch origin main
+          ./scripts/check-breaking-changes.sh
+
+      - name: Security Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+
+      - name: Cost Estimation
+        run: |
+          # Run Infracost to estimate changes
+          infracost breakdown --path .
+
+      - name: Request Approval
+        if: contains(github.event.pull_request.labels.*.name, 'breaking-change')
+        run: |
+          echo "Breaking change detected - requires senior approval"
+```
+
+### **Module Discovery and Documentation**
+
+#### **Module Catalog Structure**
+
+Organize modules by category in your registry:
+
+```
+Private Module Registry
+├── Networking
+│   ├── terraform-aws-vpc (v1.2.0)
+│   ├── terraform-aws-subnet (v1.0.5)
+│   └── terraform-aws-security-group (v2.1.0)
+├── Compute
+│   ├── terraform-aws-ec2 (v3.0.0)
+│   ├── terraform-aws-asg (v2.5.0)
+│   └── terraform-aws-ecs (v1.8.0)
+├── Database
+│   ├── terraform-aws-rds (v4.2.0)
+│   └── terraform-aws-dynamodb (v1.3.0)
+└── Security
+    ├── terraform-aws-iam-role (v2.0.0)
+    └── terraform-aws-kms (v1.5.0)
+```
+
+#### **Module Metadata**
+
+Add metadata to help with discovery:
+
+```hcl
+# In README.md or module description
+---
+category: networking
+tags: [vpc, networking, aws, production-ready]
+maturity: stable
+owner: platform-team
+support: platform-team@company.com
+---
+```
+
 ## 🎯 **2025 Best Practices Summary**
 
 ### **Advanced Module Development Checklist**
@@ -1161,13 +1850,14 @@ resource "null_resource" "module_publishing" {
 - ✅ **Meta-Module Patterns**: Implement complex module composition for enterprise stacks
 - ✅ **Dynamic Configuration**: Use functions for environment-specific module behavior
 - ✅ **Advanced Testing**: Implement comprehensive testing frameworks with automation
-- ✅ **Registry Management**: Establish private module registry with versioning
+- ✅ **Registry Management**: Establish private module registry with versioning (see Private Module Registry section)
 - ✅ **Security Integration**: Include security scanning and compliance checking
 - ✅ **Performance Optimization**: Monitor and optimize module performance
 - ✅ **Documentation Excellence**: Maintain comprehensive module documentation
 - ✅ **Version Management**: Implement semantic versioning and lifecycle management
 - ✅ **CI/CD Integration**: Automate testing, validation, and publishing
 - ✅ **Governance Frameworks**: Establish enterprise governance and compliance
+- ✅ **Private Registry**: Use HCP Terraform Private Module Registry for centralized distribution
 
 ### **Enterprise Adoption Strategy**
 
@@ -1188,15 +1878,15 @@ resource "null_resource" "module_publishing" {
 
 ---
 
-**Topic Version**: 8.0
-**Last Updated**: September 2025
+**Topic Version**: 9.0
+**Last Updated**: October 2025
 **Terraform Version**: ~> 1.13.0
 **AWS Provider Version**: ~> 6.12.0
 **Compatibility**: Multi-platform (Linux, macOS, Windows WSL)
-**2025 Features**: Meta-Modules, Dynamic Configuration, Advanced Testing, Enterprise Registry
+**2025 Features**: Meta-Modules, Dynamic Configuration, Advanced Testing, Enterprise Registry, Private Module Registry
 
 ---
 
-*This comprehensive guide provides the foundation for mastering advanced Terraform module development with AWS, enabling teams to achieve operational excellence while maximizing business value and return on investment through sophisticated module automation and governance.*
+*This comprehensive guide provides the foundation for mastering advanced Terraform module development with AWS, enabling teams to achieve operational excellence while maximizing business value and return on investment through sophisticated module automation, governance, and centralized module distribution via Private Module Registry.*
 
 **Next Steps:** Proceed to Lab 7 for hands-on module development and implementation exercises.

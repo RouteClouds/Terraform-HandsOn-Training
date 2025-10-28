@@ -1,0 +1,135 @@
+name: 'Terraform Drift Detection'
+
+on:
+  schedule:
+    # Run every day at 9 AM UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to check'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - dev
+          - staging
+          - prod
+
+env:
+  TF_VERSION: '1.13.0'
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  drift-detection:
+    name: 'Drift Detection - ${{ matrix.environment }}'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: ${{ github.event.inputs.environment == 'all' && fromJSON('["dev", "staging", "prod"]') || fromJSON(format('["{0}"]', github.event.inputs.environment)) }}
+    
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./terraform-manifests
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+    
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Terraform Init
+      run: terraform init -backend-config=../environments/${{ matrix.environment }}/backend-config.hcl
+    
+    - name: Terraform Plan (Drift Check)
+      id: plan
+      run: |
+        terraform plan -var-file=../environments/${{ matrix.environment }}/terraform.tfvars -detailed-exitcode -no-color > plan_output.txt
+        EXIT_CODE=$?
+        cat plan_output.txt
+        echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+      continue-on-error: true
+    
+    - name: Check for Drift
+      id: drift
+      run: |
+        EXIT_CODE=${{ steps.plan.outputs.exit_code }}
+        
+        if [ "$EXIT_CODE" = "0" ]; then
+          echo "status=no-drift" >> $GITHUB_OUTPUT
+          echo "message=✅ No drift detected" >> $GITHUB_OUTPUT
+        elif [ "$EXIT_CODE" = "2" ]; then
+          echo "status=drift-detected" >> $GITHUB_OUTPUT
+          echo "message=⚠️ Configuration drift detected!" >> $GITHUB_OUTPUT
+        else
+          echo "status=error" >> $GITHUB_OUTPUT
+          echo "message=❌ Error checking for drift" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Create Issue on Drift
+      if: steps.drift.outputs.status == 'drift-detected'
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        script: |
+          const fs = require('fs');
+          const planOutput = fs.readFileSync('terraform-manifests/plan_output.txt', 'utf8');
+          
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `⚠️ Configuration Drift Detected - ${{ matrix.environment }}`,
+            body: `## Configuration Drift Detected
+            
+            **Environment:** ${{ matrix.environment }}
+            **Detected:** ${new Date().toISOString()}
+            **Workflow:** ${context.workflow}
+            **Run:** ${context.runNumber}
+            
+            ### Plan Output
+            
+            <details>
+            <summary>Show Drift Details</summary>
+            
+            \`\`\`
+            ${planOutput}
+            \`\`\`
+            
+            </details>
+            
+            ### Action Required
+            
+            Please review the drift and take appropriate action:
+            1. If the drift is expected, update the Terraform configuration
+            2. If the drift is unexpected, investigate and remediate
+            3. Consider running \`terraform apply\` to bring infrastructure back to desired state
+            
+            ### Links
+            
+            - [Workflow Run](${context.payload.repository.html_url}/actions/runs/${context.runId})
+            - [Environment: ${{ matrix.environment }}](../environments/${{ matrix.environment }})
+            `,
+            labels: ['drift-detection', 'infrastructure', '${{ matrix.environment }}']
+          });
+    
+    - name: Drift Summary
+      run: |
+        echo "## Drift Detection Summary - ${{ matrix.environment }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "${{ steps.drift.outputs.message }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Environment:** ${{ matrix.environment }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Checked:** $(date)" >> $GITHUB_STEP_SUMMARY
+

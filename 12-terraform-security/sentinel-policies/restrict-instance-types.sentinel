@@ -1,0 +1,133 @@
+# Policy: restrict-instance-types.sentinel
+# Description: Limits EC2 instance types based on workspace/environment
+# Enforcement Level: soft-mandatory
+# Version: 1.0
+
+import "tfplan/v2" as tfplan
+import "strings"
+
+# Get workspace name
+workspace_name = strings.to_lower(tfplan.workspace.name)
+
+# Allowed instance types per environment
+allowed_instance_types = {
+    "dev": [
+        "t3.micro",
+        "t3.small",
+        "t2.micro",
+        "t2.small",
+    ],
+    "staging": [
+        "t3.small",
+        "t3.medium",
+        "t3.large",
+        "t2.small",
+        "t2.medium",
+        "t2.large",
+    ],
+    "prod": [
+        "t3.medium",
+        "t3.large",
+        "t3.xlarge",
+        "m5.large",
+        "m5.xlarge",
+        "m5.2xlarge",
+        "c5.large",
+        "c5.xlarge",
+        "r5.large",
+        "r5.xlarge",
+    ],
+}
+
+# Determine environment from workspace name
+get_environment = func() {
+    if strings.has_prefix(workspace_name, "dev") or
+       strings.contains(workspace_name, "-dev-") or
+       strings.has_suffix(workspace_name, "-dev") {
+        return "dev"
+    } else if strings.has_prefix(workspace_name, "staging") or
+              strings.has_prefix(workspace_name, "stage") or
+              strings.contains(workspace_name, "-staging-") or
+              strings.contains(workspace_name, "-stage-") or
+              strings.has_suffix(workspace_name, "-staging") or
+              strings.has_suffix(workspace_name, "-stage") {
+        return "staging"
+    } else if strings.has_prefix(workspace_name, "prod") or
+              strings.contains(workspace_name, "-prod-") or
+              strings.has_suffix(workspace_name, "-prod") {
+        return "prod"
+    }
+    
+    # Default to dev for unknown environments
+    return "dev"
+}
+
+# Find all EC2 instances
+find_ec2_instances = func() {
+    instances = {}
+    for tfplan.resource_changes as address, rc {
+        if rc.type == "aws_instance" and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            instances[address] = rc
+        }
+    }
+    return instances
+}
+
+# Check if instance type is allowed for environment
+is_allowed_instance_type = func(instance_type, environment) {
+    if environment not in keys(allowed_instance_types) {
+        return false
+    }
+    
+    return instance_type in allowed_instance_types[environment]
+}
+
+# Main validation
+environment = get_environment()
+instances = find_ec2_instances()
+violations = []
+
+print("Workspace:", tfplan.workspace.name)
+print("Detected Environment:", environment)
+print("Allowed instance types:", strings.join(allowed_instance_types[environment], ", "))
+print("")
+
+# Check each instance
+for instances as address, instance {
+    instance_type = instance.change.after.instance_type else "unknown"
+    
+    if not is_allowed_instance_type(instance_type, environment) {
+        violations = violations + [{
+            "address": address,
+            "instance_type": instance_type,
+            "environment": environment,
+        }]
+    }
+}
+
+# Print violations
+if length(violations) > 0 {
+    print("\n=== Instance Type Policy Violations ===")
+    for violations as violation {
+        print("Resource:", violation.address)
+        print("  Instance Type:", violation.instance_type)
+        print("  Environment:", violation.environment)
+        print("  Allowed Types:", strings.join(allowed_instance_types[violation.environment], ", "))
+        print("")
+    }
+    print("=======================================\n")
+}
+
+# Main rule: No violations allowed
+main = rule {
+    length(violations) == 0
+}
+
+# Violation message
+violation_message = "One or more EC2 instances use instance types not allowed for the '" + 
+                   environment + "' environment. " +
+                   "Allowed types: " + strings.join(allowed_instance_types[environment], ", ") + ". " +
+                   "This policy can be overridden with proper justification."
+

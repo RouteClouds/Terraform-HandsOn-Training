@@ -1,0 +1,57 @@
+# Root Module - Variable Values Example
+# Copy this file to terraform.tfvars and customize the values
+
+# General Configuration
+aws_region   = "us-east-1"
+environment  = "dev"  # dev, staging, or prod
+project_name = "modular-infra"
+
+# VPC Configuration
+vpc_cidr           = "10.0.0.0/16"
+availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+private_subnet_cidrs = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+
+enable_nat_gateway = true
+single_nat_gateway = false  # Set to true for cost savings
+
+# Compute Configuration
+instance_type    = "t3.micro"
+min_size         = 2
+max_size         = 6
+desired_capacity = 2
+
+# Database Configuration
+db_engine            = "postgres"
+db_engine_version    = "15.4"
+db_instance_class    = "db.t3.micro"
+db_allocated_storage = 20
+db_name              = "myappdb"
+db_username          = "admin"
+db_password          = "CHANGE_ME"  # Use AWS Secrets Manager in production!
+db_multi_az          = false
+
+# Load Balancer Configuration
+enable_https    = false
+certificate_arn = null
+
+# Storage Configuration
+enable_versioning = true
+
+# DNS Configuration (Optional)
+domain_name        = null
+create_hosted_zone = false
+
+# Monitoring Configuration
+alarm_email = null
+
+# Security Configuration
+enable_kms_encryption = true
+allowed_cidr_blocks   = ["0.0.0.0/0"]
+
+# Additional Tags
+tags = {
+  Owner      = "Your Name"
+  CostCenter = "Engineering"
+}
+

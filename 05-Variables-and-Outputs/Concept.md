@@ -35,7 +35,7 @@ By completing this topic, you will achieve measurable mastery in:
 
 ### **1. Advanced Variable Types and Patterns**
 
-![Variable Architecture](DaC/generated_diagrams/variable_architecture.png)
+![Figure 5.1: Variable Architecture](DaC/generated_diagrams/figure_5_1_variable_types_validation.png)
 *Figure 5.1: Enterprise variable architecture with type hierarchies, validation layers, and security controls*
 
 #### **Complex Variable Type Definitions**
@@ -354,7 +354,7 @@ variable "ssl_certificates" {
 
 ### **2. Advanced Output Patterns and Data Flow**
 
-![Output Architecture](DaC/generated_diagrams/output_architecture.png)
+![Figure 5.2: Output Architecture](DaC/generated_diagrams/figure_5_2_output_data_flow.png)
 *Figure 5.2: Enterprise output architecture with data flow patterns, module integration, and automation interfaces*
 
 #### **Structured Output Patterns for Module Integration**
@@ -555,7 +555,7 @@ output "sensitive_configuration" {
 
 ### **1. Environment-Specific Variable Management**
 
-![Environment Configuration](DaC/generated_diagrams/environment_configuration.png)
+![Figure 5.3: Environment Configuration](DaC/generated_diagrams/figure_5_3_environment_configuration.png)
 *Figure 5.3: Environment-specific configuration management with inheritance patterns and override mechanisms*
 
 #### **Hierarchical Configuration with Inheritance**
@@ -877,6 +877,9 @@ locals {
 
 ## 🎯 **Advanced Use Cases and Integration Patterns**
 
+![Figure 5.4: AWS Integration Patterns](DaC/generated_diagrams/figure_5_4_variable_precedence_hierarchy.png)
+*Figure 5.4: Variable precedence hierarchy and AWS integration patterns showing Parameter Store, Secrets Manager, and environment-specific configuration management with security controls*
+
 ### **1. Multi-Environment Variable Orchestration**
 - Cross-environment variable inheritance and override patterns
 - Centralized configuration management with AWS Parameter Store
@@ -1179,6 +1182,9 @@ data "external" "parameter_validation" {
 - **Risk Reduction**: 92% reduction in configuration-related incidents
 - **Cost Optimization**: 30% reduction in infrastructure configuration overhead
 - **Competitive Advantage**: 3-month faster time-to-market
+
+![Figure 5.5: Enterprise Organization Patterns](DaC/generated_diagrams/figure_5_5_validation_workflow.png)
+*Figure 5.5: Enterprise variable organization and validation workflow showing comprehensive validation patterns, security controls, and best practices for large-scale infrastructure management*
 
 ## 🎯 **2025 Best Practices Summary**
 

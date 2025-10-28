@@ -1,0 +1,74 @@
+# Policy: require-s3-encryption.sentinel
+# Description: Ensures all S3 buckets have server-side encryption enabled
+# Enforcement Level: hard-mandatory
+# Version: 1.0
+
+import "tfplan/v2" as tfplan
+import "strings"
+
+# Find all S3 bucket resources
+find_s3_buckets = func() {
+    buckets = {}
+    for tfplan.resource_changes as address, rc {
+        if rc.type == "aws_s3_bucket" and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            buckets[address] = rc
+        }
+    }
+    return buckets
+}
+
+# Find all S3 bucket encryption configurations
+find_s3_encryption_configs = func() {
+    configs = {}
+    for tfplan.resource_changes as address, rc {
+        if rc.type == "aws_s3_bucket_server_side_encryption_configuration" and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            # Extract bucket reference from configuration
+            bucket_ref = rc.change.after.bucket else null
+            if bucket_ref != null {
+                configs[bucket_ref] = rc
+            }
+        }
+    }
+    return configs
+}
+
+# Check if bucket has encryption configured
+has_encryption = func(bucket_address, encryption_configs) {
+    # Check if there's a corresponding encryption configuration
+    for encryption_configs as bucket_ref, config {
+        # Match bucket address or ID
+        if strings.has_suffix(bucket_address, bucket_ref) or
+           strings.contains(bucket_ref, bucket_address) {
+            # Verify encryption rule exists
+            if config.change.after.rule else null != null {
+                return true
+            }
+        }
+    }
+    return false
+}
+
+# Main rule
+buckets = find_s3_buckets()
+encryption_configs = find_s3_encryption_configs()
+
+# Validate all buckets have encryption
+main = rule {
+    all buckets as address, bucket {
+        has_encryption(address, encryption_configs)
+    }
+}
+
+# Print violations for debugging
+print("S3 Buckets found:", length(buckets))
+print("Encryption configs found:", length(encryption_configs))
+
+# Provide helpful error message
+violation_message = "All S3 buckets must have server-side encryption enabled. " +
+                   "Add aws_s3_bucket_server_side_encryption_configuration resource " +
+                   "for each bucket with SSE-S3 (AES256) or SSE-KMS encryption."
+

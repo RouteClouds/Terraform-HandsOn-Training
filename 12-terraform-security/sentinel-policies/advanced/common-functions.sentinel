@@ -1,0 +1,291 @@
+# common-functions.sentinel
+# Reusable functions for Sentinel policies
+# This module provides common utility functions for policy composition
+
+import "tfplan/v2" as tfplan
+import "strings"
+
+# Get all resources of a specific type that are being created or updated
+# Parameters:
+#   resource_type: string - The resource type to filter (e.g., "aws_instance")
+# Returns:
+#   list of maps containing address and resource
+get_resources = func(resource_type) {
+    resources = []
+    for tfplan.resource_changes as address, rc {
+        if rc.type == resource_type and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            append(resources, {
+                "address": address,
+                "resource": rc,
+            })
+        }
+    }
+    return resources
+}
+
+# Get all resources of multiple types
+# Parameters:
+#   resource_types: list of strings - Resource types to filter
+# Returns:
+#   map of resource_type to list of resources
+get_resources_by_types = func(resource_types) {
+    resources_map = {}
+    for resource_types as rt {
+        resources_map[rt] = get_resources(rt)
+    }
+    return resources_map
+}
+
+# Get environment from workspace name
+# Returns:
+#   string - "production", "staging", or "development"
+get_environment = func() {
+    workspace_name = strings.to_lower(tfplan.workspace.name)
+    if strings.has_prefix(workspace_name, "prod") or strings.contains(workspace_name, "production") {
+        return "production"
+    } else if strings.has_prefix(workspace_name, "stg") or 
+              strings.has_prefix(workspace_name, "staging") or
+              strings.contains(workspace_name, "staging") {
+        return "staging"
+    } else if strings.has_prefix(workspace_name, "dev") or strings.contains(workspace_name, "development") {
+        return "development"
+    }
+    return "development"
+}
+
+# Check if resource has all required tags
+# Parameters:
+#   resource: resource change object
+#   required_tags: list of strings - Tag keys that must be present
+# Returns:
+#   boolean - true if all required tags are present
+has_required_tags = func(resource, required_tags) {
+    if "tags" not in keys(resource.change.after) {
+        return false
+    }
+    
+    resource_tags = resource.change.after.tags
+    for required_tags as tag {
+        if tag not in keys(resource_tags) {
+            return false
+        }
+    }
+    return true
+}
+
+# Get missing tags for a resource
+# Parameters:
+#   resource: resource change object
+#   required_tags: list of strings - Tag keys that must be present
+# Returns:
+#   list of strings - Missing tag keys
+get_missing_tags = func(resource, required_tags) {
+    missing = []
+    
+    if "tags" not in keys(resource.change.after) {
+        return required_tags
+    }
+    
+    resource_tags = resource.change.after.tags
+    for required_tags as tag {
+        if tag not in keys(resource_tags) {
+            append(missing, tag)
+        }
+    }
+    return missing
+}
+
+# Check if a value is in a list
+# Parameters:
+#   value: any - Value to check
+#   list: list - List to search
+# Returns:
+#   boolean - true if value is in list
+in_list = func(value, list) {
+    for list as item {
+        if item == value {
+            return true
+        }
+    }
+    return false
+}
+
+# Get attribute from resource with default value
+# Parameters:
+#   resource: resource change object
+#   attribute: string - Attribute path (e.g., "instance_type")
+#   default: any - Default value if attribute doesn't exist
+# Returns:
+#   any - Attribute value or default
+get_attribute = func(resource, attribute, default) {
+    if attribute in keys(resource.change.after) {
+        return resource.change.after[attribute]
+    }
+    return default
+}
+
+# Check if resource is being created
+# Parameters:
+#   resource: resource change object
+# Returns:
+#   boolean - true if resource is being created
+is_create = func(resource) {
+    return resource.change.actions contains "create"
+}
+
+# Check if resource is being updated
+# Parameters:
+#   resource: resource change object
+# Returns:
+#   boolean - true if resource is being updated
+is_update = func(resource) {
+    return resource.change.actions contains "update"
+}
+
+# Check if resource is being deleted
+# Parameters:
+#   resource: resource change object
+# Returns:
+#   boolean - true if resource is being deleted
+is_delete = func(resource) {
+    return resource.change.actions contains "delete"
+}
+
+# Print a formatted violation message
+# Parameters:
+#   address: string - Resource address
+#   message: string - Violation message
+#   severity: string - Severity level (critical, high, medium, low)
+print_violation = func(address, message, severity) {
+    severity_upper = strings.to_upper(severity)
+    print("  [" + severity_upper + "]", address + ":", message)
+}
+
+# Count resources of a specific type
+# Parameters:
+#   resource_type: string - The resource type to count
+# Returns:
+#   int - Number of resources
+count_resources = func(resource_type) {
+    count = 0
+    for tfplan.resource_changes as address, rc {
+        if rc.type == resource_type and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            count += 1
+        }
+    }
+    return count
+}
+
+# Get provider configuration value
+# Parameters:
+#   provider_name: string - Provider name (e.g., "aws")
+#   config_key: string - Configuration key (e.g., "region")
+# Returns:
+#   any - Configuration value or null
+get_provider_config = func(provider_name, config_key) {
+    if provider_name not in keys(tfplan.config.providers) {
+        return null
+    }
+    
+    provider = tfplan.config.providers[provider_name]
+    if "config" not in keys(provider) {
+        return null
+    }
+    
+    if config_key not in keys(provider.config) {
+        return null
+    }
+    
+    config_value = provider.config[config_key]
+    if "constant_value" in keys(config_value) {
+        return config_value.constant_value
+    }
+    
+    return null
+}
+
+# Validate that a string matches a pattern
+# Parameters:
+#   value: string - Value to validate
+#   pattern: string - Pattern to match (simple contains check)
+# Returns:
+#   boolean - true if value contains pattern
+matches_pattern = func(value, pattern) {
+    return strings.contains(strings.to_lower(value), strings.to_lower(pattern))
+}
+
+# Get all resource addresses of a specific type
+# Parameters:
+#   resource_type: string - The resource type
+# Returns:
+#   list of strings - Resource addresses
+get_resource_addresses = func(resource_type) {
+    addresses = []
+    for tfplan.resource_changes as address, rc {
+        if rc.type == resource_type and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            append(addresses, address)
+        }
+    }
+    return addresses
+}
+
+# Check if any resources of a type exist
+# Parameters:
+#   resource_type: string - The resource type
+# Returns:
+#   boolean - true if at least one resource exists
+has_resources = func(resource_type) {
+    for tfplan.resource_changes as address, rc {
+        if rc.type == resource_type and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            return true
+        }
+    }
+    return false
+}
+
+# Validate resource name follows naming convention
+# Parameters:
+#   name: string - Resource name to validate
+#   pattern: string - Expected pattern (e.g., "prod-", "dev-")
+# Returns:
+#   boolean - true if name follows convention
+validate_naming_convention = func(name, pattern) {
+    return strings.has_prefix(strings.to_lower(name), strings.to_lower(pattern))
+}
+
+# Get workspace name
+# Returns:
+#   string - Current workspace name
+get_workspace_name = func() {
+    return tfplan.workspace.name
+}
+
+# Check if running in production workspace
+# Returns:
+#   boolean - true if production workspace
+is_production = func() {
+    return get_environment() == "production"
+}
+
+# Check if running in staging workspace
+# Returns:
+#   boolean - true if staging workspace
+is_staging = func() {
+    return get_environment() == "staging"
+}
+
+# Check if running in development workspace
+# Returns:
+#   boolean - true if development workspace
+is_development = func() {
+    return get_environment() == "development"
+}
+

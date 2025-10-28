@@ -1,0 +1,63 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
+*.tfvars.backup
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Sensitive files
+*.pem
+*.key
+*.crt
+secrets.*
+.env
+.env.*
+
+# Secrets (NEVER commit secrets!)
+*secret*
+*password*
+*credentials*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
+
+# Backups
+backups/
+
+# Test results
+test-results/
+*.xml
+

@@ -1,0 +1,166 @@
+# Policy: require-tags.sentinel
+# Description: Enforces required tags on all AWS resources
+# Enforcement Level: hard-mandatory
+# Version: 1.0
+
+import "tfplan/v2" as tfplan
+import "strings"
+
+# Required tags for all resources
+required_tags = ["Environment", "Owner", "CostCenter", "Project"]
+
+# Valid values for Environment tag
+valid_environments = ["dev", "development", "staging", "stage", "prod", "production"]
+
+# Resource types that support tags
+taggable_resources = [
+    "aws_instance",
+    "aws_db_instance",
+    "aws_s3_bucket",
+    "aws_vpc",
+    "aws_subnet",
+    "aws_security_group",
+    "aws_lb",
+    "aws_ebs_volume",
+    "aws_efs_file_system",
+    "aws_rds_cluster",
+    "aws_elasticache_cluster",
+    "aws_lambda_function",
+    "aws_ecs_cluster",
+    "aws_eks_cluster",
+]
+
+# Find all taggable resources
+find_taggable_resources = func() {
+    resources = {}
+    for tfplan.resource_changes as address, rc {
+        if rc.type in taggable_resources and
+           rc.mode == "managed" and
+           (rc.change.actions contains "create" or rc.change.actions contains "update") {
+            resources[address] = rc
+        }
+    }
+    return resources
+}
+
+# Check if resource has all required tags
+has_required_tags = func(tags) {
+    if tags == null {
+        return false
+    }
+    
+    for required_tags as tag {
+        if tag not in keys(tags) {
+            return false
+        }
+        
+        # Check for empty tag values
+        if tags[tag] == "" or tags[tag] == null {
+            return false
+        }
+    }
+    
+    return true
+}
+
+# Validate Environment tag value
+validate_environment_tag = func(tags) {
+    if tags == null or "Environment" not in keys(tags) {
+        return false
+    }
+    
+    env_value = strings.to_lower(tags["Environment"])
+    return env_value in valid_environments
+}
+
+# Validate Owner tag format (should be email)
+validate_owner_tag = func(tags) {
+    if tags == null or "Owner" not in keys(tags) {
+        return false
+    }
+    
+    owner = tags["Owner"]
+    # Simple email validation: contains @ and .
+    return strings.contains(owner, "@") and strings.contains(owner, ".")
+}
+
+# Get missing tags for a resource
+get_missing_tags = func(tags) {
+    missing = []
+    
+    if tags == null {
+        return required_tags
+    }
+    
+    for required_tags as tag {
+        if tag not in keys(tags) or tags[tag] == "" or tags[tag] == null {
+            missing = missing + [tag]
+        }
+    }
+    
+    return missing
+}
+
+# Main validation
+resources = find_taggable_resources()
+violations = []
+
+# Check each resource
+for resources as address, resource {
+    tags = resource.change.after.tags else null
+    
+    # Check required tags
+    if not has_required_tags(tags) {
+        missing = get_missing_tags(tags)
+        violations = violations + [{
+            "address": address,
+            "type": resource.type,
+            "issue": "Missing required tags: " + strings.join(missing, ", "),
+        }]
+    } else {
+        # Validate Environment tag value
+        if not validate_environment_tag(tags) {
+            violations = violations + [{
+                "address": address,
+                "type": resource.type,
+                "issue": "Invalid Environment tag. Must be one of: " + strings.join(valid_environments, ", "),
+            }]
+        }
+        
+        # Validate Owner tag format
+        if not validate_owner_tag(tags) {
+            violations = violations + [{
+                "address": address,
+                "type": resource.type,
+                "issue": "Invalid Owner tag. Must be a valid email address",
+            }]
+        }
+    }
+}
+
+# Print violations
+if length(violations) > 0 {
+    print("\n=== Tagging Policy Violations ===")
+    for violations as violation {
+        print("Resource:", violation.address)
+        print("  Type:", violation.type)
+        print("  Issue:", violation.issue)
+        print("")
+    }
+    print("Required tags:", strings.join(required_tags, ", "))
+    print("Valid environments:", strings.join(valid_environments, ", "))
+    print("Owner format: email@example.com")
+    print("================================\n")
+}
+
+# Main rule: No violations allowed
+main = rule {
+    length(violations) == 0
+}
+
+# Violation message
+violation_message = "One or more resources are missing required tags or have invalid tag values. " +
+                   "All resources must have: " + strings.join(required_tags, ", ") + ". " +
+                   "Environment must be one of: " + strings.join(valid_environments, ", ") + ". " +
+                   "Owner must be a valid email address."
+

@@ -6,14 +6,14 @@ This comprehensive assessment evaluates your mastery of **Terraform module devel
 
 **Assessment Details:**
 - **Duration**: 90 minutes
-- **Total Points**: 100 points
-- **Passing Score**: 80 points
+- **Total Points**: 112 points
+- **Passing Score**: 90 points (80%)
 - **Question Types**: Multiple choice, scenario-based, hands-on exercises
 - **Difficulty**: Intermediate to Advanced
 
 ---
 
-## 📚 **Section 1: Multiple Choice Questions (25 points)**
+## 📚 **Section 1: Multiple Choice Questions (37 points)**
 
 ### **Question 1** (3 points)
 What is the recommended file structure for a Terraform module?
@@ -110,6 +110,48 @@ D) `module_version = "1.0.0"`
 **Answer**: C) `source = "terraform-aws-modules/vpc/aws" version = "1.0.0"`
 
 **Explanation**: The version is specified as a separate argument alongside the source when using registry modules.
+
+---
+
+### **Question 8** (4 points)
+What is the required naming convention for modules published to the HCP Terraform Private Module Registry?
+
+A) `module-<PROVIDER>-<NAME>`
+B) `terraform-<PROVIDER>-<NAME>`
+C) `<NAME>-terraform-<PROVIDER>`
+D) Any naming convention is acceptable
+
+**Answer**: B) `terraform-<PROVIDER>-<NAME>`
+
+**Explanation**: HCP Terraform requires modules to follow the naming convention `terraform-<PROVIDER>-<NAME>` (e.g., `terraform-aws-vpc`) for automatic detection and publishing to the private registry.
+
+---
+
+### **Question 9** (4 points)
+Which authentication method is recommended for consuming modules from the HCP Terraform Private Module Registry in CI/CD pipelines?
+
+A) Username and password
+B) SSH keys
+C) Environment variable with API token (`TF_TOKEN_app_terraform_io`)
+D) OAuth tokens
+
+**Answer**: C) Environment variable with API token (`TF_TOKEN_app_terraform_io`)
+
+**Explanation**: For CI/CD pipelines, using an environment variable with an API token is the most secure and automated method. The token can be stored in the CI/CD system's secret management.
+
+---
+
+### **Question 10** (4 points)
+What is the recommended version constraint operator for consuming modules from a private registry in production?
+
+A) `version = "1.0.0"` (exact version)
+B) `version = "~> 1.0"` (pessimistic constraint)
+C) `version = ">= 1.0.0"` (minimum version)
+D) No version constraint (always use latest)
+
+**Answer**: B) `version = "~> 1.0"` (pessimistic constraint)
+
+**Explanation**: The pessimistic constraint operator `~>` allows patch and minor version updates while preventing breaking changes from major version updates. For example, `~> 1.0` allows versions >= 1.0.0 and < 2.0.0, providing a balance between stability and receiving bug fixes.
 
 ---
 
@@ -667,16 +709,16 @@ Design and implement an enterprise module registry with versioning, metadata man
 
 ## 📊 **Enhanced Assessment Summary**
 
-### **Total Points**: 140 points
-- **Core Module Development (1-8)**: 100 points
+### **Total Points**: 152 points
+- **Core Module Development (1-10)**: 112 points
 - **Advanced 2025 Patterns (9-12)**: 40 points
 
 ### **Grading Scale**:
-- **Expert (126-140 points)**: Mastery of all patterns including cutting-edge features
-- **Advanced (112-125 points)**: Strong understanding with minor gaps in advanced features
-- **Intermediate (98-111 points)**: Good grasp of core concepts, needs practice with modern features
-- **Beginner (84-97 points)**: Basic understanding, requires additional study
-- **Needs Review (<84 points)**: Fundamental concepts need reinforcement
+- **Expert (137-152 points)**: Mastery of all patterns including cutting-edge features and Private Module Registry
+- **Advanced (122-136 points)**: Strong understanding with minor gaps in advanced features
+- **Intermediate (107-121 points)**: Good grasp of core concepts, needs practice with modern features
+- **Beginner (91-106 points)**: Basic understanding, requires additional study
+- **Needs Review (<91 points)**: Fundamental concepts need reinforcement
 
 ### **2025 Skills Validation**:
 - ✅ **Core Module Development**: Structure, variables, outputs, versioning mastery
@@ -684,6 +726,7 @@ Design and implement an enterprise module registry with versioning, metadata man
 - ✅ **Dynamic Configuration**: Function-based and environment-specific behavior
 - ✅ **Testing Excellence**: Comprehensive testing frameworks and automation
 - ✅ **Registry Management**: Enterprise module distribution and governance
+- ✅ **Private Module Registry**: HCP Terraform registry publishing and consumption
 - ✅ **Security Integration**: Security scanning and compliance validation
 - ✅ **Performance Optimization**: Module performance and scalability patterns
 - ✅ **Modern Features**: Latest Terraform 1.13 and AWS provider capabilities
@@ -693,18 +736,19 @@ Design and implement an enterprise module registry with versioning, metadata man
 2. **Composition Excellence** - Advanced module composition and orchestration
 3. **Testing Proficiency** - Comprehensive testing strategies and automation
 4. **Registry Management** - Enterprise module distribution and governance
-5. **Security Integration** - Security scanning and compliance frameworks
-6. **Performance Optimization** - Module performance and scalability
-7. **Version Management** - Semantic versioning and lifecycle management
-8. **🆕 Meta-Module Patterns** - Complex application stack orchestration
-9. **🆕 Dynamic Configuration** - Function-based environment adaptation
-10. **🆕 Enterprise Registry** - Advanced module distribution and governance
+5. **Private Module Registry** - HCP Terraform registry publishing, versioning, and consumption
+6. **Security Integration** - Security scanning and compliance frameworks
+7. **Performance Optimization** - Module performance and scalability
+8. **Version Management** - Semantic versioning and lifecycle management
+9. **🆕 Meta-Module Patterns** - Complex application stack orchestration
+10. **🆕 Dynamic Configuration** - Function-based environment adaptation
+11. **🆕 Enterprise Registry** - Advanced module distribution and governance
 
 ---
 
-**Assessment Version**: 3.0
-**Last Updated**: September 2025
+**Assessment Version**: 4.0
+**Last Updated**: October 2025
 **Terraform Version**: ~> 1.13.0
 **AWS Provider Version**: ~> 6.12.0
 **Estimated Completion Time**: 120 minutes
-**🆕 2025 Features**: Meta-Modules, Dynamic Configuration, Advanced Testing, Enterprise Registry
+**🆕 2025 Features**: Meta-Modules, Dynamic Configuration, Advanced Testing, Enterprise Registry, Private Module Registry

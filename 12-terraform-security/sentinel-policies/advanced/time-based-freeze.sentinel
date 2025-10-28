@@ -1,0 +1,264 @@
+# time-based-freeze.sentinel
+# Time-based change freeze policy
+# Blocks infrastructure changes during defined freeze periods
+# Typically used for holiday freezes, year-end freezes, or maintenance windows
+
+import "tfplan/v2" as tfplan
+import "time"
+import "strings"
+
+# Define change freeze periods (format: "YYYY-MM-DD")
+# Add your organization's freeze periods here
+freeze_periods = [
+    {
+        "start": "2025-11-20",
+        "end":   "2025-12-05",
+        "reason": "Thanksgiving holiday freeze period",
+        "severity": "hard",  # hard = block all changes, soft = warn only
+    },
+    {
+        "start": "2025-12-20",
+        "end":   "2026-01-05",
+        "reason": "Year-end holiday freeze period",
+        "severity": "hard",
+    },
+    {
+        "start": "2025-06-15",
+        "end":   "2025-06-20",
+        "reason": "Mid-year audit period",
+        "severity": "soft",
+    },
+]
+
+# Business hours enforcement (optional)
+# Format: 24-hour time, e.g., "09:00" to "17:00"
+business_hours = {
+    "enabled": false,  # Set to true to enforce business hours
+    "start": "09:00",
+    "end": "17:00",
+    "timezone": "America/New_York",
+    "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+}
+
+# Parse date string to time
+parse_date = func(date_str) {
+    return time.load(date_str + "T00:00:00Z")
+}
+
+# Check if current time is within freeze period
+check_freeze_periods = func() {
+    current_time = time.now
+    active_freezes = []
+    
+    for freeze_periods as period {
+        start_time = parse_date(period.start)
+        end_time = parse_date(period.end)
+        
+        # Add one day to end time to include the entire end date
+        end_time_adjusted = time.add(end_time, time.hour * 24)
+        
+        if time.after(current_time, start_time) and time.before(current_time, end_time_adjusted) {
+            append(active_freezes, period)
+        }
+    }
+    
+    return active_freezes
+}
+
+# Check if current time is within business hours
+check_business_hours = func() {
+    if not business_hours.enabled {
+        return {
+            "compliant": true,
+            "message": "Business hours enforcement disabled",
+        }
+    }
+    
+    current_time = time.now
+    day_of_week = time.weekday(current_time)
+    
+    # Convert day number to name
+    day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    current_day = day_names[day_of_week]
+    
+    # Check if current day is a business day
+    is_business_day = false
+    for business_hours.days as day {
+        if day == current_day {
+            is_business_day = true
+        }
+    }
+    
+    if not is_business_day {
+        return {
+            "compliant": false,
+            "message": "Changes not allowed on " + current_day + " (non-business day)",
+        }
+    }
+    
+    # For simplicity, we'll just check if it's a business day
+    # Full time-of-day checking would require parsing the time strings
+    # and comparing with current time in the specified timezone
+    
+    return {
+        "compliant": true,
+        "message": "Within business hours",
+    }
+}
+
+# Get environment from workspace name
+get_environment = func() {
+    workspace_name = strings.to_lower(tfplan.workspace.name)
+    if strings.has_prefix(workspace_name, "prod") {
+        return "production"
+    } else if strings.has_prefix(workspace_name, "stg") or strings.has_prefix(workspace_name, "staging") {
+        return "staging"
+    }
+    return "development"
+}
+
+# Check if this is a production or staging workspace
+is_production_or_staging = func() {
+    env = get_environment()
+    return env == "production" or env == "staging"
+}
+
+# Count resources being changed
+count_changes = func() {
+    create_count = 0
+    update_count = 0
+    delete_count = 0
+    
+    for tfplan.resource_changes as address, rc {
+        if rc.mode == "managed" {
+            if rc.change.actions contains "create" {
+                create_count += 1
+            }
+            if rc.change.actions contains "update" {
+                update_count += 1
+            }
+            if rc.change.actions contains "delete" {
+                delete_count += 1
+            }
+        }
+    }
+    
+    return {
+        "create": create_count,
+        "update": update_count,
+        "delete": delete_count,
+        "total": create_count + update_count + delete_count,
+    }
+}
+
+# Run checks
+environment = get_environment()
+active_freezes = check_freeze_periods()
+business_hours_check = check_business_hours()
+changes = count_changes()
+
+# Print policy information
+print("=" * 70)
+print("Time-Based Change Freeze Policy")
+print("=" * 70)
+print("Current Time:", time.now)
+print("Environment:", environment)
+print("Workspace:", tfplan.workspace.name)
+print("")
+
+print("Changes Summary:")
+print("  Resources to create:", changes.create)
+print("  Resources to update:", changes.update)
+print("  Resources to delete:", changes.delete)
+print("  Total changes:", changes.total)
+print("")
+
+# Check for active freeze periods
+if length(active_freezes) > 0 {
+    print("⚠️  ACTIVE CHANGE FREEZE PERIODS:")
+    print("")
+    
+    has_hard_freeze = false
+    for active_freezes as freeze {
+        severity_icon = "⚠️ "
+        if freeze.severity == "hard" {
+            severity_icon = "🚫"
+            has_hard_freeze = true
+        }
+        
+        print(severity_icon, "Freeze Period Active")
+        print("  Reason:", freeze.reason)
+        print("  Period:", freeze.start, "to", freeze.end)
+        print("  Severity:", strings.to_upper(freeze.severity))
+        print("")
+    }
+    
+    if has_hard_freeze {
+        print("❌ Changes are BLOCKED during hard freeze periods")
+        print("   Contact your infrastructure team for emergency change approval")
+    } else {
+        print("⚠️  Changes are DISCOURAGED during soft freeze periods")
+        print("   Proceed with caution and ensure proper approval")
+    }
+    print("")
+} else {
+    print("✅ No active freeze periods")
+    print("")
+}
+
+# Check business hours
+if not business_hours_check.compliant {
+    print("⚠️  BUSINESS HOURS VIOLATION:")
+    print("  ", business_hours_check.message)
+    print("   Changes should be made during business hours:")
+    print("   Days:", strings.join(business_hours.days, ", "))
+    print("   Hours:", business_hours.start, "-", business_hours.end, business_hours.timezone)
+    print("")
+}
+
+# Print configured freeze periods
+print("Configured Freeze Periods:")
+for freeze_periods as period {
+    print("  -", period.start, "to", period.end, "(" + period.reason + ")")
+}
+print("")
+
+print("=" * 70)
+
+# Main rule: block changes during hard freeze periods in production/staging
+main = rule when is_production_or_staging() {
+    # Check for hard freeze periods
+    has_hard_freeze = false
+    for active_freezes as freeze {
+        if freeze.severity == "hard" {
+            has_hard_freeze = true
+        }
+    }
+    
+    not has_hard_freeze
+}
+
+# Advisory rule for development environments
+dev_advisory = rule when not is_production_or_staging() {
+    if length(active_freezes) > 0 {
+        print("ℹ️  Freeze period check skipped for development environment")
+    }
+    true
+}
+
+# Soft freeze warning (doesn't block, just warns)
+soft_freeze_warning = rule {
+    has_soft_freeze = false
+    for active_freezes as freeze {
+        if freeze.severity == "soft" {
+            has_soft_freeze = true
+        }
+    }
+    
+    if has_soft_freeze {
+        print("⚠️  WARNING: Soft freeze period active - changes discouraged but not blocked")
+    }
+    
+    true  # Always pass, just a warning
+}
+
